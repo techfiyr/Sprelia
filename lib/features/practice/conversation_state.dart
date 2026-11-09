@@ -10,8 +10,8 @@ class TranscriptLine {
 
   TranscriptLine append(String delta) => TranscriptLine(speaker, text + delta);
 
-  Map<String, dynamic> toJson() => {
-        'speaker': speaker == Speaker.learner ? 'user' : 'tutor',
+  Map<String, Object?> toJson() => {
+        'speaker': speaker == Speaker.learner ? 'learner' : 'tutor',
         'text': text.trim(),
       };
 }

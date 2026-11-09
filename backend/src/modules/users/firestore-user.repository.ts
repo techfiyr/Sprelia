@@ -139,12 +139,21 @@ export class FirestoreUserRepository implements UserRepository {
 
   async exportUserData(uid: string): Promise<UserDataExport | null> {
     const ref = this.userRef(uid);
-    const [snap, prefs, usage, progress] = await Promise.all([
+    const [snap, prefs, usage, progress, conversations, mistakes, vocabulary] = await Promise.all([
       ref.get(),
       this.getPreferences(uid),
       ref.collection('usage').get(),
       ref.collection('dailyProgress').get(),
+      ref.collection('conversations').get(),
+      ref.collection('mistakes').get(),
+      ref.collection('vocabulary').get(),
     ]);
+    const plain = (d: DocumentData) =>
+      Object.fromEntries(
+        Object.entries(d)
+          .filter(([k]) => k !== 'schemaVersion')
+          .map(([k, v]) => [k, v instanceof Timestamp ? v.toDate().toISOString() : v]),
+      );
     if (!snap.exists) return null;
     return {
       profile: toProfile(uid, snap.data()!),
@@ -155,6 +164,9 @@ export class FirestoreUserRepository implements UserRepository {
         speakingSeconds: nonNegative(d.get('speakingSeconds')),
         sessionsCompleted: nonNegative(d.get('sessionsCompleted')),
       })),
+      conversations: conversations.docs.map((d) => ({ id: d.id, ...plain(d.data()) })),
+      mistakes: mistakes.docs.map((d) => ({ id: d.id, ...plain(d.data()) })),
+      vocabulary: vocabulary.docs.map((d) => ({ id: d.id, ...plain(d.data()) })),
     };
   }
 

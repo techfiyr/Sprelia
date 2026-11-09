@@ -633,4 +633,70 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get conversationTryAgainTomorrow => 'Come back tomorrow for more free practice.';
+
+  @override
+  String get learnTitle => 'Learn';
+
+  @override
+  String get learnMistakeVault => 'Mistake Vault';
+
+  @override
+  String get learnMistakesEmpty => 'Great! No saved corrections yet. Your feedback will appear here after practice.';
+
+  @override
+  String get learnVocabulary => 'Vocabulary';
+
+  @override
+  String get learnVocabularyEmpty => 'You haven\'t saved any vocabulary yet. Start a conversation to discover useful new words.';
+
+  @override
+  String get learnMastered => 'Mastered';
+
+  @override
+  String get learnLearned => 'Learned';
+
+  @override
+  String get progressTitle => 'Progress';
+
+  @override
+  String get progressEmptyTitle => 'No progress yet';
+
+  @override
+  String get progressEmptyMessage => 'Your progress will appear here after your first conversations.';
+
+  @override
+  String progressMinutes30(int minutes) {
+    return '${minutes} min spoken in the last 30 days';
+  }
+
+  @override
+  String progressSessions30(int count) {
+    return '${count} sessions in the last 30 days';
+  }
+
+  @override
+  String get progressLast7Days => 'Last 7 days';
+
+  @override
+  String progressDayMinutes(String day, int minutes) {
+    return '${day}: ${minutes} min';
+  }
+
+  @override
+  String progressMistakes(int open, int mastered) {
+    return 'Corrections to review: ${open} · mastered: ${mastered}';
+  }
+
+  @override
+  String progressVocabulary(int total, int learned) {
+    return 'Words saved: ${total} · learned: ${learned}';
+  }
+
+  @override
+  String get progressRecentSessions => 'Recent sessions';
+
+  @override
+  String progressSessionMinutes(int minutes) {
+    return '${minutes} min';
+  }
 }

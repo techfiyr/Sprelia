@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:speakdaily/core/auth/auth_repository.dart';
 import 'package:speakdaily/core/errors/app_failure.dart';
 import 'package:speakdaily/features/account/account_repository.dart';
+import 'package:speakdaily/features/feedback/session_feedback.dart';
+import 'package:speakdaily/features/learn/data/learning_repository.dart';
 import 'package:speakdaily/features/practice/data/catalog_repository.dart';
 import 'package:speakdaily/features/practice/data/practice_models.dart';
 import 'package:speakdaily/features/profile/data/profile_models.dart';
@@ -334,3 +336,74 @@ class FakeCatalogRepository implements CatalogRepository {
 }
 
 const networkFailure = NetworkFailure();
+
+/// In-memory learning data (Phase 8).
+class FakeLearningRepository implements LearningRepository {
+  /// Successive feedback responses for any conversation (the last one repeats).
+  List<FeedbackResult> feedbackSequence = [
+    const FeedbackCompleted(SessionFeedback(
+      summary: 'You checked in for your flight.',
+      strengths: ['Clear requests'],
+      corrections: [Correction(original: 'I go yesterday', improved: 'I went yesterday', explanation: 'Use the past tense.', category: 'grammar')],
+      vocabulary: [VocabularyItem(term: 'boarding pass', meaning: 'Your ticket to board.', example: 'Here is my boarding pass.')],
+      fluencyObservations: [],
+      recommendedPractice: ['Try hotel check-in next.'],
+    )),
+  ];
+  int feedbackCalls = 0;
+  List<MistakeEntry> mistakes = [
+    const MistakeEntry(id: 'm1', original: 'I go yesterday', improved: 'I went yesterday', explanation: 'Past tense.', category: 'grammar', mastered: false),
+  ];
+  List<VocabularyEntry> vocabulary = [
+    const VocabularyEntry(id: 'boarding-pass', term: 'boarding pass', meaning: 'Your ticket to board.', example: 'Here is my boarding pass.', learned: false),
+  ];
+  Progress progress = Progress(
+    days: [for (var i = 30; i >= 1; i--) ProgressDay('2026-10-${(i).toString().padLeft(2, '0')}', i == 1 ? 300 : 0, i == 1 ? 1 : 0)],
+    totalSpeakingSeconds: 300,
+    totalSessions: 1,
+    streakDays: 1,
+    mistakesOpen: 1,
+    mistakesMastered: 0,
+    vocabularyTotal: 1,
+    vocabularyLearned: 0,
+    recentSessions: [RecentSession(id: 's1', tutorId: 'emma', startedAt: DateTime.utc(2026, 10, 30, 9), billedSeconds: 300)],
+  );
+  final masteredCalls = <(String, bool)>[];
+  final learnedCalls = <(String, bool)>[];
+
+  @override
+  Future<FeedbackResult> getFeedback(String conversationId) async {
+    final i = feedbackCalls < feedbackSequence.length ? feedbackCalls : feedbackSequence.length - 1;
+    feedbackCalls++;
+    return feedbackSequence[i];
+  }
+
+  @override
+  Future<List<MistakeEntry>> listMistakes() async => mistakes;
+
+  @override
+  Future<void> setMistakeMastered(String id, bool mastered) async {
+    masteredCalls.add((id, mastered));
+    mistakes = [
+      for (final m in mistakes)
+        m.id == id
+            ? MistakeEntry(id: m.id, original: m.original, improved: m.improved, explanation: m.explanation, category: m.category, mastered: mastered)
+            : m,
+    ];
+  }
+
+  @override
+  Future<List<VocabularyEntry>> listVocabulary() async => vocabulary;
+
+  @override
+  Future<void> setVocabularyLearned(String id, bool learned) async {
+    learnedCalls.add((id, learned));
+    vocabulary = [
+      for (final v in vocabulary)
+        v.id == id ? VocabularyEntry(id: v.id, term: v.term, meaning: v.meaning, example: v.example, learned: learned) : v,
+    ];
+  }
+
+  @override
+  Future<Progress> getProgress() async => progress;
+}

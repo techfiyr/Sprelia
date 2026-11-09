@@ -177,6 +177,9 @@ export const profileRoutes: FastifyPluginAsync<ProfileRoutesOptions> = async (ap
       profile: serializeProfile(data.profile, data.preferences),
       usage: data.usage,
       dailyProgress: data.dailyProgress,
+      conversations: data.conversations,
+      mistakes: data.mistakes,
+      vocabulary: data.vocabulary,
     };
   });
 

@@ -8,6 +8,7 @@ import '../../core/errors/error_reporter.dart';
 import '../../core/services/realtime/audio_io.dart';
 import '../../core/services/realtime/gemini_live_provider.dart';
 import '../../core/services/realtime/realtime_provider.dart';
+import '../learn/data/learning_repository.dart';
 import '../profile/data/profile_repository.dart';
 import 'conversation_state.dart';
 import 'data/conversation_repository.dart';
@@ -180,12 +181,13 @@ class ConversationController extends Notifier<ConversationState> {
     final id = state.conversationId;
     if (id != null) {
       try {
-        await _repo.end(id, reason);
+        await _repo.end(id, reason, transcript: [for (final l in state.transcript) l.toJson()]);
       } catch (_) {
         // The backend reconciles an unended session at its reservation on the next start.
       }
-      // Today's remaining time changed.
+      // Today's remaining time and progress changed.
       ref.invalidate(dashboardProvider);
+      ref.invalidate(progressProvider);
     }
     if (_disposed) return;
     state = failedMessage == null

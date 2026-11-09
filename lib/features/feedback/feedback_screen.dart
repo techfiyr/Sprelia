@@ -6,37 +6,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/errors/app_failure.dart';
 import '../../core/routing/app_routes.dart';
-import '../../core/services/api_client.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/widgets.dart';
 import '../../l10n/l10n.dart';
+import '../learn/data/learning_repository.dart';
 import 'session_feedback.dart';
-
-/// Polls the backend until post-session analysis is ready.
-final feedbackProvider =
-    FutureProvider.autoDispose.family<SessionFeedback?, String>((ref, conversationId) async {
-  final api = ref.read(apiClientProvider);
-  for (var attempt = 0; attempt < 20; attempt++) {
-    final res = await api.get<Map<String, dynamic>>('/v1/conversations/$conversationId/feedback');
-    final data = res.data!;
-    switch (data['status']) {
-      case 'completed':
-        return SessionFeedback.fromJson(data['feedback'] as Map<String, dynamic>);
-      case 'insufficient_speech':
-        return null;
-      case 'failed':
-        throw ServerFailure(
-          statusCode: 200,
-          code: 'FEEDBACK_FAILED',
-          message: data['message'] is String
-              ? data['message'] as String
-              : 'We could not generate feedback for this session.',
-        );
-    }
-    await Future<void>.delayed(const Duration(seconds: 2));
-  }
-  throw TimeoutException('Feedback is taking longer than expected');
-});
 
 class FeedbackScreen extends ConsumerWidget {
   const FeedbackScreen({super.key, required this.conversationId});
@@ -62,17 +36,22 @@ class FeedbackScreen extends ConsumerWidget {
               : AppFailure.from(e),
           onRetry: () => ref.invalidate(feedbackProvider(conversationId)),
         ),
-        data: (fb) => fb == null
-            ? const Center(
-                child: Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Text(
-                    'That conversation was too short for feedback. Try speaking a little longer next time!',
-                    textAlign: TextAlign.center,
-                  ),
+        data: (result) => switch (result) {
+          FeedbackCompleted(:final feedback) => _FeedbackBody(feedback: feedback),
+          FeedbackFailed(:final message) => AppErrorState(
+              failure: ServerFailure(statusCode: 0, message: message),
+              onRetry: () => ref.invalidate(feedbackProvider(conversationId)),
+            ),
+          FeedbackInsufficientSpeech() || FeedbackPending() => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Text(
+                  'That conversation was too short for feedback. Try speaking a little longer next time!',
+                  textAlign: TextAlign.center,
                 ),
-              )
-            : _FeedbackBody(feedback: fb),
+              ),
+            ),
+        },
       ),
     );
   }

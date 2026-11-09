@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { GEMINI_LIVE_WS_URL, GeminiProvider } from '../../src/modules/conversations/gemini-provider.js';
 import { buildSystemPrompt, PERSONAS } from '../../src/modules/conversations/personas.js';
+import { createAnalyzer } from '../../src/modules/feedback/analysis.js';
 
 /**
  * Live Gemini check (costs nothing beyond a token and a session setup; no audio is sent):
@@ -54,6 +55,20 @@ describe.skipIf(!key)('Gemini Live (live API)', () => {
       };
     });
     expect(outcome).toBe('setupComplete');
+  });
+});
+
+describe.skipIf(!key)('Gemini analysis (live API)', () => {
+  it('returns schema-valid feedback whose corrections quote the learner', async () => {
+    const analyzer = createAnalyzer({ geminiApiKey: key, geminiAnalysisModel: process.env.GEMINI_ANALYSIS_MODEL ?? 'gemini-3.8-flash' });
+    const transcript = [
+      { speaker: 'tutor' as const, text: 'Where did you go last weekend?' },
+      { speaker: 'learner' as const, text: 'Last weekend I go to the beach with my friends and we swim a lot, it was very fun.' },
+    ];
+    const feedback = await analyzer.analyze({ transcript, level: 'A2', scenarioTitle: null });
+    expect(feedback.summary.length).toBeGreaterThan(0);
+    const learner = transcript[1]!.text.toLowerCase();
+    for (const c of feedback.corrections) expect(learner).toContain(c.original.toLowerCase().replace(/[^a-z ,]/g, '').trim().split(' ')[0]);
   });
 });
 

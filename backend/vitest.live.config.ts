@@ -9,7 +9,7 @@ export default defineConfig({
   test: {
     include: ['test/live/**/*.live.ts'],
     environment: 'node',
-    testTimeout: 60_000,
+    testTimeout: 90_000,
     fileParallelism: false,
   },
 });

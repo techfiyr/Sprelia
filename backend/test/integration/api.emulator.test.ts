@@ -9,6 +9,8 @@ import { loadConfig } from '../../src/config/env.js';
 import { FirebaseIdentityAdmin } from '../../src/modules/account/identity-admin.js';
 import type { AIProvider } from '../../src/modules/conversations/ai-provider.js';
 import { FirestoreConversationRepository } from '../../src/modules/conversations/firestore-conversation.repository.js';
+import { sanitizeFeedback, type ConversationAnalyzer } from '../../src/modules/feedback/analysis.js';
+import { FirestoreFeedbackRepository } from '../../src/modules/feedback/firestore-feedback.repository.js';
 import { FirebaseTokenVerifier } from '../../src/modules/auth/firebase-token-verifier.js';
 import { FirestoreUserRepository } from '../../src/modules/users/firestore-user.repository.js';
 import { assertEmulatorOnly, EMULATOR_PROJECT_ID } from './emulator-guard.js';
@@ -122,6 +124,26 @@ describe('API on the Firebase Emulator Suite', () => {
           expiresAt: new Date(Date.now() + 600_000),
         }),
       } satisfies AIProvider,
+      feedback: new FirestoreFeedbackRepository(db),
+      // Fake analyzer: deterministic output, still passed through the real sanitizer.
+      analyzer: {
+        available: true,
+        analyze: async (req) =>
+          sanitizeFeedback(
+            {
+              summary: 'Nice check-in.',
+              strengths: ['Polite'],
+              corrections: [
+                { original: 'I go yesterday', improved: 'I went yesterday', explanation: 'Past tense.', category: 'grammar', confidence: 0.9 },
+                { original: 'never said this', improved: 'x', explanation: 'invented', category: 'grammar', confidence: 0.99 },
+              ],
+              vocabulary: [{ term: 'Boarding pass', meaning: 'Ticket to board.', example: 'My boarding pass, please.' }],
+              fluency_observations: [],
+              recommended_practice: [],
+            },
+            req.transcript,
+          ),
+      } satisfies ConversationAnalyzer,
     };
     app = await buildApp(deps);
     await app.ready();
@@ -371,6 +393,47 @@ describe('API on the Firebase Emulator Suite', () => {
       const { conversationId } = (await call('POST', '/api/v1/me/conversations', oli.idToken, { tutorId: 'emma' })).json();
       expect((await call('POST', `/api/v1/me/conversations/${conversationId}/end`, alice.idToken, { reason: 'user_ended' })).statusCode).toBe(404);
       expect((await db.doc(`users/${oli.localId}/conversations/${conversationId}`).get()).get('status')).toBe('active');
+    });
+  });
+
+  describe('Phase 8 feedback, Mistake Vault, vocabulary and progress (Firestore)', () => {
+    it('stores the transcript, analyzes once, writes vault entries, counts them and exports them', async () => {
+      const pia = await verifiedSignUp('pia@example.com');
+      await call('POST', '/api/v1/me/profile', pia.idToken, { timezone: 'UTC' });
+      await call('PUT', '/api/v1/me/onboarding', pia.idToken, {
+        preferences: { interfaceLanguage: 'en', nativeLanguage: 'es', goals: ['travel_social'], level: 'A2', dailyGoalMinutes: 10, accent: 'american' },
+        complete: true,
+      });
+      const { conversationId } = (await call('POST', '/api/v1/me/conversations', pia.idToken, { tutorId: 'sofia', scenarioId: 'airport' })).json();
+      const transcript = [
+        { speaker: 'tutor', text: 'Where did you travel?' },
+        { speaker: 'learner', text: 'I go yesterday to the airport and I checked in my two bags at the desk with my passport ready' },
+      ];
+      expect((await call('POST', `/api/v1/me/conversations/${conversationId}/end`, pia.idToken, { reason: 'user_ended', transcript })).statusCode).toBe(200);
+      expect((await db.doc(`users/${pia.localId}/conversations/${conversationId}/private/transcript`).get()).get('lines')).toEqual(transcript);
+
+      const fb = (await call('GET', `/api/v1/me/conversations/${conversationId}/feedback`, pia.idToken)).json();
+      expect(fb.status).toBe('completed');
+      expect(fb.feedback.corrections).toHaveLength(1);
+      await call('GET', `/api/v1/me/conversations/${conversationId}/feedback`, pia.idToken); // cached
+      expect((await db.collection(`users/${pia.localId}/mistakes`).get()).size).toBe(1);
+      expect((await db.doc(`users/${pia.localId}/vocabulary/boarding-pass`).get()).get('term')).toBe('Boarding pass');
+
+      const [m] = (await call('GET', '/api/v1/me/mistakes', pia.idToken)).json().mistakes;
+      await call('PATCH', `/api/v1/me/mistakes/${m.id}`, pia.idToken, { mastered: true });
+      const progress = (await call('GET', '/api/v1/me/progress', pia.idToken)).json().progress;
+      expect(progress.mistakes).toEqual({ open: 0, mastered: 1 });
+      expect(progress.vocabulary).toEqual({ total: 1, learned: 0 });
+
+      const exp = (await call('GET', '/api/v1/me/export', pia.idToken)).json();
+      expect(exp.mistakes).toHaveLength(1);
+      expect(exp.vocabulary[0]).toMatchObject({ id: 'boarding-pass', term: 'Boarding pass' });
+      expect(exp.conversations[0]).toMatchObject({ id: conversationId, status: 'ended' });
+
+      // Deleting the account removes all learning data too.
+      expect((await call('DELETE', '/api/v1/me', pia.idToken)).statusCode).toBe(204);
+      expect((await db.collection(`users/${pia.localId}/mistakes`).get()).size).toBe(0);
+      expect((await db.doc(`users/${pia.localId}/conversations/${conversationId}/private/transcript`).get()).exists).toBe(false);
     });
   });
 });

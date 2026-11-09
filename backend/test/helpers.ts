@@ -8,6 +8,8 @@ import type { IdentityAdmin } from '../src/modules/account/identity-admin.js';
 import type { AppCheckVerifier } from '../src/modules/app-check/app-check.js';
 import type { AIProvider } from '../src/modules/conversations/ai-provider.js';
 import type { ConversationRepository } from '../src/modules/conversations/conversation.repository.js';
+import type { ConversationAnalyzer } from '../src/modules/feedback/analysis.js';
+import type { FeedbackRepository } from '../src/modules/feedback/feedback.repository.js';
 import type { AuthenticatedUser, TokenVerifier } from '../src/modules/auth/token-verifier.js';
 import { InMemoryUserRepository } from '../src/modules/users/memory-user.repository.js';
 import type { UserRepository } from '../src/modules/users/user.repository.js';
@@ -74,6 +76,8 @@ export async function makeApp(
     conversations?: ConversationRepository;
     ai?: AIProvider;
     isPremium?: (uid: string) => Promise<boolean>;
+    feedback?: FeedbackRepository;
+    analyzer?: ConversationAnalyzer;
   } = {},
 ) {
   const config = opts.config ?? testConfig();
@@ -91,6 +95,8 @@ export async function makeApp(
     conversations: opts.conversations,
     ai: opts.ai,
     isPremium: opts.isPremium,
+    feedback: opts.feedback,
+    analyzer: opts.analyzer,
   });
   opts.register?.(app);
   await app.ready();

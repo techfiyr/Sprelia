@@ -11,6 +11,9 @@ import type { TokenVerifier } from './modules/auth/token-verifier.js';
 import { UnavailableAIProvider, type AIProvider } from './modules/conversations/ai-provider.js';
 import type { ConversationRepository } from './modules/conversations/conversation.repository.js';
 import { conversationRoutes } from './modules/conversations/conversation.routes.js';
+import { UnavailableAnalyzer, type ConversationAnalyzer } from './modules/feedback/analysis.js';
+import type { FeedbackRepository } from './modules/feedback/feedback.repository.js';
+import { feedbackRoutes } from './modules/feedback/feedback.routes.js';
 import { catalogRoutes } from './modules/catalog/catalog.routes.js';
 import { CatalogService } from './modules/catalog/catalog.service.js';
 import { healthRoutes } from './modules/health/health.routes.js';
@@ -41,6 +44,10 @@ export interface AppDependencies {
   ai?: AIProvider;
   /** Server-verified Premium entitlement (Phase 9); defaults to free for everyone. */
   isPremium?: (uid: string) => Promise<boolean>;
+  /** Learning data (feedback, Mistake Vault, vocabulary); enables Phase 8 routes with `conversations`. */
+  feedback?: FeedbackRepository;
+  /** Post-session analysis; defaults to unavailable (feedback status `failed`). */
+  analyzer?: ConversationAnalyzer;
 }
 
 /**
@@ -59,6 +66,8 @@ export async function buildApp({
   conversations,
   ai = new UnavailableAIProvider(),
   isPremium = async () => false,
+  feedback,
+  analyzer = new UnavailableAnalyzer(),
 }: AppDependencies): Promise<FastifyInstance> {
   const app = Fastify({
     loggerInstance: logger,
@@ -118,7 +127,20 @@ export async function buildApp({
             minSessionSeconds: config.minSessionSeconds,
             requireEmailVerification: config.requireEmailVerification,
             isPremium,
+            feedback,
           });
+          if (feedback) {
+            await secured.register(feedbackRoutes, {
+              verifier,
+              users,
+              conversations,
+              feedback,
+              analyzer,
+              catalog,
+              now,
+              requireEmailVerification: config.requireEmailVerification,
+            });
+          }
         }
         if (identity) {
           await secured.register(accountRoutes, {

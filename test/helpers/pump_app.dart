@@ -11,6 +11,7 @@ import 'package:speakdaily/core/session/session_controller.dart';
 import 'package:speakdaily/core/storage/local_storage.dart';
 import 'package:speakdaily/core/theme/app_theme.dart';
 import 'package:speakdaily/features/account/account_repository.dart';
+import 'package:speakdaily/features/learn/data/learning_repository.dart';
 import 'package:speakdaily/features/practice/data/catalog_repository.dart';
 import 'package:speakdaily/features/profile/data/profile_repository.dart';
 import 'package:speakdaily/l10n/app_localizations.dart';
@@ -59,6 +60,7 @@ class TestBackend {
   final FakeProfileRepository profiles;
   final catalog = FakeCatalogRepository();
   final account = FakeAccountRepository();
+  final learning = FakeLearningRepository();
   final reporter = RecordingErrorReporter();
 }
 
@@ -86,6 +88,8 @@ Future<void> pumpSpreliaApp(
         profileRepositoryProvider.overrideWithValue(backend.profiles),
         catalogRepositoryProvider.overrideWithValue(backend.catalog),
         accountRepositoryProvider.overrideWithValue(backend.account),
+        learningRepositoryProvider.overrideWithValue(backend.learning),
+        feedbackPollIntervalProvider.overrideWithValue(Duration.zero),
         deviceTimeZoneProvider.overrideWithValue(() async => 'Asia/Dhaka'),
       ],
       retry: (_, _) => null,

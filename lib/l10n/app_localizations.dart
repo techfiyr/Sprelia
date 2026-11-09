@@ -1155,6 +1155,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Come back tomorrow for more free practice.'**
   String get conversationTryAgainTomorrow;
+
+  /// No description provided for @learnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn'**
+  String get learnTitle;
+
+  /// No description provided for @learnMistakeVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Mistake Vault'**
+  String get learnMistakeVault;
+
+  /// No description provided for @learnMistakesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Great! No saved corrections yet. Your feedback will appear here after practice.'**
+  String get learnMistakesEmpty;
+
+  /// No description provided for @learnVocabulary.
+  ///
+  /// In en, this message translates to:
+  /// **'Vocabulary'**
+  String get learnVocabulary;
+
+  /// No description provided for @learnVocabularyEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t saved any vocabulary yet. Start a conversation to discover useful new words.'**
+  String get learnVocabularyEmpty;
+
+  /// No description provided for @learnMastered.
+  ///
+  /// In en, this message translates to:
+  /// **'Mastered'**
+  String get learnMastered;
+
+  /// No description provided for @learnLearned.
+  ///
+  /// In en, this message translates to:
+  /// **'Learned'**
+  String get learnLearned;
+
+  /// No description provided for @progressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress'**
+  String get progressTitle;
+
+  /// No description provided for @progressEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No progress yet'**
+  String get progressEmptyTitle;
+
+  /// No description provided for @progressEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your progress will appear here after your first conversations.'**
+  String get progressEmptyMessage;
+
+  /// No description provided for @progressMinutes30.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min spoken in the last 30 days'**
+  String progressMinutes30(int minutes);
+
+  /// No description provided for @progressSessions30.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} sessions in the last 30 days'**
+  String progressSessions30(int count);
+
+  /// No description provided for @progressLast7Days.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 days'**
+  String get progressLast7Days;
+
+  /// No description provided for @progressDayMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: {minutes} min'**
+  String progressDayMinutes(String day, int minutes);
+
+  /// No description provided for @progressMistakes.
+  ///
+  /// In en, this message translates to:
+  /// **'Corrections to review: {open} · mastered: {mastered}'**
+  String progressMistakes(int open, int mastered);
+
+  /// No description provided for @progressVocabulary.
+  ///
+  /// In en, this message translates to:
+  /// **'Words saved: {total} · learned: {learned}'**
+  String progressVocabulary(int total, int learned);
+
+  /// No description provided for @progressRecentSessions.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent sessions'**
+  String get progressRecentSessions;
+
+  /// No description provided for @progressSessionMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String progressSessionMinutes(int minutes);
 }
 
 class _AppLocalizationsDelegate

@@ -33,6 +33,10 @@ export interface UserDataExport {
   preferences: Partial<LearningPreferences> | null;
   usage: { date: string; consumedSeconds: number }[];
   dailyProgress: DailyActivity[];
+  /** Learning data (Phase 8): session metadata, Mistake Vault and vocabulary. */
+  conversations: Record<string, unknown>[];
+  mistakes: Record<string, unknown>[];
+  vocabulary: Record<string, unknown>[];
 }
 
 /** Server-maintained activity for one local day: users/{uid}/dailyProgress/{YYYY-MM-DD}. */

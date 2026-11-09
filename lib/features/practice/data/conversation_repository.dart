@@ -38,8 +38,9 @@ enum ConversationEndReason {
 abstract interface class ConversationRepository {
   Future<RealtimeSessionGrant> start({required String tutorId, String? scenarioId});
 
-  /// Ends the session (idempotent on the server). Returns the billed seconds when known.
-  Future<int?> end(String conversationId, ConversationEndReason reason);
+  /// Ends the session (idempotent on the server). [transcript] (`{speaker: learner|tutor, text}`)
+  /// is uploaded for post-session feedback only. Returns the billed seconds when known.
+  Future<int?> end(String conversationId, ConversationEndReason reason, {List<Map<String, Object?>> transcript = const []});
 }
 
 class ApiConversationRepository implements ConversationRepository {
@@ -96,12 +97,21 @@ class ApiConversationRepository implements ConversationRepository {
     return id is String && RegExp(r'^[0-9a-f-]{36}$').hasMatch(id) ? id : null;
   }
 
+  /// Server limits: 400 lines, 2000 characters each.
+  static const _maxLines = 400;
+  static const _maxLineLength = 2000;
+
   @override
-  Future<int?> end(String conversationId, ConversationEndReason reason) async {
+  Future<int?> end(String conversationId, ConversationEndReason reason, {List<Map<String, Object?>> transcript = const []}) async {
+    final lines = [
+      for (final l in transcript.take(_maxLines))
+        if ((l['text'] as String? ?? '').trim().isNotEmpty)
+          {'speaker': l['speaker'], 'text': _clip((l['text']! as String).trim())},
+    ];
     try {
       final res = await _dio.post<Map<String, dynamic>>(
         '/api/v1/me/conversations/${Uri.encodeComponent(conversationId)}/end',
-        data: {'reason': reason.wire},
+        data: {'reason': reason.wire, if (lines.isNotEmpty) 'transcript': lines},
       );
       return (res.data?['conversation'] as Map?)?['billedSeconds'] as int?;
     } catch (e) {
@@ -109,6 +119,8 @@ class ApiConversationRepository implements ConversationRepository {
     }
   }
 }
+
+String _clip(String s) => s.length <= ApiConversationRepository._maxLineLength ? s : s.substring(0, ApiConversationRepository._maxLineLength);
 
 class _SessionActive implements Exception {
   const _SessionActive(this.conversationId);

@@ -7,6 +7,8 @@ import { FirebaseAppCheckVerifier } from './modules/app-check/app-check.js';
 import { FirebaseTokenVerifier } from './modules/auth/firebase-token-verifier.js';
 import { FirestoreConversationRepository } from './modules/conversations/firestore-conversation.repository.js';
 import { createAIProvider } from './modules/conversations/gemini-provider.js';
+import { createAnalyzer } from './modules/feedback/analysis.js';
+import { FirestoreFeedbackRepository } from './modules/feedback/firestore-feedback.repository.js';
 import { FirestoreUserRepository } from './modules/users/firestore-user.repository.js';
 
 /**
@@ -25,6 +27,8 @@ export async function createRuntimeApp(config: AppConfig, logger: FastifyBaseLog
     conversations: new FirestoreConversationRepository(db),
     // Without GEMINI_API_KEY voice is unavailable (503 VOICE_UNAVAILABLE), never a crash.
     ai: createAIProvider(config),
+    feedback: new FirestoreFeedbackRepository(db),
+    analyzer: createAnalyzer(config),
     identity: new FirebaseIdentityAdmin(auth),
     appCheck: config.appCheckMode === 'off' ? undefined : new FirebaseAppCheckVerifier(firebaseAppCheck(firebase)),
   });

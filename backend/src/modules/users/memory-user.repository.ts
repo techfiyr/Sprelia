@@ -117,6 +117,9 @@ export class InMemoryUserRepository implements UserRepository {
       preferences: this.preferences.get(uid) ?? null,
       usage: own(this.usage).map(([k, v]) => ({ date: k.slice(uid.length + 1), consumedSeconds: v })),
       dailyProgress: own(this.activity).map(([, v]) => ({ ...v })),
+      conversations: [],
+      mistakes: [],
+      vocabulary: [],
     };
   }
 }

@@ -81,6 +81,7 @@ class FakeConversations implements ConversationRepository {
   Object? startError;
   final starts = <(String, String?)>[];
   final ends = <(String, ConversationEndReason)>[];
+  final transcripts = <List<Map<String, Object?>>>[];
   @override
   Future<RealtimeSessionGrant> start({required String tutorId, String? scenarioId}) async {
     starts.add((tutorId, scenarioId));
@@ -89,8 +90,9 @@ class FakeConversations implements ConversationRepository {
   }
 
   @override
-  Future<int?> end(String conversationId, ConversationEndReason reason) async {
+  Future<int?> end(String conversationId, ConversationEndReason reason, {List<Map<String, Object?>> transcript = const []}) async {
     ends.add((conversationId, reason));
+    transcripts.add(transcript);
     return 60;
   }
 }
@@ -156,6 +158,10 @@ void main() {
 
     await h.controller.end();
     expect(h.repo.ends.single, (h.repo.grant.conversationId, ConversationEndReason.userEnded));
+    expect(h.repo.transcripts.single, [
+      {'speaker': 'tutor', 'text': 'Hi! Where are you flying today?'},
+      {'speaker': 'learner', 'text': 'To London.'},
+    ]);
     expect(h.state.status, ConversationStatus.ended);
     expect(h.mic.stopped && h.realtime.disconnected, isTrue);
   });

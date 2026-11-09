@@ -329,5 +329,74 @@
   "profileInterfaceLanguage": "App language",
   "profilePolicies": "Privacy Policy and Terms are available on the Sprelia website.",
   "prepareNoTimeLeft": "You've used today's free speaking time. It resets at midnight in your time zone.",
-  "conversationTryAgainTomorrow": "Come back tomorrow for more free practice."
+  "conversationTryAgainTomorrow": "Come back tomorrow for more free practice.",
+  "learnTitle": "Learn",
+  "learnMistakeVault": "Mistake Vault",
+  "learnMistakesEmpty": "Great! No saved corrections yet. Your feedback will appear here after practice.",
+  "learnVocabulary": "Vocabulary",
+  "learnVocabularyEmpty": "You haven't saved any vocabulary yet. Start a conversation to discover useful new words.",
+  "learnMastered": "Mastered",
+  "learnLearned": "Learned",
+  "progressTitle": "Progress",
+  "progressEmptyTitle": "No progress yet",
+  "progressEmptyMessage": "Your progress will appear here after your first conversations.",
+  "progressMinutes30": "{minutes} min spoken in the last 30 days",
+  "@progressMinutes30": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "progressSessions30": "{count} sessions in the last 30 days",
+  "@progressSessions30": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "progressLast7Days": "Last 7 days",
+  "progressDayMinutes": "{day}: {minutes} min",
+  "@progressDayMinutes": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "progressMistakes": "Corrections to review: {open} · mastered: {mastered}",
+  "@progressMistakes": {
+    "placeholders": {
+      "open": {
+        "type": "int"
+      },
+      "mastered": {
+        "type": "int"
+      }
+    }
+  },
+  "progressVocabulary": "Words saved: {total} · learned: {learned}",
+  "@progressVocabulary": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      },
+      "learned": {
+        "type": "int"
+      }
+    }
+  },
+  "progressRecentSessions": "Recent sessions",
+  "progressSessionMinutes": "{minutes} min",
+  "@progressSessionMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  }
 }

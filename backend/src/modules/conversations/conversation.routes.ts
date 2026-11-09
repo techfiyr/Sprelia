@@ -9,6 +9,8 @@ import type { CatalogService } from '../catalog/catalog.service.js';
 import { localDate } from '../users/local-date.js';
 import { contentLevel } from '../users/recommendation.js';
 import type { UserRepository } from '../users/user.repository.js';
+import { Transcript } from '../feedback/analysis.js';
+import type { FeedbackRepository } from '../feedback/feedback.repository.js';
 import type { AIProvider } from './ai-provider.js';
 import {
   ConversationNotFoundError,
@@ -33,6 +35,8 @@ export interface ConversationRoutesOptions {
   requireEmailVerification: boolean;
   /** Server-verified Premium entitlement (Phase 9). Never client-supplied. */
   isPremium: (uid: string) => Promise<boolean>;
+  /** Stores the uploaded transcript for post-session feedback (Phase 8). */
+  feedback?: FeedbackRepository;
 }
 
 const Id = z.string().uuid();
@@ -42,7 +46,13 @@ const StartBody = z
     scenarioId: z.string().regex(/^[a-z][a-z0-9-]{1,60}$/).nullable().optional(),
   })
   .strict();
-const EndBody = z.object({ reason: z.enum(END_REASONS).default('user_ended') }).strict();
+const EndBody = z
+  .object({
+    reason: z.enum(END_REASONS).default('user_ended'),
+    /** Live transcription captured by the app (untrusted data; size-limited; used only for feedback). */
+    transcript: Transcript.optional(),
+  })
+  .strict();
 const ListQuery = z.object({ limit: z.coerce.number().int().min(1).max(50).default(20) }).strict();
 
 const err = (status: number, code: ErrorCode, message: string) => new AppError(status, code, message);
@@ -165,6 +175,10 @@ export const conversationRoutes: FastifyPluginAsync<ConversationRoutesOptions> =
       const { uid } = requireUser(request);
       try {
         const c = await opts.conversations.endSession(uid, request.params.id, request.body.reason, opts.now());
+        const transcript = request.body.transcript;
+        if (opts.feedback && transcript?.length && c.status === 'ended' && !(await opts.feedback.getFeedback(uid, c.id))) {
+          await opts.feedback.saveTranscript(uid, c.id, transcript, opts.now());
+        }
         return { conversation: serialize(c) };
       } catch (e) {
         if (e instanceof ConversationNotFoundError) throw err(404, ErrorCode.CONVERSATION_NOT_FOUND, 'Conversation not found.');
