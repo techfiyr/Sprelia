@@ -4,6 +4,8 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/errors/app_failure.dart';
+import '../../core/errors/error_reporter.dart';
 import '../../core/services/api_client.dart';
 import '../../core/services/realtime/audio_io.dart';
 import '../../core/services/realtime/gemini_live_provider.dart';
@@ -73,14 +75,10 @@ class ConversationController extends Notifier<ConversationState> {
       await provider.connect(grant);
       // The session goes live on RealtimeReady.
       _pendingOpening = grant.openingInstruction;
-    } on DioException catch (e) {
-      final data = e.response?.data;
-      final message = data is Map && data['message'] is String
-          ? data['message'] as String
-          : 'Could not reach SpeakDaily. Check your connection and try again.';
-      _fail(message);
-    } catch (e) {
-      _fail('Could not start the conversation: $e');
+    } catch (e, st) {
+      // Show only user-safe text; the raw error goes to the reporter.
+      ref.read(errorReporterProvider).report(e, st, reason: 'Conversation start failed');
+      _fail(AppFailure.from(e).message);
     }
   }
 

@@ -1,0 +1,19 @@
+rules_version = '2';
+
+// PROTECTED FILE (.agents/protected-files.md). Changes need explicit approval
+// and Firebase Emulator Suite rule tests. Never weaken rules to fix an error.
+//
+// Phase 1: DEFAULT DENY. No client may read or write anything.
+// The backend uses the Admin SDK (which bypasses these rules) and must
+// authorize and validate every write itself.
+//
+// Phase 4 replaces this with the owner-scoped rules documented in
+// .agents/security.md (users/{uid} owner-read; usage, subscription,
+// conversations, feedback and appConfig are never client-writable).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

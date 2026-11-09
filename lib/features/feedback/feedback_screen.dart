@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/errors/app_failure.dart';
+import '../../core/routing/app_routes.dart';
 import '../../core/services/api_client.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/widgets.dart';
 import 'session_feedback.dart';
 
 /// Polls the backend until post-session analysis is ready.
@@ -21,7 +24,13 @@ final feedbackProvider =
       case 'insufficient_speech':
         return null;
       case 'failed':
-        throw Exception(data['message'] ?? 'Feedback generation failed');
+        throw ServerFailure(
+          statusCode: 200,
+          code: 'FEEDBACK_FAILED',
+          message: data['message'] is String
+              ? data['message'] as String
+              : 'We could not generate feedback for this session.',
+        );
     }
     await Future<void>.delayed(const Duration(seconds: 2));
   }
@@ -41,29 +50,16 @@ class FeedbackScreen extends ConsumerWidget {
         title: const Text('Your feedback'),
         automaticallyImplyLeading: false,
         actions: [
-          IconButton(icon: const Icon(Icons.close), onPressed: () => context.go('/home')),
+          IconButton(icon: const Icon(Icons.close), onPressed: () => context.go(AppRoutes.home)),
         ],
       ),
       body: feedback.when(
-        loading: () => const Center(
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text('Analysing your conversation…'),
-          ]),
-        ),
-        error: (e, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Text('$e', textAlign: TextAlign.center),
-              const SizedBox(height: 12),
-              OutlinedButton(
-                onPressed: () => ref.invalidate(feedbackProvider(conversationId)),
-                child: const Text('Retry'),
-              ),
-            ]),
-          ),
+        loading: () => const AppLoadingView(message: 'Analysing your conversation…'),
+        error: (e, _) => AppErrorState(
+          failure: e is TimeoutException
+              ? const ServerFailure(statusCode: 0, message: 'Feedback is taking longer than expected. Please try again.')
+              : AppFailure.from(e),
+          onRetry: () => ref.invalidate(feedbackProvider(conversationId)),
         ),
         data: (fb) => fb == null
             ? const Center(
@@ -88,14 +84,15 @@ class _FeedbackBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
+    final text = context.textStyles;
+    final palette = context.palette;
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         Text(feedback.summary, style: text.bodyLarge),
         if (feedback.strengths.isNotEmpty) ...[
           _Heading('Strengths'),
-          ...feedback.strengths.map((s) => _Bullet(s, icon: Icons.check_circle_outline, color: AppColors.success)),
+          ...feedback.strengths.map((s) => _Bullet(s, icon: Icons.check_circle_outline, color: palette.success)),
         ],
         if (feedback.corrections.isNotEmpty) ...[
           _Heading('Corrections'),
@@ -108,17 +105,17 @@ class _FeedbackBody extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(c.category.toUpperCase(),
-                            style: text.labelSmall?.copyWith(color: AppColors.inkMuted, letterSpacing: 0.8)),
+                            style: text.labelSmall?.copyWith(letterSpacing: 0.8)),
                         const SizedBox(height: 6),
                         Text(c.original,
                             style: text.bodyMedium?.copyWith(
-                              color: AppColors.danger,
+                              color: palette.danger,
                               decoration: TextDecoration.lineThrough,
                             )),
                         const SizedBox(height: 4),
                         Text(c.improved,
                             style: text.bodyMedium?.copyWith(
-                              color: AppColors.success,
+                              color: palette.success,
                               fontWeight: FontWeight.w600,
                             )),
                         const SizedBox(height: 8),
@@ -147,10 +144,7 @@ class _FeedbackBody extends StatelessWidget {
           ...feedback.recommendedPractice.map((s) => _Bullet(s, icon: Icons.arrow_forward)),
         ],
         const SizedBox(height: 24),
-        FilledButton(
-          onPressed: () => context.go('/home'),
-          child: const Text('Done'),
-        ),
+        AppButton(label: 'Done', onPressed: () => context.go(AppRoutes.home)),
       ],
     );
   }
@@ -164,21 +158,21 @@ class _Heading extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(top: 24, bottom: 10),
         child: Text(label,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+            style: context.textStyles.titleMedium),
       );
 }
 
 class _Bullet extends StatelessWidget {
-  const _Bullet(this.text, {required this.icon, this.color = AppColors.primary});
+  const _Bullet(this.text, {required this.icon, this.color});
   final String text;
   final IconData icon;
-  final Color color;
+  final Color? color;
 
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Icon(icon, size: 18, color: color),
+          Icon(icon, size: 18, color: color ?? context.colors.primary),
           const SizedBox(width: 10),
           Expanded(child: Text(text)),
         ]),

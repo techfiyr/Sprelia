@@ -1,0 +1,75 @@
+# Firebase setup (required configuration)
+
+Status (2026-11-09):
+- Firebase project **`sprelia`** exists. Project ID `sprelia`, project number `756773147926`.
+  The number is not the ID; tools and `FIREBASE_PROJECT_ID` take the **ID**.
+- Android app registered: `com.techfiyr.sprelia`
+  (`1:756773147926:android:1bc8ce332ae6b5ccce2c37`). No SHA-1/SHA-256 fingerprints yet.
+- iOS app: not registered. Auth providers, Firestore database, App Check: not verified or not set up.
+- It is the only project, and whether it is dev or prod is undecided. Agents must not change
+  its configuration or deploy to it without explicit owner approval. Local development
+  uses the emulators with `demo-sprelia`.
+
+The repo contains local scaffolding only: `firebase.json` (emulators), `firestore.rules`
+and `firestore.indexes.json`.
+
+## 1. Projects (owner action)
+Create one Firebase project per environment, all in the same region as Cloud Run:
+
+| Environment | Suggested project ID | Purpose |
+|---|---|---|
+| (existing) | `sprelia` | role to be decided by the owner (dev or prod) |
+| development | `sprelia-dev` (suggested) | if `sprelia` becomes production |
+| staging | `sprelia-staging` (suggested) | internal testing builds |
+
+Project IDs are permanent. Confirm the brand name before creating them.
+Also enable billing for Cloud Run and Secret Manager, and confirm the Gemini API
+paid tier for learner data.
+
+## 2. Per project
+1. **Authentication**: enable the Google and Email/Password providers. Turn on email
+   enumeration protection.
+2. **Apps**: Android `com.techfiyr.sprelia` (registered in `sprelia`) and iOS
+   `com.techfiyr.sprelia` (not registered yet). Add debug and release SHA-1/SHA-256 fingerprints for
+   Google Sign-In and Play Integrity.
+3. **Firestore**: create the database in Native mode, choose a location, then deploy the
+   rules from this repo (after emulator tests and approval).
+4. **App Check**: Play Integrity (Android) and App Attest (iOS); debug provider for
+   development. Start in *monitor* mode and enforce after metrics look healthy.
+5. **Cloud Run service account**: grant it only the roles it needs (Firebase Auth admin
+   for token revocation checks, Datastore user for Firestore). Use no key files.
+
+## 3. Flutter wiring (Phase 4; not done yet)
+- Packages: `firebase_core`, `firebase_auth`, `google_sign_in`, `cloud_firestore`,
+  `firebase_app_check`, `firebase_analytics`, `firebase_crashlytics`, `firebase_messaging`.
+  Add them with `flutter pub add` and verify versions at that time.
+- Generate options with the FlutterFire CLI per environment. The generated
+  `lib/firebase_options*.dart`, `google-services.json` and `GoogleService-Info.plist`
+  are **gitignored**; CI supplies them from secrets.
+- Initialize in `lib/main.dart` before `runApp` (a placeholder comment marks the spot),
+  then activate App Check.
+- Add the Dio interceptor: `Authorization: Bearer <ID token>`, App Check header, and
+  token refresh with a single retry on 401.
+
+## 4. Backend wiring (done in Phase 1)
+- `FIREBASE_PROJECT_ID` selects the project whose ID tokens are accepted.
+- Credentials: Application Default Credentials (Cloud Run service account; locally
+  `gcloud auth application-default login`).
+- Local without a project: `firebase emulators:start --project demo-sprelia` and
+  `FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099` (development only; staging and
+  production refuse to start with it).
+
+## 5. Security rules roadmap
+Phase 1 denies all client access. Phase 4 adds the owner-scoped rules described in
+`.agents/architecture.md` together with `@firebase/rules-unit-testing` tests run on
+the emulator. A rule change without tests is not mergeable.
+
+## Owner checklist
+- [ ] Confirm brand / project naming
+- [x] Project `sprelia` created, Android app registered
+- [ ] Decide whether `sprelia` is dev or prod; create the remaining environments
+- [ ] Register the iOS app; add SHA fingerprints to the Android app
+- [ ] Choose a region (Firestore + Cloud Run)
+- [ ] Install the `gcloud` CLI locally
+- [ ] Provide release signing keystore (via CI secrets, never in git)
+- [ ] Link Play Console for Play Integrity

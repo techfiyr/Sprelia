@@ -47,10 +47,35 @@ app.*.map.json
 # Widget Preview related
 .widget_preview/
 
-# Secrets
+# ---------------------------------------------------------------------------
+# Secrets & credentials — NEVER commit (see .agents/security.md)
+# ---------------------------------------------------------------------------
 .env
-backend/.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+# Firebase app config (generated per environment; distributed via CI secrets)
 **/google-services.json
 **/GoogleService-Info.plist
+lib/firebase_options*.dart
+lib/core/firebase/options/
+# Service accounts / private keys / signing
+**/service-account*.json
+**/*-adminsdk-*.json
+**/*credentials*.json
+*.pem
+*.p8
+*.p12
 *.jks
 *.keystore
+**/key.properties
+# Release build environments (created from env/*.example.json)
+env/staging.json
+env/production.json
+
+# Firebase CLI / emulators
+.firebase/
+*-debug.log
+firebase-export-*/

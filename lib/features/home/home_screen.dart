@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/routing/app_routes.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/widgets.dart';
 import '../tutors/tutor.dart';
 import '../tutors/tutor_avatar.dart';
 
@@ -17,61 +19,58 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
+    final text = context.textStyles;
+    final secondary = context.palette.textSecondary;
     final emma = tutorById('emma');
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          IconButton(icon: const Icon(Icons.insights_outlined), onPressed: () => context.push('/progress')),
-          IconButton(icon: const Icon(Icons.person_outline), onPressed: () => context.push('/profile')),
-        ],
-      ),
+      appBar: AppBar(),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+        padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.xl),
         children: [
-          Text(_greeting(), style: text.headlineSmall?.copyWith(fontWeight: FontWeight.w700)),
-          const SizedBox(height: 4),
-          Text('Ready to improve your English?',
-              style: text.bodyLarge?.copyWith(color: AppColors.inkMuted)),
-          const SizedBox(height: 20),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Today's goal", style: text.labelLarge?.copyWith(color: AppColors.inkMuted)),
-                  const SizedBox(height: 6),
-                  // TODO(progress): read from GET /v1/usage/daily and dailyProgress.
-                  Text('0 of 10 minutes', style: text.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 10),
-                  LinearProgressIndicator(
-                    value: 0,
-                    minHeight: 6,
-                    borderRadius: BorderRadius.circular(3),
-                    backgroundColor: AppColors.border,
-                  ),
-                ],
-              ),
+          Text(_greeting(), style: text.headlineSmall),
+          Gap.xs,
+          Text('Ready to improve your English?', style: text.bodyLarge?.copyWith(color: secondary)),
+          Gap.xl,
+          AppCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("Today's goal", style: text.labelLarge?.copyWith(color: secondary)),
+                const SizedBox(height: 6),
+                // TODO(progress): read from the server-authoritative daily usage endpoint.
+                Text('0 of 10 minutes', style: text.titleLarge),
+                const SizedBox(height: 10),
+                const LinearProgressIndicator(value: 0, minHeight: 6, borderRadius: BorderRadius.all(Radius.circular(3))),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
-          FilledButton.icon(
-            onPressed: () => context.push('/prepare/emma'),
-            icon: const Icon(Icons.mic_rounded),
-            label: const Text('Start Speaking'),
+          Gap.lg,
+          AppButton(
+            label: 'Start Speaking',
+            icon: Icons.mic_rounded,
+            onPressed: () => context.push(AppRoutes.prepare(emma.id)),
           ),
-          const SizedBox(height: 24),
-          Text('Recommended tutor', style: text.titleMedium?.copyWith(fontWeight: FontWeight.w600)),
+          Gap.xl,
+          Text('Recommended tutor', style: text.titleMedium),
           const SizedBox(height: 10),
-          Card(
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              leading: TutorAvatar(tutor: emma),
-              title: Text(emma.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-              subtitle: Text(emma.title),
-              trailing: const Icon(Icons.chevron_right),
-              onTap: () => context.push('/tutors'),
+          AppCard(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+            onTap: () => context.push(AppRoutes.tutors),
+            child: Row(
+              children: [
+                TutorAvatar(tutor: emma),
+                Gap.lg,
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(emma.name, style: text.titleSmall),
+                      Text(emma.title, style: text.bodySmall),
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right, color: secondary),
+              ],
             ),
           ),
         ],
