@@ -107,6 +107,8 @@ firebase emulators:start --project demo-sprelia    # Auth :9099, Firestore :8180
 4. `flutter build apk --debug --dart-define-from-file=env/development.json` succeeds
    for changes touching native config or dependencies.
 5. Security checklist (`security.md`) reviewed for security-sensitive changes.
+5a. Asset changes: `AppAssets`, `doc/ASSET_LIBRARY.md`, `pubspec.yaml` and
+    `assets/ATTRIBUTION.md` updated together (`flutter test test/core/assets/`).
 6. Docs in `.agents/` updated when a decision or convention changes.
 
 ## Git

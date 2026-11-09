@@ -19,6 +19,12 @@ seems to require it, stop and explain why.
 - `android/app/src/debug/res/xml/network_security_config.xml` (cleartext scope).
 - Future: usage, subscription, entitlement and webhook modules.
 
+## Assets
+- `lib/core/assets/app_assets.dart` status and licence fields, and `assets/ATTRIBUTION.md`:
+  marking an asset `available` or `bundled` needs owner approval of its licence and, for
+  branding, brand approval.
+- `test/core/assets/asset_library_test.dart` (may be extended; never weakened).
+
 ## Contracts
 - `lib/core/services/realtime/realtime_provider.dart`: realtime provider contract.
   Changing it affects every vendor implementation.

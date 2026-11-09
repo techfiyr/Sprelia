@@ -57,6 +57,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  crypto: ^3.0.8
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -70,17 +71,23 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-  # Brand typeface: Inter v4.1, SIL Open Font License 1.1 (assets/fonts/inter/OFL.txt).
+  # Bundled assets. Every entry is listed in lib/core/assets/app_assets.dart and
+  # doc/ASSET_LIBRARY.md; test/core/assets/asset_library_test.dart keeps them in sync.
+  # Register only folders/files that contain shipped assets (never README files).
+  assets:
+    - assets/fonts/inter/license_ofl.txt   # shown in the in-app licenses page (OFL requirement)
+
+  # Brand typeface: Inter v4.1, SIL Open Font License 1.1.
   fonts:
     - family: Inter
       fonts:
-        - asset: assets/fonts/inter/Inter-Regular.ttf
+        - asset: assets/fonts/inter/inter_regular.ttf
           weight: 400
-        - asset: assets/fonts/inter/Inter-Medium.ttf
+        - asset: assets/fonts/inter/inter_medium.ttf
           weight: 500
-        - asset: assets/fonts/inter/Inter-SemiBold.ttf
+        - asset: assets/fonts/inter/inter_semibold.ttf
           weight: 600
-        - asset: assets/fonts/inter/Inter-Bold.ttf
+        - asset: assets/fonts/inter/inter_bold.ttf
           weight: 700
 
   # To add assets to your application, add an assets section, like this:

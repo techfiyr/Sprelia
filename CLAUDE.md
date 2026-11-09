@@ -21,6 +21,7 @@ Node.js/TypeScript backend + Firebase + Gemini.
 | Screens, flows, copy, acceptance criteria | `doc/APP_FLOW.md` |
 | Name, colors, logo, tutor visuals, voice & tone | `doc/BRAND.md` (Sprelia, purple) |
 | Type scale, spacing names, components, accessibility | `doc/DESIGN_SYSTEM.md` (its teal palette and "SpeakDaily" name are **superseded** by BRAND.md) |
+| Assets: rules, inventory, specs, licences | `doc/ASSET_LIBRARY.md` (enforced by `test/core/assets/`) |
 | Strategy / future ideas (not approved scope) | `doc/TARGET.md` |
 
 `APP_DEVELOPMENT.md` §9 to §19 and `BRAND.md` §11 to §14 were completed by engineering

@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
+import 'core/assets/app_assets.dart';
 import 'core/auth/auth_repository.dart';
 import 'core/config/app_config.dart';
 import 'core/errors/app_provider_observer.dart';
@@ -16,6 +18,7 @@ Future<void> main() async {
 
   const ErrorReporter reporter = DebugErrorReporter();
   installGlobalErrorHandlers(reporter);
+  registerAssetLicenses();
 
   final AppConfig config;
   try {
@@ -50,6 +53,15 @@ Future<void> main() async {
       child: const SpreliaApp(),
     ),
   );
+}
+
+/// Adds bundled third-party asset licences (Inter, SIL OFL 1.1) to the in-app
+/// licences page (`showLicensePage`). Package licences are added by Flutter.
+void registerAssetLicenses() {
+  LicenseRegistry.addLicense(() async* {
+    final text = await rootBundle.loadString(AppAssets.interLicense.path);
+    yield LicenseEntryWithLineBreaks(const ['Inter (font)'], text);
+  });
 }
 
 /// Routes every uncaught error to [reporter] so nothing fails silently.

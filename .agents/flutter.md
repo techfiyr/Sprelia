@@ -17,9 +17,11 @@
   `context.textStyles`, `AppSpacing`, `Gap` and `AppRadius`. A dark theme must be addable
   by providing a second `ThemeData` and `AppPalette` only.
 - **Components**: `lib/core/widgets/widgets.dart`. Extend these rather than duplicating.
-- **Assets**: the final logo and tutor portraits do not exist yet. `BrandLogo` and
-  `TutorAvatar` are labelled placeholders. Never ship generated or invented brand assets.
-  Inter is bundled in `assets/fonts/inter/` (OFL).
+- **Assets**: follow `doc/ASSET_LIBRARY.md`. Reference files only through `AppAssets`
+  (`lib/core/assets/app_assets.dart`) and load only entries where `isUsable` is true.
+  Tutor images render only through `TutorAvatar`. The final logo and avatars do not exist
+  yet: `BrandLogo` and `TutorAvatar` show labelled placeholders. Never ship generated,
+  invented or unlicensed assets. `assets/tutors/img_tutor_*.jpeg` are unapproved candidates.
 - **Errors**: global handlers in `main.dart`, `AppProviderObserver` for provider
   failures, `AppErrorState` for display. Never render raw exceptions.
 - **Audio**: mic input is PCM16 mono 16 kHz (`record`); output is PCM16 mono 24 kHz

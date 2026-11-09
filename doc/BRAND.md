@@ -632,5 +632,6 @@ visible name, assets and listings change.
 | Inter typeface | Bundled (v4.1, OFL) |
 
 Do not generate or ship invented final assets. Replace each placeholder only with an approved asset.
+The full inventory, specs and licence status are in `doc/ASSET_LIBRARY.md`.
 
 **End of brand guidelines.**
