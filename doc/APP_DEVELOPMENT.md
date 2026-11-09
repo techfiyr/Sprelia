@@ -507,11 +507,14 @@ Re-verify against the official documentation before implementation and record th
 | Environment | Firebase project | Backend | Flutter config |
 |---|---|---|---|
 | Local and automated tests | Emulator Suite (`demo-sprelia`) | `npm run dev` | `env/development.json` |
-| Development | Separate project (to be created; proposed `sprelia-dev`) | Cloud Run (dev) | `env/development-firebase.local.json` |
-| Production | **`sprelia`** (756773147926), approved by the owner on 2026-11-09 | Cloud Run (production) | `env/production.json` |
+| Development (pre-launch) | **`sprelia`** (756773147926), test accounts only | local `npm run dev` | `env/development-firebase.local.json` |
+| Staging / production | **`sprelia`** | Cloud Run | `env/staging.json`, `env/production.json` |
 
-Production credentials are never used locally or in automated tests; the config refuses the
-production project outside `APP_ENV=production` (`doc/FIREBASE_SETUP.md`).
+Owner architecture decision (2026-11-09): **one Firebase project, `sprelia`**, for development,
+integration testing where appropriate, and eventual production. It supersedes the separate
+`sprelia-dev` proposal. Automated tests run only on the emulators (the config refuses any real
+project with `APP_ENV=test`). No public release until the readiness checklist in
+`doc/roadmap/phase_3.md` §5 passes (`doc/FIREBASE_SETUP.md`).
 
 - Backend configuration is validated at startup. Secrets come from Secret Manager.
 - Flutter configuration is compiled in, so it never contains secrets.
@@ -588,7 +591,7 @@ The application must remain buildable after every phase.
 | Decision | Owner |
 |---|---|
 | Final product name (trademark, domain and store clearance) | Product owner |
-| ~~Role of Firebase project `sprelia`~~: **decided** 2026-11-09, production. Creating the development project remains open. | Product owner |
+| ~~Role of Firebase project `sprelia`~~: **decided** 2026-11-09: the single project for development and production (no separate development project). | Product owner |
 | Premium daily allowance | Product owner |
 | Transcript retention period | Product owner / legal |
 | Guest mode (recommended: none for the MVP) | Product owner |

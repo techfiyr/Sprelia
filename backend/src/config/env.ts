@@ -10,11 +10,18 @@ import { z } from 'zod';
  */
 
 /**
- * The PRODUCTION Firebase project (owner decision 2026-11-09, final unless the owner
- * changes it). Local development and automated tests must never use it; production
- * deployments must use exactly this project.
+ * The single approved Firebase project (owner architecture decision 2026-11-09, which
+ * supersedes the earlier separate development project). It serves development and
+ * eventual production. No other real project is accepted.
+ *
+ * - `production` and `staging` must use exactly this project.
+ * - `development` may use it (with test accounts only) or a `demo-*` emulator project.
+ * - `test` (automated tests) must use a `demo-*` project on the emulators: fail closed.
  */
-export const PRODUCTION_FIREBASE_PROJECT_ID = 'sprelia';
+export const FIREBASE_PROJECT_ID = 'sprelia';
+
+export const APP_CHECK_MODES = ['off', 'monitor', 'enforce'] as const;
+export type AppCheckMode = (typeof APP_CHECK_MODES)[number];
 
 const booleanString = z
   .enum(['true', 'false'])
@@ -58,6 +65,19 @@ const EnvSchema = z
      * production; forced false in production (owner decision: review before publishing).
      */
     CATALOG_INCLUDE_DRAFTS: booleanString.optional(),
+
+    /**
+     * Firebase App Check on protected routes. `off`: not checked. `monitor`: verified when
+     * present, failures logged but allowed. `enforce`: missing or invalid tokens rejected.
+     * Defaults: production enforce (required), staging monitor, otherwise off.
+     */
+    APP_CHECK_MODE: z.enum(APP_CHECK_MODES).optional(),
+
+    /** Email/password accounts must verify their email before using /me resources. */
+    REQUIRE_EMAIL_VERIFICATION: booleanString.default(true),
+
+    /** Sensitive operations (account deletion) need a sign-in at most this many seconds ago. */
+    RECENT_AUTH_MAX_AGE_SECONDS: z.coerce.number().int().min(60).max(3600).default(300),
   })
   .superRefine((env, ctx) => {
     const deployed = env.APP_ENV === 'staging' || env.APP_ENV === 'production';
@@ -75,19 +95,34 @@ const EnvSchema = z
         message: 'must not be set in staging/production',
       });
     }
-    if (env.APP_ENV === 'production' && env.FIREBASE_PROJECT_ID !== PRODUCTION_FIREBASE_PROJECT_ID) {
+    const project = env.FIREBASE_PROJECT_ID;
+    const demo = project.startsWith('demo-');
+    if (deployed && project !== FIREBASE_PROJECT_ID) {
       ctx.addIssue({
         code: 'custom',
         path: ['FIREBASE_PROJECT_ID'],
-        message: `production must use the production project (${PRODUCTION_FIREBASE_PROJECT_ID})`,
+        message: `staging/production must use the approved project (${FIREBASE_PROJECT_ID})`,
       });
     }
-    if (env.APP_ENV !== 'production' && env.FIREBASE_PROJECT_ID === PRODUCTION_FIREBASE_PROJECT_ID) {
+    if (env.APP_ENV === 'test' && !demo) {
+      // Automated tests never touch a real project (fail closed).
+      ctx.addIssue({ code: 'custom', path: ['FIREBASE_PROJECT_ID'], message: 'APP_ENV=test requires a demo-* emulator project' });
+    }
+    if (!demo && project !== FIREBASE_PROJECT_ID) {
       ctx.addIssue({
         code: 'custom',
         path: ['FIREBASE_PROJECT_ID'],
-        message: 'the production project must not be used outside APP_ENV=production',
+        message: `only the approved project (${FIREBASE_PROJECT_ID}) or a demo-* emulator project is allowed`,
       });
+    }
+    if (demo && !env.FIREBASE_AUTH_EMULATOR_HOST && env.APP_ENV !== 'test') {
+      ctx.addIssue({ code: 'custom', path: ['FIREBASE_AUTH_EMULATOR_HOST'], message: 'demo-* projects only work with the emulators' });
+    }
+    if (env.APP_ENV === 'production' && env.APP_CHECK_MODE !== undefined && env.APP_CHECK_MODE !== 'enforce') {
+      ctx.addIssue({ code: 'custom', path: ['APP_CHECK_MODE'], message: 'must be enforce in production' });
+    }
+    if (deployed && !env.REQUIRE_EMAIL_VERIFICATION) {
+      ctx.addIssue({ code: 'custom', path: ['REQUIRE_EMAIL_VERIFICATION'], message: 'must be true in staging/production' });
     }
     if (env.APP_ENV === 'production' && env.CATALOG_INCLUDE_DRAFTS === true) {
       ctx.addIssue({
@@ -118,6 +153,9 @@ export interface AppConfig {
   trustProxyHops: number;
   rateLimitPerMinute: number;
   catalogIncludeDrafts: boolean;
+  appCheckMode: AppCheckMode;
+  requireEmailVerification: boolean;
+  recentAuthMaxAgeSeconds: number;
 }
 
 export class ConfigError extends Error {
@@ -149,5 +187,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     trustProxyHops: e.TRUST_PROXY_HOPS,
     rateLimitPerMinute: e.RATE_LIMIT_PER_MINUTE,
     catalogIncludeDrafts: e.CATALOG_INCLUDE_DRAFTS ?? e.APP_ENV !== 'production',
+    appCheckMode: e.APP_CHECK_MODE ?? (e.APP_ENV === 'production' ? 'enforce' : e.APP_ENV === 'staging' ? 'monitor' : 'off'),
+    requireEmailVerification: e.REQUIRE_EMAIL_VERIFICATION,
+    recentAuthMaxAgeSeconds: e.RECENT_AUTH_MAX_AGE_SECONDS,
   };
 }

@@ -1,4 +1,5 @@
 import { applicationDefault, getApps, initializeApp, type App } from 'firebase-admin/app';
+import { getAppCheck, type AppCheck } from 'firebase-admin/app-check';
 import { getAuth, type Auth } from 'firebase-admin/auth';
 import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 import type { AppConfig } from '../config/env.js';
@@ -30,6 +31,10 @@ export function initFirebaseAdmin(config: AppConfig): App {
 
 export function firebaseAuth(app: App): Auth {
   return getAuth(app);
+}
+
+export function firebaseAppCheck(app: App): AppCheck {
+  return getAppCheck(app);
 }
 
 export function firestore(app: App): Firestore {

@@ -897,6 +897,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose another category to practice.'**
   String get practiceChooseAnotherCategory;
+
+  /// No description provided for @authContinueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get authContinueWithGoogle;
+
+  /// No description provided for @authOrDivider.
+  ///
+  /// In en, this message translates to:
+  /// **'or'**
+  String get authOrDivider;
+
+  /// No description provided for @authGoogleUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Google sign-in will be available soon.'**
+  String get authGoogleUnavailable;
+
+  /// No description provided for @verifyEmailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your email'**
+  String get verifyEmailTitle;
+
+  /// No description provided for @verifyEmailBody.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a verification link to {email}. Open it on this device, then come back here.'**
+  String verifyEmailBody(String email);
+
+  /// No description provided for @verifyEmailCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'I\'ve verified my email'**
+  String get verifyEmailCheck;
+
+  /// No description provided for @verifyEmailResend.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend email'**
+  String get verifyEmailResend;
+
+  /// No description provided for @verifyEmailResendIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend in {seconds}s'**
+  String verifyEmailResendIn(int seconds);
+
+  /// No description provided for @verifyEmailSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification email sent. Check your inbox and spam folder.'**
+  String get verifyEmailSent;
+
+  /// No description provided for @verifyEmailNotYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Your email isn\'t verified yet. Open the link in the email we sent, then try again.'**
+  String get verifyEmailNotYet;
+
+  /// No description provided for @verifyEmailUseAnotherAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a different account'**
+  String get verifyEmailUseAnotherAccount;
+
+  /// No description provided for @profileAccountSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get profileAccountSection;
+
+  /// No description provided for @profileDeleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get profileDeleteAccount;
+
+  /// No description provided for @deleteAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete your account?'**
+  String get deleteAccountTitle;
+
+  /// No description provided for @deleteAccountBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently deletes your Sprelia account, profile, preferences and learning progress. This can\'t be undone.'**
+  String get deleteAccountBody;
+
+  /// No description provided for @deleteAccountConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete permanently'**
+  String get deleteAccountConfirm;
+
+  /// No description provided for @commonCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get commonCancel;
+
+  /// No description provided for @reauthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm it\'s you'**
+  String get reauthTitle;
+
+  /// No description provided for @reauthPasswordBody.
+  ///
+  /// In en, this message translates to:
+  /// **'For your security, enter your password to continue.'**
+  String get reauthPasswordBody;
+
+  /// No description provided for @reauthGoogleBody.
+  ///
+  /// In en, this message translates to:
+  /// **'For your security, sign in with Google again to continue.'**
+  String get reauthGoogleBody;
+
+  /// No description provided for @reauthContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get reauthContinue;
+
+  /// No description provided for @deleteAccountInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting your account…'**
+  String get deleteAccountInProgress;
 }
 
 class _AppLocalizationsDelegate

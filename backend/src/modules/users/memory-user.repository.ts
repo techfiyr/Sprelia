@@ -74,4 +74,12 @@ export class InMemoryUserRepository implements UserRepository {
       return a ? [{ ...a }] : [];
     });
   }
+
+  async deleteUserData(uid: string) {
+    this.profiles.delete(uid);
+    this.preferences.delete(uid);
+    for (const map of [this.usage, this.activity] as Map<string, unknown>[]) {
+      for (const key of [...map.keys()]) if (key.startsWith(`${uid}/`)) map.delete(key);
+    }
+  }
 }

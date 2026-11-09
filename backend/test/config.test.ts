@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ConfigError, loadConfig } from '../src/config/env.js';
 
-const base = { FIREBASE_PROJECT_ID: 'demo-sprelia' };
+const base = { FIREBASE_PROJECT_ID: 'demo-sprelia', FIREBASE_AUTH_EMULATOR_HOST: '127.0.0.1:9099' };
 
 describe('loadConfig', () => {
   it('applies safe defaults', () => {
@@ -46,24 +46,51 @@ describe('FIREBASE_PROJECT_ID', () => {
   it('rejects a project number', () => {
     expect(() => loadConfig({ FIREBASE_PROJECT_ID: '756773147926' })).toThrowError(/project number/);
   });
-  it('accepts real and demo project IDs', () => {
-    expect(loadConfig({ FIREBASE_PROJECT_ID: 'sprelia-dev' }).firebaseProjectId).toBe('sprelia-dev');
-    expect(loadConfig({ FIREBASE_PROJECT_ID: 'demo-sprelia' }).firebaseProjectId).toBe('demo-sprelia');
+  it('accepts the approved project and demo emulator projects only', () => {
+    expect(loadConfig({ FIREBASE_PROJECT_ID: 'sprelia' }).firebaseProjectId).toBe('sprelia');
+    expect(loadConfig(base).firebaseProjectId).toBe('demo-sprelia');
+    expect(() => loadConfig({ FIREBASE_PROJECT_ID: 'sprelia-dev' })).toThrowError(/approved project/);
+    expect(() => loadConfig({ FIREBASE_PROJECT_ID: 'someone-else' })).toThrowError(/approved project/);
+  });
+  it('demo projects need the emulators', () => {
+    expect(() => loadConfig({ FIREBASE_PROJECT_ID: 'demo-sprelia' })).toThrowError(/emulators/);
   });
 });
 
-describe('production Firebase project guard (owner decision 2026-11-09)', () => {
+describe('single Firebase project guard (owner decision 2026-11-09)', () => {
   const prod = { APP_ENV: 'production', TRUST_PROXY_HOPS: '1' };
-  it('production must use the sprelia project', () => {
-    expect(loadConfig({ ...prod, FIREBASE_PROJECT_ID: 'sprelia' }).firebaseProjectId).toBe('sprelia');
-    expect(() => loadConfig({ ...prod, FIREBASE_PROJECT_ID: 'sprelia-dev' })).toThrowError(/production project/);
+  it.each(['staging', 'production'])('%s must use sprelia', (env) => {
+    expect(loadConfig({ ...prod, APP_ENV: env, FIREBASE_PROJECT_ID: 'sprelia' }).firebaseProjectId).toBe('sprelia');
+    expect(() => loadConfig({ ...prod, APP_ENV: env, FIREBASE_PROJECT_ID: 'demo-sprelia' })).toThrowError(/approved project/);
   });
-  it.each(['development', 'test', 'staging'])('%s must not use the production project', (env) => {
-    expect(() => loadConfig({ APP_ENV: env, FIREBASE_PROJECT_ID: 'sprelia' })).toThrowError(/production project/);
+  it('development may use sprelia (pre-launch, test accounts only)', () => {
+    expect(loadConfig({ APP_ENV: 'development', FIREBASE_PROJECT_ID: 'sprelia' }).firebaseProjectId).toBe('sprelia');
+  });
+  it('automated tests fail closed on any real project', () => {
+    expect(() => loadConfig({ APP_ENV: 'test', FIREBASE_PROJECT_ID: 'sprelia' })).toThrowError(/demo-\* emulator project/);
+    expect(loadConfig({ APP_ENV: 'test', FIREBASE_PROJECT_ID: 'demo-sprelia' }).appEnv).toBe('test');
   });
   it('drafts are never published in production', () => {
     expect(loadConfig({ ...prod, FIREBASE_PROJECT_ID: 'sprelia' }).catalogIncludeDrafts).toBe(false);
     expect(() => loadConfig({ ...prod, FIREBASE_PROJECT_ID: 'sprelia', CATALOG_INCLUDE_DRAFTS: 'true' })).toThrowError(/unreviewed/);
-    expect(loadConfig({ FIREBASE_PROJECT_ID: 'demo-sprelia' }).catalogIncludeDrafts).toBe(true);
+    expect(loadConfig(base).catalogIncludeDrafts).toBe(true);
+  });
+});
+
+describe('App Check and account security settings', () => {
+  const prod = { APP_ENV: 'production', TRUST_PROXY_HOPS: '1', FIREBASE_PROJECT_ID: 'sprelia' };
+  it('defaults: production enforce, staging monitor, development off', () => {
+    expect(loadConfig(prod).appCheckMode).toBe('enforce');
+    expect(loadConfig({ ...prod, APP_ENV: 'staging' }).appCheckMode).toBe('monitor');
+    expect(loadConfig(base).appCheckMode).toBe('off');
+  });
+  it('production cannot relax App Check', () => {
+    expect(() => loadConfig({ ...prod, APP_CHECK_MODE: 'monitor' })).toThrowError(/APP_CHECK_MODE/);
+    expect(() => loadConfig({ ...prod, APP_CHECK_MODE: 'off' })).toThrowError(/APP_CHECK_MODE/);
+  });
+  it('email verification and recent sign-in defaults', () => {
+    expect(loadConfig(base)).toMatchObject({ requireEmailVerification: true, recentAuthMaxAgeSeconds: 300 });
+    expect(() => loadConfig({ ...prod, REQUIRE_EMAIL_VERIFICATION: 'false' })).toThrowError(/REQUIRE_EMAIL_VERIFICATION/);
+    expect(() => loadConfig({ ...base, RECENT_AUTH_MAX_AGE_SECONDS: '5' })).toThrowError(/RECENT_AUTH_MAX_AGE_SECONDS/);
   });
 });

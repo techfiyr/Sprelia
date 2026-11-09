@@ -1,7 +1,9 @@
 import { buildApp } from './app.js';
 import { createLogger } from './common/logger.js';
 import { ConfigError, loadConfig } from './config/env.js';
-import { firebaseAuth, firestore, initFirebaseAdmin } from './firebase/admin.js';
+import { firebaseAppCheck, firebaseAuth, firestore, initFirebaseAdmin } from './firebase/admin.js';
+import { FirebaseIdentityAdmin } from './modules/account/identity-admin.js';
+import { FirebaseAppCheckVerifier } from './modules/app-check/app-check.js';
 import { FirebaseTokenVerifier } from './modules/auth/firebase-token-verifier.js';
 import { FirestoreUserRepository } from './modules/users/firestore-user.repository.js';
 
@@ -23,7 +25,10 @@ async function main() {
 
   const users = new FirestoreUserRepository(firestore(firebase));
 
-  const app = await buildApp({ config, logger, verifier, users });
+  const identity = new FirebaseIdentityAdmin(firebaseAuth(firebase));
+  const appCheck = config.appCheckMode === 'off' ? undefined : new FirebaseAppCheckVerifier(firebaseAppCheck(firebase));
+
+  const app = await buildApp({ config, logger, verifier, users, identity, appCheck });
 
   const shutdown = async (signal: string) => {
     logger.info({ signal }, 'shutting down');
@@ -45,6 +50,10 @@ async function main() {
   if (config.firestoreEmulatorHost) {
     logger.warn('Using the Firestore emulator (development only)');
   }
+  if (!config.firebaseProjectId.startsWith('demo-') && config.appEnv === 'development') {
+    logger.warn({ project: config.firebaseProjectId }, 'Development server on the shared Firebase project: use test accounts only');
+  }
+  logger.info({ appCheckMode: config.appCheckMode, requireEmailVerification: config.requireEmailVerification }, 'security settings');
 }
 
 main().catch((err) => {

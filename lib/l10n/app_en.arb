@@ -265,5 +265,41 @@
   "tutorsForScenario": "Tutors who can help with this scenario",
   "feedbackAnalyzing": "Analyzing your conversation…",
   "feedbackPracticeNext": "Practice next",
-  "practiceChooseAnotherCategory": "Choose another category to practice."
+  "practiceChooseAnotherCategory": "Choose another category to practice.",
+  "authContinueWithGoogle": "Continue with Google",
+  "authOrDivider": "or",
+  "authGoogleUnavailable": "Google sign-in will be available soon.",
+  "verifyEmailTitle": "Verify your email",
+  "verifyEmailBody": "We sent a verification link to {email}. Open it on this device, then come back here.",
+  "@verifyEmailBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "verifyEmailCheck": "I've verified my email",
+  "verifyEmailResend": "Resend email",
+  "verifyEmailResendIn": "Resend in {seconds}s",
+  "@verifyEmailResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "verifyEmailSent": "Verification email sent. Check your inbox and spam folder.",
+  "verifyEmailNotYet": "Your email isn't verified yet. Open the link in the email we sent, then try again.",
+  "verifyEmailUseAnotherAccount": "Use a different account",
+  "profileAccountSection": "Account",
+  "profileDeleteAccount": "Delete account",
+  "deleteAccountTitle": "Delete your account?",
+  "deleteAccountBody": "This permanently deletes your Sprelia account, profile, preferences and learning progress. This can't be undone.",
+  "deleteAccountConfirm": "Delete permanently",
+  "commonCancel": "Cancel",
+  "reauthTitle": "Confirm it's you",
+  "reauthPasswordBody": "For your security, enter your password to continue.",
+  "reauthGoogleBody": "For your security, sign in with Google again to continue.",
+  "reauthContinue": "Continue",
+  "deleteAccountInProgress": "Deleting your account…"
 }

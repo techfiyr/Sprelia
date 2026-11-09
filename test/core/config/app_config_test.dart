@@ -13,7 +13,7 @@ void main() {
     AppConfig release(String env, String url) => AppConfig.fromValues(
           appEnv: env,
           apiBaseUrl: url,
-          firebaseProjectId: env == 'production' ? 'sprelia' : 'sprelia-staging',
+          firebaseProjectId: 'sprelia',
           firebaseApiKey: 'k',
           firebaseAppId: '1:1:android:1',
           firebaseMessagingSenderId: '1',
@@ -99,11 +99,48 @@ void main() {
         expect(() => build(project: '756773147926', emulator: ''), throwsA(isA<ConfigException>()));
       });
 
-      test('the production project is reserved for production builds', () {
-        expect(() => build(env: 'development', project: 'sprelia', emulator: ''), throwsA(isA<ConfigException>()));
-        expect(() => build(env: 'staging', project: 'sprelia', emulator: ''), throwsA(isA<ConfigException>()));
+      test('single approved project: sprelia in every environment, no other real project', () {
+        final dev = build(project: 'sprelia', emulator: '');
+        expect(dev.firebase!.projectId, 'sprelia');
+        expect(dev.firebase!.usesSharedProject, isTrue);
+        expect(build(env: 'staging', project: 'sprelia', emulator: '').firebase!.projectId, 'sprelia');
+        expect(() => build(project: 'sprelia-dev', emulator: ''), throwsA(isA<ConfigException>()));
+        expect(() => build(env: 'staging', project: 'sprelia-dev', emulator: ''), throwsA(isA<ConfigException>()));
         expect(() => build(env: 'production', project: 'sprelia-dev', emulator: ''), throwsA(isA<ConfigException>()));
-        expect(build(env: 'development', project: 'sprelia-dev', emulator: '').firebase!.projectId, 'sprelia-dev');
+        expect(build().firebase!.usesSharedProject, isFalse);
+      });
+
+      test('Google sign-in is configured only with valid OAuth client IDs', () {
+        AppConfig google(String server, [String ios = '']) => AppConfig.fromValues(
+              appEnv: 'development',
+              apiBaseUrl: '',
+              firebaseProjectId: 'demo-sprelia',
+              firebaseApiKey: 'k',
+              firebaseAppId: '1:1:android:1',
+              firebaseMessagingSenderId: '1',
+              firebaseAuthEmulatorHost: '10.0.2.2:9099',
+              googleServerClientId: server,
+              googleIosClientId: ios,
+            );
+        expect(google('').firebase!.googleSignInConfigured, isFalse);
+        expect(google('123-abc.apps.googleusercontent.com').firebase!.googleSignInConfigured, isTrue);
+        expect(() => google('not-a-client-id'), throwsA(isA<ConfigException>()));
+        expect(() => google('123-abc.apps.googleusercontent.com', 'bad'), throwsA(isA<ConfigException>()));
+      });
+
+      test('App Check can only be disabled in development', () {
+        AppConfig withAppCheck(String env, bool enabled) => AppConfig.fromValues(
+              appEnv: env,
+              apiBaseUrl: env == 'development' ? '' : 'https://api.example.com',
+              firebaseProjectId: 'sprelia',
+              firebaseApiKey: 'k',
+              firebaseAppId: '1:1:android:1',
+              firebaseMessagingSenderId: '1',
+              appCheckEnabled: enabled,
+            );
+        expect(withAppCheck('development', false).appCheckEnabled, isFalse);
+        expect(withAppCheck('staging', false).appCheckEnabled, isTrue);
+        expect(withAppCheck('production', false).appCheckEnabled, isTrue);
       });
 
       test('a real project works without the emulator in production', () {

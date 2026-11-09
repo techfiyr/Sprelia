@@ -493,4 +493,79 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get practiceChooseAnotherCategory =>
       'Choose another category to practice.';
+
+  @override
+  String get authContinueWithGoogle => 'Continue with Google';
+
+  @override
+  String get authOrDivider => 'or';
+
+  @override
+  String get authGoogleUnavailable => 'Google sign-in will be available soon.';
+
+  @override
+  String get verifyEmailTitle => 'Verify your email';
+
+  @override
+  String verifyEmailBody(String email) {
+    return 'We sent a verification link to $email. Open it on this device, then come back here.';
+  }
+
+  @override
+  String get verifyEmailCheck => 'I\'ve verified my email';
+
+  @override
+  String get verifyEmailResend => 'Resend email';
+
+  @override
+  String verifyEmailResendIn(int seconds) {
+    return 'Resend in ${seconds}s';
+  }
+
+  @override
+  String get verifyEmailSent =>
+      'Verification email sent. Check your inbox and spam folder.';
+
+  @override
+  String get verifyEmailNotYet =>
+      'Your email isn\'t verified yet. Open the link in the email we sent, then try again.';
+
+  @override
+  String get verifyEmailUseAnotherAccount => 'Use a different account';
+
+  @override
+  String get profileAccountSection => 'Account';
+
+  @override
+  String get profileDeleteAccount => 'Delete account';
+
+  @override
+  String get deleteAccountTitle => 'Delete your account?';
+
+  @override
+  String get deleteAccountBody =>
+      'This permanently deletes your Sprelia account, profile, preferences and learning progress. This can\'t be undone.';
+
+  @override
+  String get deleteAccountConfirm => 'Delete permanently';
+
+  @override
+  String get commonCancel => 'Cancel';
+
+  @override
+  String get reauthTitle => 'Confirm it\'s you';
+
+  @override
+  String get reauthPasswordBody =>
+      'For your security, enter your password to continue.';
+
+  @override
+  String get reauthGoogleBody =>
+      'For your security, sign in with Google again to continue.';
+
+  @override
+  String get reauthContinue => 'Continue';
+
+  @override
+  String get deleteAccountInProgress => 'Deleting your account…';
 }

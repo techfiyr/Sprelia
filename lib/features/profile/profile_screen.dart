@@ -5,11 +5,12 @@ import '../../core/session/session_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/widgets.dart';
 import '../../l10n/l10n.dart';
+import '../account/delete_account_flow.dart';
 import '../onboarding/onboarding_labels.dart';
 import 'data/learning_preferences.dart';
 
-/// Profile (APP_FLOW §17). Phase 2: read-only preferences and sign-out.
-/// Editing, subscription, privacy controls and account deletion follow later.
+/// Profile (APP_FLOW §17): read-only preferences, sign-out and account deletion
+/// (Phase 3). Editing, subscription and privacy controls follow later.
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
@@ -67,6 +68,16 @@ class ProfileScreen extends ConsumerWidget {
             icon: Icons.logout_rounded,
             onPressed: () => ref.read(sessionProvider.notifier).signOut(),
           ),
+          Gap.xl,
+          Text(l10n.profileAccountSection, style: text.titleMedium),
+          Gap.sm,
+          AppButton.destructive(
+            key: const ValueKey('profile-delete-account'),
+            label: l10n.profileDeleteAccount,
+            icon: Icons.delete_forever_outlined,
+            onPressed: () => runDeleteAccountFlow(context, ref, session.user),
+          ),
+          Gap.xl,
         ],
       ),
     );

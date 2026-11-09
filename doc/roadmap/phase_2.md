@@ -278,7 +278,7 @@ decision applies: **`sprelia` is PRODUCTION**.
 ## Firebase
 - [x] `sprelia` recorded as **PRODUCTION** everywhere (`doc/FIREBASE_SETUP.md`, CLAUDE.md, `.agents/*`, APP_DEVELOPMENT §12/§19).
 - [x] Code guards: the production project is refused outside `APP_ENV=production` (backend + app), and production must use `sprelia`. Tests run only on the emulators.
-- [-] Development Firebase project: **not created**. It needs owner approval of the project ID (proposed `sprelia-dev`) and is Phase 3 preparation.
+- [-] Development Firebase project: **not created**. Superseded on 2026-11-09: the owner approved a single project (`sprelia`) for development and production; no `sprelia-dev` (`phase_3.md`).
 - [x] Outstanding production work documented: iOS registration, SHA fingerprints, Email/Password, Firestore + rules, App Check, deployment validation. No production settings changed.
 
 ## Documentation

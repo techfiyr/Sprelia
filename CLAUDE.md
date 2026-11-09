@@ -54,11 +54,11 @@ silently choosing.
   official documentation and record what you verified.
 - Do not change application identifiers (`com.techfiyr.sprelia`), native app
   labels, signing config or Firebase projects without explicit approval.
-- Firebase project `sprelia` (number 756773147926) is **PRODUCTION** (owner decision,
-  2026-11-09). Never use it, or its credentials, for local development or automated
-  tests (the config refuses it outside `APP_ENV=production`). Never change production
-  settings or deploy without an approved plan. Local work and tests use the emulators
-  (`demo-sprelia`). See `doc/FIREBASE_SETUP.md`.
+- Firebase project `sprelia` (number 756773147926) is the **single** project for development
+  and eventual production (owner decision 2026-11-09; do not create another project).
+  Automated tests use only the emulators (`demo-sprelia`); manual checks on `sprelia` use
+  test accounts only. Never change Firebase settings, deploy, or delete data without an
+  approved plan. See `doc/roadmap/phase_3.md` and `doc/FIREBASE_SETUP.md`.
 - **Explicit approval is required** before: destructive operations (deleting files
   or data, force pushes, history rewrites), creating/modifying Firebase or Google
   Cloud resources, any deployment, editing protected files, or adding paid services.

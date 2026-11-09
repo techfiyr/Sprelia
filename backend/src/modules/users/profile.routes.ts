@@ -1,7 +1,7 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { AppError, ErrorCode, validationError } from '../../common/errors.js';
 import { validate } from '../../common/validate.js';
-import { authenticate, requireUser } from '../auth/authenticate.js';
+import { authenticate, requireUser, requireVerifiedEmail } from '../auth/authenticate.js';
 import type { TokenVerifier } from '../auth/token-verifier.js';
 import type { CatalogService } from '../catalog/catalog.service.js';
 import { buildDashboard } from './dashboard.js';
@@ -16,6 +16,8 @@ export interface ProfileRoutesOptions {
   freeDailySeconds: number;
   now: () => Date;
   catalog: CatalogService;
+  /** Email/password accounts must verify their email first (config REQUIRE_EMAIL_VERIFICATION). */
+  requireEmailVerification?: boolean;
 }
 
 const profileNotFound = () =>
@@ -44,6 +46,7 @@ function serializeProfile(p: UserProfile, preferences: Partial<LearningPreferenc
 export const profileRoutes: FastifyPluginAsync<ProfileRoutesOptions> = async (app, opts) => {
   const { users } = opts;
   app.addHook('preHandler', authenticate(opts.verifier));
+  app.addHook('preHandler', requireVerifiedEmail(opts.requireEmailVerification ?? true));
   app.addHook('onSend', async (_request, reply) => {
     reply.header('cache-control', 'private, no-store');
   });

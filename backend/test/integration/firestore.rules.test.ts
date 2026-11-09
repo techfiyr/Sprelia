@@ -7,6 +7,7 @@ import {
 } from '@firebase/rules-unit-testing';
 import { deleteDoc, doc, getDoc, getDocs, collection, setDoc, updateDoc } from 'firebase/firestore';
 import { afterAll, beforeAll, describe, it } from 'vitest';
+import { assertEmulatorOnly, EMULATOR_PROJECT_ID } from './emulator-guard.js';
 
 /**
  * Firestore security rules (repo-root firestore.rules) on the emulator.
@@ -22,9 +23,9 @@ describe('firestore.rules', () => {
   let env: RulesTestEnvironment;
 
   beforeAll(async () => {
-    const [host, port] = process.env.FIRESTORE_EMULATOR_HOST!.split(':');
+    const [host, port] = assertEmulatorOnly().firestoreHost.split(':');
     env = await initializeTestEnvironment({
-      projectId: 'demo-sprelia',
+      projectId: EMULATOR_PROJECT_ID,
       firestore: { rules: readFileSync(RULES_PATH, 'utf8'), host: host!, port: Number(port) },
     });
     await env.clearFirestore();

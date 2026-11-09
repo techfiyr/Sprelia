@@ -4,7 +4,7 @@
 
 ```
 Flutter app (Riverpod · GoRouter · Dio)
-  │ HTTPS  Authorization: Bearer <Firebase ID token>   (+ App Check token, Phase 4)
+  │ HTTPS  Authorization: Bearer <Firebase ID token>   (+ X-Firebase-AppCheck, Phase 3)
   ▼
 Sprelia API — Node.js/TypeScript, Fastify, Cloud Run          backend/src/main.ts
   │ Firebase Admin SDK: verifies ID tokens; writes trusted Firestore data
@@ -54,7 +54,7 @@ Cloud Firestore: default-deny rules. Phase 2: NO direct client access; all data 
 
 | Decision | Implementation |
 |---|---|
-| Firebase `sprelia` = PRODUCTION; separate dev project; emulators for tests | `PRODUCTION_FIREBASE_PROJECT_ID` guard in the backend `env.ts` and Flutter `AppConfig`; `doc/FIREBASE_SETUP.md` |
+| ~~Firebase `sprelia` = PRODUCTION; separate dev project~~ (superseded: single project, see below); emulators for tests | `PRODUCTION_FIREBASE_PROJECT_ID` guard in the backend `env.ts` and Flutter `AppConfig`; `doc/FIREBASE_SETUP.md` |
 | Tutor–scenario compatibility enforced on the backend | `modules/catalog/compatibility.ts`: the tutor supports the category AND its range contains the scenario range. `CatalogService` refuses to start on violations and publishes `compatibleTutorIds`. The app offers only compatible tutors. |
 | Study abroad: not Emma; Sofia only if she supports the category | Sofia doesn't support Academic, so **Alex** (A2–C1, Academic) |
 | Networking: Alex only if his config supports Social | `social` explicitly added to Alex's `categoryIds` |
@@ -197,10 +197,14 @@ tutors/{id}, scenarios/{id}                  signed-in read; backend write only
 appConfig/{id}                               public fields read; backend write only
 ```
 
-Firebase: **`sprelia`** (number 756773147926) is the **production** project (owner decision
-2026-11-09). It has an Android app `com.techfiyr.sprelia`, no SHA fingerprints and no iOS app.
-The development project is not created yet; local development and tests use the emulators
-(`demo-sprelia`). See `doc/FIREBASE_SETUP.md`.
+Firebase (**approved architecture decision, 2026-11-09**, supersedes the separate
+`sprelia-dev` proposal): one project, **`sprelia`** (number 756773147926), is used for
+development, integration testing where appropriate, and eventual production. Do not create
+another Firebase project. Automated tests use the emulators (`demo-sprelia`). There is no public
+release until the readiness checklist in `doc/roadmap/phase_3.md` §5 passes. Audit status:
+Android app `com.techfiyr.sprelia` registered; no SHA fingerprints, no iOS app, no Firestore
+database, Google provider not enabled. Code guards accept only `sprelia` or `demo-*` emulator
+projects (`env.ts`, `AppConfig`).
 
 ## Provider abstraction
 `RealtimeConversationProvider` (Flutter) and the planned `AIProvider` (backend) isolate

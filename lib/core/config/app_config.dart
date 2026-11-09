@@ -4,9 +4,12 @@ import 'app_environment.dart';
 
 export 'app_environment.dart';
 
-/// The PRODUCTION Firebase project (owner decision 2026-11-09). Never used by
-/// development or staging builds; production builds must use exactly this project.
-const productionFirebaseProjectId = 'sprelia';
+/// The single approved Firebase project (owner architecture decision 2026-11-09,
+/// superseding the separate development project). Used by development builds
+/// (test accounts only, pre-launch) and required for staging and production.
+/// No other real project is accepted; `demo-*` projects only with the emulator.
+const approvedFirebaseProjectId = 'sprelia';
+
 
 /// Firebase client configuration (public identifiers, not secrets).
 ///
@@ -21,6 +24,11 @@ class FirebaseClientConfig {
     required this.appId,
     required this.messagingSenderId,
     this.authEmulatorHost,
+    this.iosAppId,
+    this.iosApiKey,
+    this.iosBundleId,
+    this.googleServerClientId,
+    this.googleIosClientId,
   });
 
   final String projectId;
@@ -30,6 +38,21 @@ class FirebaseClientConfig {
 
   /// `host:port` of the Auth emulator (development only).
   final String? authEmulatorHost;
+
+  /// iOS Firebase app (registered separately; null until the owner registers it).
+  final String? iosAppId;
+  final String? iosApiKey;
+  final String? iosBundleId;
+
+  /// Google sign-in: the Web OAuth client ID (Android `serverClientId`) and the iOS
+  /// OAuth client ID. Created when the owner enables the Google provider.
+  final String? googleServerClientId;
+  final String? googleIosClientId;
+
+  bool get googleSignInConfigured => googleServerClientId != null;
+
+  /// Development build talking to the shared real project (test accounts only).
+  bool get usesSharedProject => !usesEmulator && projectId == approvedFirebaseProjectId;
 
   bool get usesEmulator => authEmulatorHost != null;
 
@@ -52,6 +75,7 @@ class AppConfig {
     required this.apiBaseUrl,
     this.devUserId,
     this.firebase,
+    this.appCheckEnabled = true,
   });
 
   /// Reads and validates the compile-time environment.
@@ -65,6 +89,12 @@ class AppConfig {
         firebaseAppId: const String.fromEnvironment('FIREBASE_APP_ID'),
         firebaseMessagingSenderId: const String.fromEnvironment('FIREBASE_MESSAGING_SENDER_ID'),
         firebaseAuthEmulatorHost: const String.fromEnvironment('FIREBASE_AUTH_EMULATOR_HOST'),
+        firebaseIosAppId: const String.fromEnvironment('FIREBASE_IOS_APP_ID'),
+        firebaseIosApiKey: const String.fromEnvironment('FIREBASE_IOS_API_KEY'),
+        firebaseIosBundleId: const String.fromEnvironment('FIREBASE_IOS_BUNDLE_ID'),
+        googleServerClientId: const String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID'),
+        googleIosClientId: const String.fromEnvironment('GOOGLE_IOS_CLIENT_ID'),
+        appCheckEnabled: const bool.fromEnvironment('APP_CHECK_ENABLED', defaultValue: true),
       );
 
   factory AppConfig.fromValues({
@@ -76,6 +106,12 @@ class AppConfig {
     String firebaseAppId = '',
     String firebaseMessagingSenderId = '',
     String firebaseAuthEmulatorHost = '',
+    String firebaseIosAppId = '',
+    String firebaseIosApiKey = '',
+    String firebaseIosBundleId = '',
+    String googleServerClientId = '',
+    String googleIosClientId = '',
+    bool appCheckEnabled = true,
   }) {
     final environment = AppEnvironment.parse(appEnv);
 
@@ -103,7 +139,14 @@ class AppConfig {
         appId: firebaseAppId,
         messagingSenderId: firebaseMessagingSenderId,
         authEmulatorHost: firebaseAuthEmulatorHost,
+        iosAppId: firebaseIosAppId,
+        iosApiKey: firebaseIosApiKey,
+        iosBundleId: firebaseIosBundleId,
+        googleServerClientId: googleServerClientId,
+        googleIosClientId: googleIosClientId,
       ),
+      // App Check can only be switched off in development builds.
+      appCheckEnabled: appCheckEnabled || !environment.isDevelopment,
     );
   }
 
@@ -114,6 +157,11 @@ class AppConfig {
     required String appId,
     required String messagingSenderId,
     required String authEmulatorHost,
+    String iosAppId = '',
+    String iosApiKey = '',
+    String iosBundleId = '',
+    String googleServerClientId = '',
+    String googleIosClientId = '',
   }) {
     final values = [projectId, apiKey, appId, messagingSenderId];
     if (values.every((v) => v.isEmpty) && authEmulatorHost.isEmpty) {
@@ -132,11 +180,11 @@ class AppConfig {
     if (!RegExp(r'^[a-z][a-z0-9-]{4,28}[a-z0-9]$').hasMatch(projectId)) {
       throw const ConfigException('FIREBASE_PROJECT_ID must be a Firebase project ID (not the project number).');
     }
-    if (environment.isProduction && projectId != productionFirebaseProjectId) {
-      throw const ConfigException('Production builds must use the production Firebase project.');
+    if (!environment.isDevelopment && projectId != approvedFirebaseProjectId) {
+      throw const ConfigException('Staging and production builds must use the approved Firebase project.');
     }
-    if (!environment.isProduction && projectId == productionFirebaseProjectId) {
-      throw const ConfigException('The production Firebase project must not be used outside production builds.');
+    if (!projectId.startsWith('demo-') && projectId != approvedFirebaseProjectId) {
+      throw const ConfigException('Only the approved Firebase project (or a demo-* emulator project) is allowed.');
     }
     if (authEmulatorHost.isNotEmpty) {
       if (!environment.isDevelopment) {
@@ -148,12 +196,23 @@ class AppConfig {
     } else if (projectId.startsWith('demo-')) {
       throw const ConfigException('demo-* Firebase projects only work with the emulator.');
     }
+    final oauthClient = RegExp(r'^[0-9]+-[a-z0-9]+\.apps\.googleusercontent\.com$');
+    for (final id in [googleServerClientId, googleIosClientId]) {
+      if (id.isNotEmpty && !oauthClient.hasMatch(id)) {
+        throw const ConfigException('GOOGLE_*_CLIENT_ID must be a Google OAuth client ID (…apps.googleusercontent.com).');
+      }
+    }
     return FirebaseClientConfig(
       projectId: projectId,
       apiKey: apiKey,
       appId: appId,
       messagingSenderId: messagingSenderId,
       authEmulatorHost: authEmulatorHost.isEmpty ? null : authEmulatorHost,
+      iosAppId: iosAppId.isEmpty ? null : iosAppId,
+      iosApiKey: iosApiKey.isEmpty ? null : iosApiKey,
+      iosBundleId: iosBundleId.isEmpty ? null : iosBundleId,
+      googleServerClientId: googleServerClientId.isEmpty ? null : googleServerClientId,
+      googleIosClientId: googleIosClientId.isEmpty ? null : googleIosClientId,
     );
   }
 
@@ -168,6 +227,9 @@ class AppConfig {
 
   /// Null only in development builds without Firebase (sign-in unavailable).
   final FirebaseClientConfig? firebase;
+
+  /// Activate Firebase App Check (always on outside development; never with the emulator).
+  final bool appCheckEnabled;
 
   /// The legacy voice prototype may only be launched from development builds.
   bool get voicePrototypeEnabled => environment.isDevelopment;

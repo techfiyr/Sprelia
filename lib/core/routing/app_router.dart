@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/auth/sign_in_screen.dart';
+import '../../features/auth/verify_email_screen.dart';
 import '../../features/feedback/feedback_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/learn/learn_screen.dart';
@@ -27,6 +28,7 @@ export 'app_routes.dart';
 ///
 /// - Session loading or failed → splash (which shows retry on failure).
 /// - Signed out → welcome / sign-in only.
+/// - Signed in with an unverified email/password account → email verification only.
 /// - Signed in, onboarding incomplete → onboarding only.
 /// - Signed in and onboarded → never back to splash/welcome/sign-in/onboarding.
 String? sessionRedirect(AsyncValue<SessionState> session, String location) {
@@ -38,10 +40,14 @@ String? sessionRedirect(AsyncValue<SessionState> session, String location) {
     case SignedOut():
       if (location == AppRoutes.welcome || location == AppRoutes.signIn) return null;
       return AppRoutes.welcome;
+    case NeedsEmailVerification():
+      return location == AppRoutes.verifyEmail ? null : AppRoutes.verifyEmail;
     case SignedIn(:final profile) when !profile.onboardingCompleted:
       return location == AppRoutes.onboarding ? null : AppRoutes.onboarding;
     case SignedIn():
-      final entry = AppRoutes.publicRoutes.contains(location) || location == AppRoutes.onboarding;
+      final entry = AppRoutes.publicRoutes.contains(location) ||
+          location == AppRoutes.onboarding ||
+          location == AppRoutes.verifyEmail;
       return entry ? AppRoutes.home : null;
   }
 }
@@ -73,6 +79,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: AppRoutes.splash, builder: (_, _) => const SplashScreen()),
       GoRoute(path: AppRoutes.welcome, builder: (_, _) => const WelcomeScreen()),
       GoRoute(path: AppRoutes.signIn, builder: (_, _) => const SignInScreen()),
+      GoRoute(path: AppRoutes.verifyEmail, builder: (_, _) => const VerifyEmailScreen()),
       GoRoute(path: AppRoutes.onboarding, builder: (_, _) => const OnboardingScreen()),
       StatefulShellRoute.indexedStack(
         builder: (_, _, shell) => AppShell(navigationShell: shell),

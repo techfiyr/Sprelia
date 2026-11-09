@@ -1,5 +1,5 @@
 import type { FastifyReply, FastifyRequest, preHandlerAsyncHookHandler } from 'fastify';
-import { unauthenticated, invalidToken } from '../../common/errors.js';
+import { emailNotVerified, unauthenticated, invalidToken } from '../../common/errors.js';
 import type { AuthenticatedUser, TokenVerifier } from './token-verifier.js';
 
 declare module 'fastify' {
@@ -31,6 +31,18 @@ export function authenticate(verifier: TokenVerifier): preHandlerAsyncHookHandle
   return async function authenticateRequest(request: FastifyRequest, _reply: FastifyReply) {
     const token = extractBearerToken(request.headers.authorization);
     request.user = await verifier.verify(token);
+  };
+}
+
+/**
+ * Requires a verified email for email/password accounts (owner decision D1, recommended).
+ * Federated providers (Google) assert verified emails themselves. Attach after `authenticate`.
+ */
+export function requireVerifiedEmail(enabled: boolean): preHandlerAsyncHookHandler {
+  return async function verifiedEmail(request: FastifyRequest, _reply: FastifyReply) {
+    if (!enabled) return;
+    const user = requireUser(request);
+    if (user.signInProvider === 'password' && !user.emailVerified) throw emailNotVerified();
   };
 }
 

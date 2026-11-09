@@ -8,6 +8,9 @@ export const ErrorCode = {
   UNAUTHENTICATED: 'UNAUTHENTICATED',
   INVALID_TOKEN: 'INVALID_TOKEN',
   FORBIDDEN: 'FORBIDDEN',
+  EMAIL_NOT_VERIFIED: 'EMAIL_NOT_VERIFIED',
+  REAUTH_REQUIRED: 'REAUTH_REQUIRED',
+  APP_CHECK_FAILED: 'APP_CHECK_FAILED',
   NOT_FOUND: 'NOT_FOUND',
   PROFILE_NOT_FOUND: 'PROFILE_NOT_FOUND',
   RATE_LIMITED: 'RATE_LIMITED',
@@ -51,3 +54,15 @@ export const authUnavailable = (cause?: unknown) =>
 
 export const validationError = (details: ErrorDetail[]) =>
   new AppError(400, ErrorCode.VALIDATION_ERROR, 'The request is invalid.', details);
+
+export const emailNotVerified = () =>
+  new AppError(403, ErrorCode.EMAIL_NOT_VERIFIED, 'Please verify your email address to continue.');
+
+/** 403 (not 401): the session is valid, so clients must not refresh-and-retry or sign out. */
+export const reauthRequired = () =>
+  new AppError(403, ErrorCode.REAUTH_REQUIRED, 'For your security, please sign in again to continue.');
+
+export const appCheckFailed = (cause?: unknown) =>
+  new AppError(403, ErrorCode.APP_CHECK_FAILED, 'This app could not be verified. Please update the app and try again.', undefined, {
+    cause,
+  });

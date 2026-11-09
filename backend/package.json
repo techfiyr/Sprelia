@@ -11,7 +11,7 @@
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:integration": "firebase emulators:exec --only auth,firestore --project demo-sprelia --config ../firebase.json \"vitest run --config vitest.integration.config.ts\""
+    "test:integration": "GOOGLE_CLOUD_PROJECT=demo-sprelia firebase emulators:exec --only auth,firestore --project demo-sprelia --config ../firebase.json \"vitest run --config vitest.integration.config.ts\""
   },
   "dependencies": {
     "@fastify/helmet": "^13.2.0",

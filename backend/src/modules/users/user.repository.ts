@@ -58,6 +58,12 @@ export interface UserRepository {
 
   /** Activity for the given local dates (missing days are omitted). */
   getDailyActivity(uid: string, dates: string[]): Promise<DailyActivity[]>;
+
+  /**
+   * Permanently deletes users/{uid} and every subcollection (account deletion).
+   * Idempotent: succeeds when nothing is stored.
+   */
+  deleteUserData(uid: string): Promise<void>;
 }
 
 export class OnboardingIncompleteError extends Error {

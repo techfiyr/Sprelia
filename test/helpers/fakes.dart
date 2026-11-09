@@ -2,13 +2,14 @@ import 'dart:async';
 
 import 'package:speakdaily/core/auth/auth_repository.dart';
 import 'package:speakdaily/core/errors/app_failure.dart';
+import 'package:speakdaily/features/account/account_repository.dart';
 import 'package:speakdaily/features/practice/data/catalog_repository.dart';
 import 'package:speakdaily/features/practice/data/practice_models.dart';
 import 'package:speakdaily/features/profile/data/profile_models.dart';
 import 'package:speakdaily/features/profile/data/profile_repository.dart';
 import 'package:speakdaily/features/tutors/tutor.dart';
 
-class FakeAuthRepository implements AuthRepository {
+class FakeAuthRepository implements AuthRepository, AccountAuth {
   FakeAuthRepository({AuthUser? signedIn}) : _user = signedIn;
 
   AuthUser? _user;
@@ -46,14 +47,77 @@ class FakeAuthRepository implements AuthRepository {
   Future<void> createAccountWithEmail({required String email, required String password}) async {
     createCalls.add((email, password));
     if (nextFailure != null) throw nextFailure!;
-    _setUser(AuthUser(uid: 'uid-1', email: email));
+    // Like Firebase: a new email/password account starts unverified.
+    _setUser(AuthUser(uid: 'uid-1', email: email, providerIds: const ['password']));
   }
 
   @override
   Future<void> sendPasswordReset(String email) async => resetCalls.add(email);
 
   @override
-  Future<void> signOut() async => _setUser(null);
+  Future<void> signOut() async {
+    signOutCalls++;
+    _setUser(null);
+  }
+
+  // --- AccountAuth -----------------------------------------------------------
+  int signOutCalls = 0;
+  bool googleAvailable = false;
+  AuthFailure? nextGoogleFailure;
+  int googleCalls = 0;
+  int verificationSends = 0;
+
+  /// What the server says on the next [refreshUser] (the user clicked the link).
+  bool verifiedOnServer = false;
+  final reauthPasswords = <String>[];
+  int reauthGoogleCalls = 0;
+  AuthFailure? nextReauthFailure;
+
+  @override
+  bool get googleSignInAvailable => googleAvailable;
+
+  @override
+  Future<void> signInWithGoogle() async {
+    googleCalls++;
+    if (nextGoogleFailure != null) throw nextGoogleFailure!;
+    _setUser(const AuthUser(uid: 'uid-1', email: 'learner@gmail.com', emailVerified: true, providerIds: ['google.com']));
+  }
+
+  @override
+  Future<void> sendEmailVerification() async => verificationSends++;
+
+  @override
+  Future<AuthUser?> refreshUser() async {
+    final u = _user;
+    if (u == null) return null;
+    if (verifiedOnServer && !u.emailVerified) {
+      _setUser(AuthUser(uid: u.uid, email: u.email, emailVerified: true, providerIds: u.providerIds));
+    }
+    return _user;
+  }
+
+  @override
+  Future<void> reauthenticateWithPassword(String password) async {
+    reauthPasswords.add(password);
+    if (nextReauthFailure != null) throw nextReauthFailure!;
+  }
+
+  @override
+  Future<void> reauthenticateWithGoogle() async {
+    reauthGoogleCalls++;
+    if (nextReauthFailure != null) throw nextReauthFailure!;
+  }
+}
+
+class FakeAccountRepository implements AccountRepository {
+  int deleteCalls = 0;
+  Object? error;
+
+  @override
+  Future<void> deleteAccount() async {
+    deleteCalls++;
+    if (error != null) throw error!;
+  }
 }
 
 /// In-memory stand-in for the backend profile API.

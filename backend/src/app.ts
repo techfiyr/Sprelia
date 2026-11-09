@@ -4,6 +4,9 @@ import rateLimit from '@fastify/rate-limit';
 import Fastify, { type FastifyBaseLogger, type FastifyInstance } from 'fastify';
 import { registerErrorHandling } from './common/error-handler.js';
 import type { AppConfig } from './config/env.js';
+import { accountRoutes } from './modules/account/account.routes.js';
+import type { IdentityAdmin } from './modules/account/identity-admin.js';
+import { appCheckGuard, type AppCheckVerifier } from './modules/app-check/app-check.js';
 import type { TokenVerifier } from './modules/auth/token-verifier.js';
 import { catalogRoutes } from './modules/catalog/catalog.routes.js';
 import { CatalogService } from './modules/catalog/catalog.service.js';
@@ -25,6 +28,10 @@ export interface AppDependencies {
   catalog?: CatalogService;
   /** Injectable clock for deterministic tests. */
   now?: () => Date;
+  /** Firebase Auth admin operations; enables DELETE /me (account deletion). */
+  identity?: IdentityAdmin;
+  /** Required unless `config.appCheckMode` is `off` (startup fails closed otherwise). */
+  appCheck?: AppCheckVerifier;
 }
 
 /**
@@ -38,6 +45,8 @@ export async function buildApp({
   users,
   catalog = new CatalogService({ includeDrafts: config.catalogIncludeDrafts }),
   now = () => new Date(),
+  identity,
+  appCheck,
 }: AppDependencies): Promise<FastifyInstance> {
   const app = Fastify({
     loggerInstance: logger,
@@ -69,9 +78,31 @@ export async function buildApp({
   await app.register(
     async (api) => {
       await api.register(healthRoutes);
-      await api.register(meRoutes, { verifier });
-      await api.register(profileRoutes, { verifier, users, freeDailySeconds: config.freeDailySeconds, now, catalog });
-      await api.register(catalogRoutes, { verifier, catalog });
+      // Everything except health is protected: App Check (per APP_CHECK_MODE) runs before
+      // the per-route Firebase ID token verification.
+      const checkApp = appCheckGuard(config.appCheckMode, appCheck);
+      await api.register(async (secured) => {
+        secured.addHook('preHandler', checkApp);
+        await secured.register(meRoutes, { verifier });
+        await secured.register(profileRoutes, {
+          verifier,
+          users,
+          freeDailySeconds: config.freeDailySeconds,
+          now,
+          catalog,
+          requireEmailVerification: config.requireEmailVerification,
+        });
+        await secured.register(catalogRoutes, { verifier, catalog });
+        if (identity) {
+          await secured.register(accountRoutes, {
+            verifier,
+            users,
+            identity,
+            recentAuthMaxAgeSeconds: config.recentAuthMaxAgeSeconds,
+            now,
+          });
+        }
+      });
     },
     { prefix: API_PREFIX },
   );

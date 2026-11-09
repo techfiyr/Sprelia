@@ -101,6 +101,12 @@ export class FirestoreUserRepository implements UserRepository {
     });
   }
 
+  async deleteUserData(uid: string): Promise<void> {
+    // Deletes the profile document and all nested subcollections (preferences, usage,
+    // dailyProgress and any future ones). Missing documents are not an error.
+    await this.db.recursiveDelete(this.userRef(uid));
+  }
+
   async getUsageSeconds(uid: string, date: string): Promise<number> {
     const snap = await this.userRef(uid).collection('usage').doc(date).get();
     const consumed = snap.exists ? snap.get('consumedSeconds') : 0;

@@ -11,6 +11,7 @@ import 'core/config/app_config.dart';
 import 'core/errors/app_provider_observer.dart';
 import 'core/errors/error_reporter.dart';
 import 'core/firebase/firebase_bootstrap.dart';
+import 'core/services/api_client.dart';
 import 'core/storage/local_storage.dart';
 
 Future<void> main() async {
@@ -28,10 +29,13 @@ Future<void> main() async {
     return;
   }
 
-  final AuthRepository auth;
+  final FirebaseServices firebase;
   final SharedPreferences prefs;
   try {
-    (auth, prefs) = await (initializeFirebase(config), SharedPreferences.getInstance()).wait;
+    (firebase, prefs) = await (initializeFirebase(config, reporter: reporter), SharedPreferences.getInstance()).wait;
+  } on ConfigException catch (e) {
+    runApp(ConfigErrorApp(message: e.message));
+    return;
   } catch (e, st) {
     reporter.report(e, st, reason: 'Startup failed', fatal: true);
     runApp(const ConfigErrorApp(message: 'The app could not start. Please try again later.'));
@@ -43,7 +47,8 @@ Future<void> main() async {
       overrides: [
         appConfigProvider.overrideWithValue(config),
         errorReporterProvider.overrideWithValue(reporter),
-        authRepositoryProvider.overrideWithValue(auth),
+        authRepositoryProvider.overrideWithValue(firebase.auth),
+        appCheckTokenProvider.overrideWithValue(firebase.appCheckToken),
         sharedPreferencesProvider.overrideWithValue(prefs),
       ],
       observers: [AppProviderObserver(reporter)],

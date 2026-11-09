@@ -42,18 +42,18 @@ Do not modify application code or begin a new phase during this audit. Update on
 
 # Roadmap status
 
-**Last updated:** 2026-11-09 (Phase 2 final decisions applied)
+**Last updated:** 2026-11-09 (Phase 3 audit and plan; single Firebase project decision)
 **Location note:** these instructions refer to `docs/roadmap/`. The repository keeps all
 documentation in `doc/`, so the roadmap lives in `doc/roadmap/`. The folder was not renamed,
 to avoid breaking existing references.
 
 | Phase | Scope | Status | Branch / commits | Record |
 |---|---|---|---|---|
-| 1 | Project foundation and guardrails | `[x]` Completed and approved | `phase-1-foundation` (`7643ba5`, `c72774f`) | `phase_1.md` |
-| 2 | Application experience: onboarding, home, tutors, practice; profile/onboarding/dashboard/catalogue APIs; asset library; final decisions | `[x]` Complete. **Conditionally approved** 2026-11-09; conditions applied; final confirmation pending | `phase-2-experience` (`8587600`) → `asset-library` (`42c862b`) → `phase-2-closeout` | `phase_2.md` |
-| 3 | Backend foundation and production Firebase preparation (plan first, then approval) | `[ ]` Not started (needs approval) | none | none |
-| 4 | Firebase Auth hardening, App Check, Firestore owner rules | `[ ]` Not started | none | none |
-| 5 | Onboarding and profile management (editing, deletion) | `[ ]` Not started | none | none |
+| 1 | Project foundation and guardrails | `[x]` Completed and approved | merged to `main` (PR #1) | `phase_1.md` |
+| 2 | Application experience: onboarding, home, tutors, practice; profile/onboarding/dashboard/catalogue APIs; asset library; final decisions | `[x]` Complete; merged to `main` (PR #2 and merge `bbe720a`) | `main` | `phase_2.md` |
+| 3 | Firebase integration and account management: single `sprelia` project, Google sign-in, email verification, account deletion, App Check, Firestore | `[/]` **Code complete and verified locally; blocked on owner items** (Firebase Console, signing, retention policy); not committed | `main` | `phase_3.md` |
+| 4 | ~~Firebase Auth hardening, App Check, Firestore owner rules~~ (merged into Phase 3) | n/a | none | none |
+| 5 | Profile editing (account deletion moved to Phase 3) | `[ ]` Not started | none | none |
 | 6 | Gemini real-time speaking | `[ ]` Not started | none | none |
 | 7 | Sessions and daily quotas | `[ ]` Not started | none | none |
 | 8 | AI feedback, vocabulary, Mistake Vault | `[ ]` Not started | none | none |
@@ -85,11 +85,12 @@ to avoid breaking existing references.
 | 2026-11-09 | Contrast fixes keep the primary purple; text tokens darkened | Phase 2 §A; BRAND §12 |
 | 2026-11-09 | Clients have no direct Firestore access in Phase 2 (API only) | `.agents/security.md` |
 | 2026-11-09 | Unapproved/unlicensed assets are never bundled | `doc/ASSET_LIBRARY.md` |
-| 2026-11-09 | **Firebase `sprelia` = PRODUCTION** (final); separate dev project; emulators for tests; production project refused outside production (code guard) | Owner architecture decision; `doc/FIREBASE_SETUP.md` |
+| 2026-11-09 | ~~Firebase `sprelia` = PRODUCTION only; separate dev project~~ (superseded below) | Owner architecture decision |
+| 2026-11-09 | **Single Firebase project `sprelia`** for development, integration testing where appropriate, and eventual production. No `sprelia-dev`. Automated tests stay on the emulators; test accounts only; no public release until readiness | Owner architecture decision; `phase_3.md` |
 | 2026-11-09 | Tutor–scenario compatibility enforced on the backend; Study abroad → Alex; Alex supports Social; Emma supports Professional and Academic (A1 content) | Owner decisions 1, 2, 4, 8; `doc/reviews/SCENARIO_REVIEW.md` §5 |
 | 2026-11-09 | Levels A1–C1; daily targets and durations 5/10/15 | Owner decisions |
 | 2026-11-09 | 5 Premium scenarios; recommendation rotates among all eligible scenarios | Owner decisions 6, 7 |
 | 2026-11-09 | Human review required before publishing scenarios (production serves approved only) | Owner content decision |
 | 2026-11-09 | American English for the initial release; British via overlays and ARB later | Owner content decision |
 | 2026-11-09 | Tutor images: rights not established → replace; no history rewrite; keep empty-state icons | Owner asset decisions; `doc/ASSET_LIBRARY.md` §3a |
-| 2026-11-09 | Stacked PRs preserved: Phase 1 → Phase 2 → Asset library → Close-out; no automatic merges | Owner git decision |
+| 2026-11-09 | ~~Stacked PRs~~ superseded: everything merged to `main`; **work directly on `main`** from Phase 3 | Owner git decision |

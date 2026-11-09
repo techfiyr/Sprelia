@@ -17,13 +17,24 @@ task, stop and ask; do not work around it.
 - Agents must never invent or fill in credentials. If one is needed, document the
   requirement and ask.
 
-## 1a. Environment separation (owner decision 2026-11-09)
-- Firebase project `sprelia` is **production**. Development uses a separate project (to be
-  created) or the Emulator Suite. Automated tests always use the emulators (`demo-sprelia`).
-- Never use production credentials locally. Never run tests against production data.
-  Keep development and production env vars, app configs (Android/iOS) and CI secrets separate.
-- Code guards: the backend `loadConfig` and the Flutter `AppConfig` refuse the production
-  project outside production, and refuse any other project in production.
+## 1a. Single Firebase project (approved architecture decision 2026-11-09)
+Supersedes the earlier "separate development project" rule.
+- One project, `sprelia`, serves development, integration testing where appropriate, and
+  eventual production. Do not create another Firebase project.
+- Automated tests always use the emulators (`demo-sprelia`) and must refuse any non-`demo-*`
+  project. Manual or integration checks on `sprelia` use clearly identified test accounts and
+  test data only. Never run destructive tests against real user data.
+- No service-account key files anywhere. Local backend access uses personal Application Default
+  Credentials. Production credentials and CI secrets stay out of git.
+- Development-only mechanisms (emulator hosts, debug App Check providers, the prototype's
+  `DEV_SKIP_AUTH`) must never reach a release build, and must never run against `sprelia` in a
+  deployed environment.
+- Before public release, complete the checklist in `doc/roadmap/phase_3.md` §5 (test data
+  removed, rules verified, App Check enforced, app registrations verified, backend config
+  verified, no auth bypasses, final security review).
+- Code guards: the backend `loadConfig` and Flutter `AppConfig` accept only `sprelia` or `demo-*`
+  (emulator) projects; staging/production must use `sprelia`; `APP_ENV=test` refuses any real
+  project; the integration suite aborts unless it is on local emulators (`emulator-guard.ts`).
 - Verify the project ID before every deployment. Never deploy rules or config to production
   without explicit approval.
 
@@ -38,7 +49,13 @@ task, stop and ask; do not work around it.
   `loadConfig` refuses to start with it (or with revocation checks off) in staging/production.
 - The legacy prototype's `DEV_SKIP_AUTH` header auth is local-only and defaults to
   `false`. Never deploy the prototype.
-- Phase 4: verify App Check tokens on protected routes as an extra layer.
+- App Check (Phase 3): `APP_CHECK_MODE` off/monitor/enforce on every route except health, before
+  ID-token verification; production must be `enforce`. Tokens are never logged.
+- Email/password accounts must verify their email (`EMAIL_NOT_VERIFIED`, 403) before using `/me/*`.
+- Account deletion (`DELETE /me`) requires a sign-in within `RECENT_AUTH_MAX_AGE_SECONDS`
+  (`REAUTH_REQUIRED`, 403), deletes `users/{uid}` recursively, then the Auth user. Own uid only.
+  Immediate hard delete is a **recommendation (D2), not owner-approved**; the retention policy
+  (APP_FLOW §17) is a release blocker.
   App Check never replaces authentication.
 
 ## 3. Server-authoritative data

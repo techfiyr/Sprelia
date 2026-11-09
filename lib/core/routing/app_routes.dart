@@ -4,6 +4,7 @@ abstract final class AppRoutes {
   static const welcome = '/welcome';
   static const signIn = '/sign-in';
   static const onboarding = '/onboarding';
+  static const verifyEmail = '/verify-email';
 
   // Main navigation tabs (APP_FLOW §1).
   static const home = '/home';

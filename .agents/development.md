@@ -112,7 +112,9 @@ firebase emulators:start --project demo-sprelia    # Auth :9099, Firestore :8180
 6. Docs in `.agents/` updated when a decision or convention changes.
 
 ## Git
-- `main` is the default branch. Work on feature branches, and commit only when the owner asks.
+- Work directly on `main` (owner decision, 2026-11-09). Do not create feature or phase
+  branches unless the owner asks for one. Earlier phase branches are historical and already merged.
+- Commit and push to `main` only when the owner asks; never force-push or rewrite history.
 - Commit messages: imperative summary plus a body explaining why.
 - Before committing, check `git status` and `git diff --cached` for secrets.
 
@@ -120,8 +122,7 @@ firebase emulators:start --project demo-sprelia    # Auth :9099, Firestore :8180
 
 | Phase | Status |
 |---|---|
-| 1. Foundation (architecture, design system, routing, env config, error handling, Fastify API with auth middleware, Firebase scaffolding, guardrails) | **Done** (branch `phase-1-foundation`) |
-| 2. Experience: docs completed, contrast fixes, Inter, l10n, email auth, onboarding with persistence, home dashboard, tutors, practice categories, preparation; profile, onboarding, dashboard and catalogue APIs | **Done and closed out**, awaiting approval (`phase-2-experience` → `asset-library` → `phase-2-closeout`; record in `doc/roadmap/phase_2.md`) |
-| 3. Backend foundation: remaining modules, `AIProvider`, Dockerfile | Not started |
-| 4. Firebase projects, Auth, App Check, Firestore rules + emulator tests, Crashlytics/Analytics | Not started (needs approval to create projects) |
-| 5–10. Onboarding/profile, Gemini realtime, quotas, feedback, monetization, release | Not started |
+| 1. Foundation (architecture, design system, routing, env config, error handling, Fastify API with auth middleware, Firebase scaffolding, guardrails) | **Done**, merged to `main` |
+| 2. Experience (docs, l10n, email auth, onboarding, dashboard, tutors, practice, catalogue APIs, asset library, final decisions) | **Done**, merged to `main` |
+| 3. Firebase integration and account management (single `sprelia` project, Auth incl. Google, verification, deletion, App Check, Firestore) | **In progress** (`doc/roadmap/phase_3.md`) |
+| 4+. Gemini voice, AI feedback, subscriptions, ads, release | Not started |

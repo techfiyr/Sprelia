@@ -6,6 +6,7 @@ import '../../core/errors/error_reporter.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/widgets.dart';
 import '../../l10n/l10n.dart';
+import 'google_sign_in_button.dart';
 
 /// Email sign-in and account creation (APP_FLOW §4). After success the
 /// session and router take over (profile check → onboarding or home).
@@ -44,7 +45,14 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     final auth = ref.read(authRepositoryProvider);
     try {
       if (_creating) {
+        final account = ref.read(accountAuthProvider);
         await auth.createAccountWithEmail(email: _email.text, password: _password.text);
+        // Send the verification email right away; the verification screen can resend.
+        try {
+          await account.sendEmailVerification();
+        } catch (_) {
+          // Not fatal: the user can resend from the verification screen.
+        }
       } else {
         await auth.signInWithEmail(email: _email.text, password: _password.text);
       }
@@ -140,6 +148,18 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
                   isLoading: _busy,
                   onPressed: _submit,
                 ),
+                if (ref.watch(accountAuthProvider).googleSignInAvailable) ...[
+                  Gap.md,
+                  Text(l10n.authOrDivider, textAlign: TextAlign.center, style: text.bodySmall),
+                  Gap.md,
+                  GoogleSignInButton(
+                    enabled: !_busy,
+                    onError: (m) => setState(() {
+                      _info = null;
+                      _error = m;
+                    }),
+                  ),
+                ],
                 Gap.md,
                 AppButton.text(
                   label: _creating ? l10n.authSwitchToSignIn : l10n.authSwitchToCreate,
