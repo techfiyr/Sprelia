@@ -1,4 +1,4 @@
-package com.techfiyr.speakdaily
+package com.techfiyr.sprelia
 
 import io.flutter.embedding.android.FlutterActivity
 
