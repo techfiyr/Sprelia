@@ -117,3 +117,129 @@ Provide a report with changed files, implemented features, test results, remaini
 Do not proceed to Phase 3 or Gemini integration.
 
 Stop after Phase 2 and wait for my approval.
+---
+
+# Completion record — Phase 2
+
+**Status:** Implementation complete and verified. **Awaiting owner approval.** Phase 3 has not started.
+**Branches (stacked, all pushed):** `phase-2-experience` (`8587600`) → `asset-library` (`42c862b`) →
+`phase-2-closeout` (close-out documentation).
+**Verified:** 2026-11-09 with a fresh run of all checks (see "Test results").
+
+## A. Phase 1 documentation and accessibility issues
+- [x] A1–A3 `APP_DEVELOPMENT.md` (§1–19) and `BRAND.md` (§1–14) completed and verified with no
+  truncation. The added sections are marked **pending owner review** in each file's header.
+- [x] A4 Supporting grey text #77758B → #6A687C (≥ 4.65:1 on every surface).
+- [x] A5 Destructive button: error fill #C82D2D with white label, 5.43:1.
+- [x] A6 Success text #1C7857 (≥ 4.66:1). A warning text token was also added.
+- [x] A7 Primary purple button label verified at 5.12:1.
+- [x] A8 Purple identity preserved. Primary palette unchanged; base status hues kept for icons.
+  Enforced by `test/core/theme/app_theme_test.dart`.
+
+## B. App identity
+- [x] Sprelia used as the visible app name (Android label, iOS display and bundle name).
+- [-] "Keep the existing Android application ID / iOS bundle identifier": **superseded by owner
+  decision** (2026-11-09). IDs changed to `com.techfiyr.sprelia` to match the Android app the owner
+  registered in Firebase project `sprelia` (commit `c72774f`). Recorded in `.agents/architecture.md`.
+- [x] No store listings, domains or trademarks. Rebranding requirements documented in BRAND.md §13.
+
+## C. Screens
+- [x] C1 Welcome and onboarding: welcome, email sign-in / create account / password reset, 6 steps + plan.
+- [x] C2 Language selection: interface language (English shipped) and first language (40, searchable).
+- [x] C3 English proficiency: **self-assessment** (A1–B2 + "not sure"), stated as "not a test". No
+  formal CEFR claim (APP_FLOW §5). A placement test is not in scope.
+- [x] C4 Learning goals (multi-select). C5 Daily target (5/10/15/20). C6 Accent.
+- [x] C7 Home dashboard (server data only). C8 Tutor selection. C9 Practice categories →
+  scenarios. C10 Practice preparation.
+
+## D. Backend
+- [x] Profile create/retrieve, onboarding save, dashboard, tutors and categories (`/api/v1/me/*`,
+  `/api/v1/tutors`, `/api/v1/practice/categories`).
+- [x] Firebase ID tokens verified, Zod validation, ownership from the token only, no body uids,
+  Firestore rules still deny all, unit and emulator integration tests.
+- [x] No fake entitlements or usage data. The dashboard shows zeros until real data exists.
+
+## E. UI and UX quality
+- [x] Purple identity, bundled Inter, reusable components (incl. `AppSelectionTile`).
+- [x] Screen sizes: scrollable layouts, no fixed heights. Verified on phone sizes only (tests and
+  Pixel emulator); no tablet-specific layouts.
+- [x] Loading, empty, success and error states with retry. Encouraging copy.
+- [x] Onboarding progress survives an app kill, verified on the Android emulator with
+  `am force-stop` + relaunch.
+- [x] Localization architecture (gen-l10n, `lib/l10n/app_en.arb`). Phase 1 screens still inline.
+- [x] Placeholders only where final assets are missing; labelled and inventoried.
+
+## F. Excluded (not implemented, as instructed)
+- [-] Gemini voice / live sessions, subscriptions, AdMob, AI feedback, production deployment and
+  production Firebase configuration. The legacy Emma prototype is untouched and can only be
+  launched from development builds.
+
+## G. Testing and completion
+- [x] G1–G5 analyze, Flutter tests, backend tests, typecheck and build all pass (see below).
+- [x] G6 Authenticated and unauthenticated API requests tested (unit, emulator integration, live curl).
+- [x] G7–G8 Onboarding navigation, persistence and restart: widget tests plus a real device process kill.
+- [x] G9 Contrast verified (automated). G10 Firestore rules reviewed and tested (deny-all).
+
+## Close-out tasks (Phase 2 final review)
+- [x] Asset library: `assets/` structure, `AppAssets` registry, `doc/ASSET_LIBRARY.md` (the repo uses
+  `doc/`, not `docs/`), `assets/ATTRIBUTION.md`. pubspec registers only approved files. Enforced by
+  `test/core/assets/asset_library_test.dart`; the built APK contains only the 4 Inter fonts + OFL licence.
+- [x] Inventory of fonts, licences, placeholders, candidates and missing illustrations
+  (onboarding illustration added as planned).
+- [x] 22 scenarios reviewed: `doc/reviews/SCENARIO_REVIEW.md` (findings F1–F11, decisions D1–D8;
+  **no content changed**).
+- [x] APP_DEVELOPMENT.md and BRAND.md completeness verified; review status added to their headers.
+  DESIGN_SYSTEM.md has a precedence note (name and palette superseded by BRAND.md).
+- [x] Package ID and Firebase status consistent across docs; Firebase re-checked read-only (below).
+- [x] Roadmap updated (`README.md`, `phase_1.md`, this file).
+
+## Implementation summary (changed files)
+- `phase-2-experience` (105 files): `lib/core/{auth,session,firebase,storage}`,
+  `lib/features/{auth,splash,onboarding,home,practice,tutors,profile}`, `lib/l10n/`,
+  `assets/fonts/inter/`, `backend/src/modules/{users,catalog}`, `backend/test/**` (incl. `integration/`),
+  `doc/{APP_DEVELOPMENT,BRAND,FIREBASE_SETUP}.md`, `.agents/*`, `env/*`, debug network security config.
+- `asset-library` (20 files): `lib/core/assets/app_assets.dart`, `doc/ASSET_LIBRARY.md`,
+  `assets/{README,ATTRIBUTION}.md`, Inter renamed to snake_case, OFL licence shown in-app,
+  `TutorAvatar`, `test/core/assets/`.
+- `phase-2-closeout`: `doc/reviews/SCENARIO_REVIEW.md`, `doc/ASSET_LIBRARY.md`,
+  `lib/core/assets/app_assets.dart` (planned onboarding illustration entry; no behaviour change),
+  headers of `doc/{APP_DEVELOPMENT,BRAND,DESIGN_SYSTEM}.md`, `doc/roadmap/*`.
+
+## Test results (2026-11-09, close-out run)
+| Check | Result |
+|---|---|
+| `flutter analyze` | No issues |
+| `flutter test` | 107/107 (includes 11 asset-library and 26 theme/contrast tests) |
+| Backend unit (`npm test`) | 105/105 |
+| Backend integration (`npm run test:integration`, Auth + Firestore emulators, rules) | 16/16 |
+| `npm run typecheck` / `npm run build` | Pass / pass |
+| Debug APK | Builds; bundled assets = 4 fonts + licence |
+| Secret scan | Clean |
+
+## Identity and Firebase (verified read-only, 2026-11-09)
+- App / bundle ID `com.techfiyr.sprelia` (Android `applicationId` + namespace, iOS Runner;
+  `.RunnerTests` for tests). Dart package name `speakdaily` (internal).
+- Firebase project ID `sprelia`, number `756773147926`. One Android app
+  (`1:756773147926:android:1bc8ce332ae6b5ccce2c37`), **no SHA fingerprints**, **no iOS app**.
+  Auth providers and the Firestore database are not verified or configured by the agent.
+  All app testing used the Emulator Suite (`demo-sprelia`).
+
+## Remaining limitations
+- Google sign-in, email verification, display name capture, profile and time zone editing: not built.
+- Phase 1 screens (learn, progress, feedback, conversation) still have inline English strings.
+- Recommendation reaches only 6 of 22 scenarios (deterministic first match; see review F9).
+- Legacy voice prototype: Express, superseded model IDs, v1alpha tokens, "SpeakDaily" in prompts
+  (Phase 6). Release signing still uses the debug key (Phase 10).
+- npm: 4 moderate production advisories (firebase-admin, transitive); 5 high in the dev-only `firebase` SDK.
+- Final logo, app icon, tutor avatars and illustrations do not exist; placeholders are shown.
+
+## Outstanding owner decisions
+1. Tutor candidate images: source, licence, style direction (`doc/ASSET_LIBRARY.md`); history removal if unlicensed.
+2. Scenario decisions D1–D8 (`doc/reviews/SCENARIO_REVIEW.md`).
+3. Review and approve the engineering-drafted sections of APP_DEVELOPMENT.md (§9 cont.–§19) and BRAND.md (§11 end–§14).
+4. Role of Firebase project `sprelia` (dev or prod); iOS app registration; SHA fingerprints; Email/Password provider.
+5. Empty-state illustrations: commission or keep icons.
+6. Merge strategy for the stacked branches into `main`.
+
+## Approval
+- [ ] Phase 2 approved by owner. *(pending)*

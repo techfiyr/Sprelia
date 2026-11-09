@@ -206,6 +206,13 @@ abstract final class AppAssets {
     license: 'TBD: commissioned or licensed',
   );
 
+  static const onboardingIllustration = AssetEntry(
+    path: 'assets/illustrations/onboarding_illustration.webp',
+    status: AssetStatus.planned,
+    purpose: 'Portrait onboarding illustration (DESIGN_SYSTEM §8, banner variant 2)',
+    license: 'TBD: commissioned or licensed',
+  );
+
   // ----------------------------------------------------------- Animations ----
   static const voiceActivity = AssetEntry(
     path: 'assets/animations/voice_activity.json',
@@ -237,6 +244,7 @@ abstract final class AppAssets {
     tutorEmmaCandidate,
     tutorSofiaCandidate,
     welcomeIllustration,
+    onboardingIllustration,
     voiceActivity,
   ];
 

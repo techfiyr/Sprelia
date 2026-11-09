@@ -1,5 +1,10 @@
 # SpeakDaily — Brand Identity & UI/UX Design System
 
+> **Precedence note (2026-11-09):** the product name ("SpeakDaily"), tagline, teal/navy
+> palette, logo and icon colours in this document are **superseded by `doc/BRAND.md`**
+> (Sprelia, purple). Its type scale, spacing names, components, screen rules, animation
+> and accessibility guidance remain in force (see `CLAUDE.md`, document precedence).
+
 **Version:** 1.0 — Proposed  
 **Product:** SpeakDaily  
 **Tagline:** Practice English. Speak with confidence everywhere.  

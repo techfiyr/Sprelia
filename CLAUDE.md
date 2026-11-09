@@ -22,6 +22,7 @@ Node.js/TypeScript backend + Firebase + Gemini.
 | Name, colors, logo, tutor visuals, voice & tone | `doc/BRAND.md` (Sprelia, purple) |
 | Type scale, spacing names, components, accessibility | `doc/DESIGN_SYSTEM.md` (its teal palette and "SpeakDaily" name are **superseded** by BRAND.md) |
 | Assets: rules, inventory, specs, licences | `doc/ASSET_LIBRARY.md` (enforced by `test/core/assets/`) |
+| Practice scenario review and open content decisions | `doc/reviews/SCENARIO_REVIEW.md` |
 | Strategy / future ideas (not approved scope) | `doc/TARGET.md` |
 
 `APP_DEVELOPMENT.md` §9 to §19 and `BRAND.md` §11 to §14 were completed by engineering
@@ -30,8 +31,10 @@ silently choosing.
 
 ## Current status
 
-- **Phase 2 (application experience) is complete**, on branch `phase-2-experience`, awaiting approval.
-  See `.agents/development.md` → "Phase status".
+- **Phase 2 (application experience) is complete and closed out**, awaiting owner approval
+  (stacked branches `phase-2-experience` → `asset-library` → `phase-2-closeout`).
+- The roadmap and per-phase records live in `doc/roadmap/` (follow `doc/roadmap/README.md`).
+  Open owner decisions are listed in `doc/roadmap/phase_2.md`.
 - Do not start the next phase (or Gemini voice, subscriptions, ads, deployment, or
   configuring the real `sprelia` Firebase project) without approval.
 

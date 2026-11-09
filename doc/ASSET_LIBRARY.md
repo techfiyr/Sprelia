@@ -1,6 +1,9 @@
 # Sprelia Asset Library
 
-**Status date:** 2026-11-09 · **Owner:** product/brand owner (approvals), engineering (registry)
+**Status date:** 2026-11-09 (verified at Phase 2 close-out) · **Owner:** product/brand owner (approvals), engineering (registry)
+
+> Location note: the guidelines name `docs/ASSET_LIBRARY.md`. This repository keeps all
+> specifications in `doc/`, so the library lives at `doc/ASSET_LIBRARY.md`.
 
 This document is the inventory and rulebook for every image, SVG, Lottie, font and
 branding asset. It is enforced by `test/core/assets/asset_library_test.dart`. That test
@@ -119,7 +122,22 @@ white launch theme. Both are regenerated from the icon sources once approved.
 | Asset | File path | Format | Purpose | Status | Licence / source |
 |---|---|---|---|---|---|
 | `AppAssets.welcomeIllustration` | `assets/illustrations/welcome_illustration.webp` | WebP | Friendly welcome illustration (APP_FLOW §3) | planned | TBD |
+| `AppAssets.onboardingIllustration` | `assets/illustrations/onboarding_illustration.webp` | WebP | Portrait onboarding illustration (DESIGN_SYSTEM §8) | planned | TBD |
 | `AppAssets.voiceActivity` | `assets/animations/voice_activity.json` | Lottie | Subtle voice activity indicator (conversation screen); respects reduced motion | planned | TBD |
+
+### Missing illustrations by screen (Phase 2 close-out)
+
+Screens that the specs say should carry illustrations or brand art, and what they show today:
+
+| Screen | Spec | Shows today | Registry entry |
+|---|---|---|---|
+| Splash | DESIGN_SYSTEM §10: centred logo | `BrandLogo` placeholder | `logoMark` (planned) |
+| Welcome | APP_FLOW §3: "friendly illustration" | Placeholder logo + text only | `welcomeIllustration` (planned) |
+| Onboarding | DESIGN_SYSTEM §8: portrait onboarding illustration | None (text + selection cards) | `onboardingIllustration` (planned) |
+| Learning plan | n/a | Material celebration icon | none needed |
+| Tutor cards, preparation, conversation | BRAND §6: tutor portraits | Initial-letter placeholder | `tutorEmma` / `tutorAlex` / `tutorSofia` (planned) |
+| Empty and error states | DESIGN_SYSTEM §9 lists illustration subjects, but no per-screen requirement | Material icons | **Open decision:** whether to commission empty-state art |
+| Launcher icon / native splash | BRAND §5, DESIGN_SYSTEM §7 | Flutter defaults | `appIcon*` sources (planned) |
 
 ## 4. Specifications for planned assets
 

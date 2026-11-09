@@ -4,7 +4,13 @@
 **Date:** November 2026  
 **Product:** SpeakDaily — AI English Speaking & Communication Coach  
 **Platforms:** Android first, iOS-ready  
-**Development approach:** Flutter + Firebase + Node.js + Gemini API
+**Development approach:** Flutter + Firebase + Node.js + Gemini API  
+**Completeness:** complete (§1–§19, verified 2026-11-09; no truncated sections)  
+**Review status:** §1 to the start of §9 are the owner's original text. §9 (continued) to §19
+were drafted by engineering on 2026-11-09 and are **pending owner review**.  
+**Name note:** the product's provisional name is now **Sprelia** (owner decision,
+`doc/roadmap/phase_2.md` §B; BRAND.md §1, §13). "SpeakDaily" in this document refers to the
+same product. The app ID is `com.techfiyr.sprelia`.
 
 ---
 
@@ -31,7 +37,7 @@ These decisions are already approved and must not be changed without explicit au
 
 | Area | Decision |
 |---|---|
-| Product name | SpeakDaily |
+| Product name | SpeakDaily, now provisionally **Sprelia** (owner decision, roadmap phase 2 §B; pending clearance) |
 | Target market | Global |
 | Initial audience | Adults, 18+ |
 | Mobile framework | Flutter |
