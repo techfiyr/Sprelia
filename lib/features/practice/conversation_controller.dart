@@ -1,33 +1,40 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/errors/app_failure.dart';
 import '../../core/errors/error_reporter.dart';
-import '../../core/services/api_client.dart';
 import '../../core/services/realtime/audio_io.dart';
 import '../../core/services/realtime/gemini_live_provider.dart';
 import '../../core/services/realtime/realtime_provider.dart';
+import '../profile/data/profile_repository.dart';
 import 'conversation_state.dart';
+import 'data/conversation_repository.dart';
 
 /// Swap this provider to change AI vendors; nothing else in the UI changes.
 final realtimeProviderFactory = Provider<RealtimeConversationProvider Function()>(
   (ref) => GeminiLiveProvider.new,
 );
 
+/// Microphone and speaker factories; overridden with fakes in tests.
+final audioInputFactory = Provider<AudioInput Function()>((ref) => MicrophoneStream.new);
+final audioOutputFactory = Provider<AudioOutput Function()>((ref) => PcmPlayer.new);
+
 final conversationControllerProvider = NotifierProvider.autoDispose
     .family<ConversationController, ConversationState, String>(ConversationController.new);
 
+/// One live voice session (APP_FLOW §10). The backend reserves the allowance and bills measured
+/// time; the client timer is for display and a polite stop only.
 class ConversationController extends Notifier<ConversationState> {
   ConversationController(this.tutorId);
 
   final String tutorId;
 
   RealtimeConversationProvider? _provider;
-  final _mic = MicrophoneStream();
-  final _player = PcmPlayer();
+  // Created in build(), never lazily: teardown can run after the provider is disposed.
+  late AudioInput _mic;
+  late AudioOutput _player;
   StreamSubscription<Uint8List>? _micSub;
   StreamSubscription<RealtimeEvent>? _eventSub;
   Timer? _ticker;
@@ -38,6 +45,8 @@ class ConversationController extends Notifier<ConversationState> {
 
   @override
   ConversationState build() {
+    _mic = ref.read(audioInputFactory)();
+    _player = ref.read(audioOutputFactory)();
     ref.onDispose(() {
       _disposed = true;
       _teardown();
@@ -45,7 +54,7 @@ class ConversationController extends Notifier<ConversationState> {
     return const ConversationState();
   }
 
-  Dio get _api => ref.read(apiClientProvider);
+  ConversationRepository get _repo => ref.read(conversationRepositoryProvider);
 
   Future<void> start({String? scenarioId}) async {
     if (state.status == ConversationStatus.connecting || state.status == ConversationStatus.live) {
@@ -59,13 +68,11 @@ class ConversationController extends Notifier<ConversationState> {
     }
 
     try {
-      final res = await _api.post<Map<String, dynamic>>('/v1/conversations', data: {
-        'tutorId': tutorId,
-        'scenarioId': ?scenarioId,
-        'mode': scenarioId == null ? 'free' : 'scenario',
-      });
-      final grant = RealtimeSessionGrant.fromJson(res.data!);
-      if (_disposed) return;
+      final grant = await _repo.start(tutorId: tutorId, scenarioId: scenarioId);
+      if (_disposed) {
+        await _repo.end(grant.conversationId, ConversationEndReason.appClosed).catchError((_) => null);
+        return;
+      }
       state = state.copyWith(conversationId: grant.conversationId, maxSeconds: grant.maxDurationSeconds);
 
       final provider = ref.read(realtimeProviderFactory)();
@@ -75,10 +82,15 @@ class ConversationController extends Notifier<ConversationState> {
       await provider.connect(grant);
       // The session goes live on RealtimeReady.
       _pendingOpening = grant.openingInstruction;
+    } on ConversationStartFailure catch (e) {
+      _fail(e.message, startError: e.kind);
     } catch (e, st) {
       // Show only user-safe text; the raw error goes to the reporter.
       ref.read(errorReporterProvider).report(e, st, reason: 'Conversation start failed');
       _fail(AppFailure.from(e).message);
+      // The grant may exist on the server; end it so it is billed correctly.
+      final id = state.conversationId;
+      if (id != null) await _repo.end(id, ConversationEndReason.error).catchError((_) => null);
     }
   }
 
@@ -112,11 +124,11 @@ class ConversationController extends Notifier<ConversationState> {
       case RealtimeGoingAway():
         // Prototype: let the session end naturally. Session resumption is a later phase.
         break;
-      case RealtimeError(:final message):
-        _fail(message);
+      case RealtimeError():
+        await end(reason: ConversationEndReason.error, failedMessage: 'The connection to your tutor was lost.');
       case RealtimeClosed():
         if (state.status == ConversationStatus.live) {
-          await end(reason: 'provider_closed');
+          await end(reason: ConversationEndReason.connectionLost);
         }
     }
   }
@@ -136,7 +148,7 @@ class ConversationController extends Notifier<ConversationState> {
       state = state.copyWith(elapsedSeconds: elapsed);
       // Client-side stop for UX only; the backend enforces the real limit.
       if (state.maxSeconds > 0 && elapsed >= state.maxSeconds) {
-        end(reason: 'limit_reached');
+        end(reason: ConversationEndReason.timeLimit);
       }
     });
 
@@ -156,7 +168,9 @@ class ConversationController extends Notifier<ConversationState> {
 
   void toggleMute() => state = state.copyWith(muted: !state.muted);
 
-  Future<void> end({String reason = 'user_ended'}) async {
+  /// Ends the session. [failedMessage] ends it as a failure (shown to the learner) while still
+  /// billing the time actually used.
+  Future<void> end({ConversationEndReason reason = ConversationEndReason.userEnded, String? failedMessage}) async {
     if (state.status != ConversationStatus.live && state.status != ConversationStatus.connecting) {
       return;
     }
@@ -166,23 +180,22 @@ class ConversationController extends Notifier<ConversationState> {
     final id = state.conversationId;
     if (id != null) {
       try {
-        await _api.post<void>('/v1/conversations/$id/end', data: {
-          'reason': reason,
-          'clientElapsedSeconds': state.elapsedSeconds,
-          // Prototype: the client uploads the transcript. Production should
-          // capture it server-side or validate it before trusting it.
-          'transcript': state.transcript.map((l) => l.toJson()).toList(),
-        });
+        await _repo.end(id, reason);
       } catch (_) {
-        // The backend reconciles usage on token expiry even if this call fails.
+        // The backend reconciles an unended session at its reservation on the next start.
       }
+      // Today's remaining time changed.
+      ref.invalidate(dashboardProvider);
     }
-    if (!_disposed) state = state.copyWith(status: ConversationStatus.ended);
+    if (_disposed) return;
+    state = failedMessage == null
+        ? state.copyWith(status: ConversationStatus.ended)
+        : state.copyWith(status: ConversationStatus.failed, error: failedMessage);
   }
 
-  void _fail(String message) {
+  void _fail(String message, {ConversationStartError? startError}) {
     if (_disposed) return;
-    state = state.copyWith(status: ConversationStatus.failed, error: message);
+    state = state.copyWith(status: ConversationStatus.failed, error: message, startError: startError);
     _teardown();
   }
 
@@ -191,7 +204,11 @@ class ConversationController extends Notifier<ConversationState> {
     _ticker = null;
     await _micSub?.cancel();
     _micSub = null;
-    await _mic.stop().catchError((_) {});
+    try {
+      await _mic.stop();
+    } catch (_) {
+      // The recorder may already be stopped.
+    }
     await _eventSub?.cancel();
     _eventSub = null;
     await _provider?.disconnect();

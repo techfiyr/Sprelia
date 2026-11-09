@@ -327,5 +327,7 @@
   "profileExportData": "Copy my data (JSON)",
   "profileExportDone": "Your data was copied to the clipboard.",
   "profileInterfaceLanguage": "App language",
-  "profilePolicies": "Privacy Policy and Terms are available on the Sprelia website."
+  "profilePolicies": "Privacy Policy and Terms are available on the Sprelia website.",
+  "prepareNoTimeLeft": "You've used today's free speaking time. It resets at midnight in your time zone.",
+  "conversationTryAgainTomorrow": "Come back tomorrow for more free practice."
 }

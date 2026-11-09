@@ -1,4 +1,5 @@
 import '../../core/services/realtime/realtime_provider.dart';
+import 'data/conversation_repository.dart';
 
 enum ConversationStatus { idle, connecting, live, ending, ended, failed }
 
@@ -26,6 +27,7 @@ class ConversationState {
     this.tutorSpeaking = false,
     this.lastResponseLatencyMs,
     this.error,
+    this.startError,
   });
 
   final ConversationStatus status;
@@ -41,6 +43,9 @@ class ConversationState {
   final int? lastResponseLatencyMs;
   final String? error;
 
+  /// Why the session could not start (e.g. daily limit), when the server said so.
+  final ConversationStartError? startError;
+
   int get remainingSeconds => (maxSeconds - elapsedSeconds).clamp(0, maxSeconds);
 
   ConversationState copyWith({
@@ -53,6 +58,7 @@ class ConversationState {
     bool? tutorSpeaking,
     int? lastResponseLatencyMs,
     String? error,
+    ConversationStartError? startError,
   }) {
     return ConversationState(
       status: status ?? this.status,
@@ -64,6 +70,7 @@ class ConversationState {
       tutorSpeaking: tutorSpeaking ?? this.tutorSpeaking,
       lastResponseLatencyMs: lastResponseLatencyMs ?? this.lastResponseLatencyMs,
       error: error ?? this.error,
+      startError: startError ?? this.startError,
     );
   }
 }

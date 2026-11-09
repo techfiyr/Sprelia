@@ -6,6 +6,8 @@ import { invalidToken, authUnavailable } from '../src/common/errors.js';
 import { loadConfig, type AppConfig } from '../src/config/env.js';
 import type { IdentityAdmin } from '../src/modules/account/identity-admin.js';
 import type { AppCheckVerifier } from '../src/modules/app-check/app-check.js';
+import type { AIProvider } from '../src/modules/conversations/ai-provider.js';
+import type { ConversationRepository } from '../src/modules/conversations/conversation.repository.js';
 import type { AuthenticatedUser, TokenVerifier } from '../src/modules/auth/token-verifier.js';
 import { InMemoryUserRepository } from '../src/modules/users/memory-user.repository.js';
 import type { UserRepository } from '../src/modules/users/user.repository.js';
@@ -69,13 +71,27 @@ export async function makeApp(
     register?: (app: FastifyInstance) => void;
     identity?: IdentityAdmin;
     appCheck?: AppCheckVerifier;
+    conversations?: ConversationRepository;
+    ai?: AIProvider;
+    isPremium?: (uid: string) => Promise<boolean>;
   } = {},
 ) {
   const config = opts.config ?? testConfig();
   const logger = createLogger(opts.logs ? { ...config, logLevel: 'info' } : config, opts.logs);
   const verifier = opts.verifier ?? new FakeVerifier();
   const users = opts.users ?? new InMemoryUserRepository();
-  const app = await buildApp({ config, logger, verifier, users, now: opts.now, identity: opts.identity, appCheck: opts.appCheck });
+  const app = await buildApp({
+    config,
+    logger,
+    verifier,
+    users,
+    now: opts.now,
+    identity: opts.identity,
+    appCheck: opts.appCheck,
+    conversations: opts.conversations,
+    ai: opts.ai,
+    isPremium: opts.isPremium,
+  });
   opts.register?.(app);
   await app.ready();
   return app;

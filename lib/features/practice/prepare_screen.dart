@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../core/config/app_config.dart';
 import '../../core/routing/app_routes.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/widgets.dart';
@@ -14,9 +13,11 @@ import 'data/catalog_repository.dart';
 /// Conversation preparation (APP_FLOW §9): tutor, scenario, objective,
 /// duration and remaining free time. No AI session is created here.
 ///
-/// Phase 2: live voice sessions are not part of this phase. In development
-/// builds the existing Emma prototype can still be launched; elsewhere the
-/// start button explains that voice practice is coming soon.
+/// "Start" needs: a voice tutor suited to the scenario, no Premium lock, and at least
+/// [minSessionSeconds] of today's free time. The server enforces all of this again.
+/// Mirrors the backend's MIN_SESSION_SECONDS default.
+const minSessionSeconds = 30;
+
 class PrepareScreen extends ConsumerWidget {
   const PrepareScreen({super.key, required this.tutorId, this.scenarioId});
 
@@ -35,15 +36,15 @@ class PrepareScreen extends ConsumerWidget {
     final tutorSuited = scenario == null || scenario.compatibleTutorIds.contains(tutor.id);
     // Phase 2 has no entitlements: everyone is on the free plan.
     final premiumLocked = scenario?.premium ?? false;
-    final canStart = tutor.voiceAvailable &&
-        tutorSuited &&
-        !premiumLocked &&
-        ref.watch(appConfigProvider).voicePrototypeEnabled;
+    final noTimeLeft = remaining != null && remaining < minSessionSeconds;
+    final canStart = tutor.voiceAvailable && tutorSuited && !premiumLocked && !noTimeLeft;
     final blockedReason = !tutorSuited
         ? l10n.prepareTutorNotSuited(tutor.name)
         : premiumLocked
             ? l10n.preparePremiumNote
-            : l10n.prepareVoiceComingSoon(tutor.name);
+            : noTimeLeft
+                ? l10n.prepareNoTimeLeft
+                : l10n.prepareVoiceComingSoon(tutor.name);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.prepareTitle)),
@@ -137,7 +138,7 @@ class PrepareScreen extends ConsumerWidget {
                     key: const ValueKey('prepare-start'),
                     label: l10n.prepareStart,
                     icon: Icons.mic_rounded,
-                    onPressed: canStart ? () => context.pushReplacement(AppRoutes.conversation(tutor.id)) : null,
+                    onPressed: canStart ? () => context.pushReplacement(AppRoutes.conversation(tutor.id, scenarioId: scenarioId)) : null,
                   ),
                 ],
               ),

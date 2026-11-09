@@ -8,6 +8,9 @@ import { accountRoutes } from './modules/account/account.routes.js';
 import type { IdentityAdmin } from './modules/account/identity-admin.js';
 import { appCheckGuard, type AppCheckVerifier } from './modules/app-check/app-check.js';
 import type { TokenVerifier } from './modules/auth/token-verifier.js';
+import { UnavailableAIProvider, type AIProvider } from './modules/conversations/ai-provider.js';
+import type { ConversationRepository } from './modules/conversations/conversation.repository.js';
+import { conversationRoutes } from './modules/conversations/conversation.routes.js';
 import { catalogRoutes } from './modules/catalog/catalog.routes.js';
 import { CatalogService } from './modules/catalog/catalog.service.js';
 import { healthRoutes } from './modules/health/health.routes.js';
@@ -32,6 +35,12 @@ export interface AppDependencies {
   identity?: IdentityAdmin;
   /** Required unless `config.appCheckMode` is `off` (startup fails closed otherwise). */
   appCheck?: AppCheckVerifier;
+  /** Voice sessions and the usage ledger; enables /me/conversations. */
+  conversations?: ConversationRepository;
+  /** Realtime AI vendor; defaults to unavailable (503 VOICE_UNAVAILABLE). */
+  ai?: AIProvider;
+  /** Server-verified Premium entitlement (Phase 9); defaults to free for everyone. */
+  isPremium?: (uid: string) => Promise<boolean>;
 }
 
 /**
@@ -47,6 +56,9 @@ export async function buildApp({
   now = () => new Date(),
   identity,
   appCheck,
+  conversations,
+  ai = new UnavailableAIProvider(),
+  isPremium = async () => false,
 }: AppDependencies): Promise<FastifyInstance> {
   const app = Fastify({
     loggerInstance: logger,
@@ -93,6 +105,21 @@ export async function buildApp({
           requireEmailVerification: config.requireEmailVerification,
         });
         await secured.register(catalogRoutes, { verifier, catalog });
+        if (conversations) {
+          await secured.register(conversationRoutes, {
+            verifier,
+            users,
+            conversations,
+            catalog,
+            ai,
+            now,
+            freeDailySeconds: config.freeDailySeconds,
+            maxSessionSeconds: config.maxSessionSeconds,
+            minSessionSeconds: config.minSessionSeconds,
+            requireEmailVerification: config.requireEmailVerification,
+            isPremium,
+          });
+        }
         if (identity) {
           await secured.register(accountRoutes, {
             verifier,

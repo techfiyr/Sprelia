@@ -1,6 +1,7 @@
 import { createLogger } from './common/logger.js';
 import { ConfigError, loadConfig } from './config/env.js';
 import { credentialSource } from './firebase/admin.js';
+import { aiProviderStatus } from './modules/conversations/ai-provider.js';
 import { createRuntimeApp } from './runtime.js';
 
 async function main() {
@@ -16,6 +17,7 @@ async function main() {
   const logger = createLogger(config);
   const app = await createRuntimeApp(config, logger);
   logger.info({ credential: credentialSource(config).kind }, 'firebase admin credential source');
+  logger.info({ voice: aiProviderStatus(config), liveModel: config.geminiLiveModel }, 'voice provider');
 
   const shutdown = async (signal: string) => {
     logger.info({ signal }, 'shutting down');

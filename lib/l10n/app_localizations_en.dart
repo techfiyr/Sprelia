@@ -627,4 +627,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profilePolicies => 'Privacy Policy and Terms are available on the Sprelia website.';
+
+  @override
+  String get prepareNoTimeLeft => 'You\'ve used today\'s free speaking time. It resets at midnight in your time zone.';
+
+  @override
+  String get conversationTryAgainTomorrow => 'Come back tomorrow for more free practice.';
 }

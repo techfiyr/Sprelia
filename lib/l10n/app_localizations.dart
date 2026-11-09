@@ -1143,6 +1143,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Privacy Policy and Terms are available on the Sprelia website.'**
   String get profilePolicies;
+
+  /// No description provided for @prepareNoTimeLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'ve used today\'s free speaking time. It resets at midnight in your time zone.'**
+  String get prepareNoTimeLeft;
+
+  /// No description provided for @conversationTryAgainTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Come back tomorrow for more free practice.'**
+  String get conversationTryAgainTomorrow;
 }
 
 class _AppLocalizationsDelegate

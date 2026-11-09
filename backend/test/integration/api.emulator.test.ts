@@ -7,6 +7,8 @@ import { buildApp } from '../../src/app.js';
 import { createLogger } from '../../src/common/logger.js';
 import { loadConfig } from '../../src/config/env.js';
 import { FirebaseIdentityAdmin } from '../../src/modules/account/identity-admin.js';
+import type { AIProvider } from '../../src/modules/conversations/ai-provider.js';
+import { FirestoreConversationRepository } from '../../src/modules/conversations/firestore-conversation.repository.js';
 import { FirebaseTokenVerifier } from '../../src/modules/auth/firebase-token-verifier.js';
 import { FirestoreUserRepository } from '../../src/modules/users/firestore-user.repository.js';
 import { assertEmulatorOnly, EMULATOR_PROJECT_ID } from './emulator-guard.js';
@@ -108,6 +110,18 @@ describe('API on the Firebase Emulator Suite', () => {
       verifier: new FirebaseTokenVerifier(getAuth(firebase), { checkRevoked: true }),
       users: new FirestoreUserRepository(db),
       identity: new FirebaseIdentityAdmin(getAuth(firebase)),
+      conversations: new FirestoreConversationRepository(db),
+      // Fake realtime vendor: the emulator suite never calls Gemini.
+      ai: {
+        available: true,
+        createRealtimeSession: async () => ({
+          provider: 'gemini' as const,
+          token: 'auth_tokens/emulator-fake',
+          model: 'gemini-3.8-live',
+          websocketUrl: 'wss://example.invalid',
+          expiresAt: new Date(Date.now() + 600_000),
+        }),
+      } satisfies AIProvider,
     };
     app = await buildApp(deps);
     await app.ready();
@@ -293,6 +307,70 @@ describe('API on the Firebase Emulator Suite', () => {
       expect(body.profile).toMatchObject({ uid: alice.localId, onboarding: { status: 'completed' } });
       expect(body.usage).toContainEqual({ date: '2026-11-09', consumedSeconds: 42 });
       expect(JSON.stringify(body)).not.toContain(bob.localId);
+    });
+  });
+
+  describe('Phases 6–7 voice sessions and quota ledger (Firestore transactions)', () => {
+    async function onboarded(email: string) {
+      const u = await verifiedSignUp(email);
+      await call('POST', '/api/v1/me/profile', u.idToken, { timezone: 'UTC' });
+      await call('PUT', '/api/v1/me/onboarding', u.idToken, {
+        preferences: { interfaceLanguage: 'en', nativeLanguage: 'es', goals: ['travel_social'], level: 'B1', dailyGoalMinutes: 10, accent: 'american' },
+        complete: true,
+      });
+      return u;
+    }
+
+    it('start reserves, end bills server time into usage, progress and the append-only ledger', async () => {
+      const max = await onboarded('max@example.com');
+      const start = await call('POST', '/api/v1/me/conversations', max.idToken, { tutorId: 'sofia', scenarioId: 'airport' });
+      expect(start.statusCode).toBe(201);
+      const { conversationId, allowedDurationSeconds } = start.json();
+      expect(allowedDurationSeconds).toBe(600);
+      expect((await db.collection('users').doc(max.localId).get()).get('activeConversationId')).toBe(conversationId);
+
+      const busy = await call('POST', '/api/v1/me/conversations', max.idToken, { tutorId: 'emma' });
+      expect(busy.json().error.code).toBe('SESSION_ACTIVE');
+
+      const ended = await call('POST', `/api/v1/me/conversations/${conversationId}/end`, max.idToken, { reason: 'user_ended' });
+      expect(ended.statusCode).toBe(200);
+      const billed = ended.json().conversation.billedSeconds as number;
+      expect(billed).toBeGreaterThanOrEqual(0);
+      expect(billed).toBeLessThanOrEqual(5);
+      const date = ended.json().conversation.localDate as string;
+      expect((await db.doc(`users/${max.localId}/usage/${date}`).get()).get('consumedSeconds')).toBe(billed);
+      const ledger = await db.collection(`users/${max.localId}/usageLedger`).get();
+      expect(ledger.docs.map((d) => d.get('conversationId'))).toEqual([conversationId]);
+      expect((await db.collection('users').doc(max.localId).get()).get('activeConversationId')).toBeNull();
+      // Idempotent end.
+      await call('POST', `/api/v1/me/conversations/${conversationId}/end`, max.idToken, { reason: 'user_ended' });
+      expect((await db.collection(`users/${max.localId}/usageLedger`).get()).size).toBe(1);
+    });
+
+    it('an abandoned session is billed at its reservation and the cleanup commits even when the limit is reached', async () => {
+      const nia = await onboarded('nia@example.com');
+      const a = (await call('POST', '/api/v1/me/conversations', nia.idToken, { tutorId: 'sofia' })).json();
+      // One hour later (laterApp's clock): the 600 s reservation has expired without an end call.
+      const next = await call('POST', '/api/v1/me/conversations', nia.idToken, { tutorId: 'sofia' }, laterApp);
+      const sameUtcDay = new Date().toISOString().slice(0, 10) === new Date(Date.now() + 3600_000).toISOString().slice(0, 10);
+      if (sameUtcDay) {
+        expect(next.statusCode).toBe(403);
+        expect(next.json().error.code).toBe('DAILY_LIMIT_REACHED');
+      } else {
+        expect(next.statusCode).toBe(201); // new local day: fresh allowance
+      }
+      const convo = await db.doc(`users/${nia.localId}/conversations/${a.conversationId}`).get();
+      expect(convo.data()).toMatchObject({ status: 'ended', endReason: 'expired', billedSeconds: 600 });
+      if (sameUtcDay) expect((await db.collection('users').doc(nia.localId).get()).get('activeConversationId')).toBeNull();
+      const dates = await db.collection(`users/${nia.localId}/usage`).get();
+      expect(dates.docs.reduce((n, d) => n + (d.get('consumedSeconds') as number), 0)).toBe(600);
+    });
+
+    it('users cannot touch each other’s sessions', async () => {
+      const oli = await onboarded('oli@example.com');
+      const { conversationId } = (await call('POST', '/api/v1/me/conversations', oli.idToken, { tutorId: 'emma' })).json();
+      expect((await call('POST', `/api/v1/me/conversations/${conversationId}/end`, alice.idToken, { reason: 'user_ended' })).statusCode).toBe(404);
+      expect((await db.doc(`users/${oli.localId}/conversations/${conversationId}`).get()).get('status')).toBe('active');
     });
   });
 });

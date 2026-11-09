@@ -33,7 +33,10 @@ abstract final class AppRoutes {
         queryParameters: scenarioId == null ? null : {'scenario': scenarioId},
       ).toString();
 
-  static String conversation(String tutorId) => '/conversation/${Uri.encodeComponent(tutorId)}';
+  static String conversation(String tutorId, {String? scenarioId}) => Uri(
+        path: '/conversation/${Uri.encodeComponent(tutorId)}',
+        queryParameters: scenarioId == null ? null : {'scenario': scenarioId},
+      ).toString();
   static String feedback(String conversationId) => '/feedback/${Uri.encodeComponent(conversationId)}';
 
   /// Routes reachable without signing in.

@@ -118,7 +118,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutes.conversationPattern,
-        builder: (_, s) => ConversationScreen(tutorId: s.pathParameters['tutorId']!),
+        builder: (_, s) => ConversationScreen(
+          tutorId: s.pathParameters['tutorId']!,
+          scenarioId: s.uri.queryParameters['scenario'],
+        ),
       ),
       GoRoute(
         path: AppRoutes.feedbackPattern,

@@ -5,6 +5,8 @@ import { firebaseAppCheck, firebaseAuth, firestore, initFirebaseAdmin } from './
 import { FirebaseIdentityAdmin } from './modules/account/identity-admin.js';
 import { FirebaseAppCheckVerifier } from './modules/app-check/app-check.js';
 import { FirebaseTokenVerifier } from './modules/auth/firebase-token-verifier.js';
+import { FirestoreConversationRepository } from './modules/conversations/firestore-conversation.repository.js';
+import { createAIProvider } from './modules/conversations/gemini-provider.js';
 import { FirestoreUserRepository } from './modules/users/firestore-user.repository.js';
 
 /**
@@ -14,11 +16,15 @@ import { FirestoreUserRepository } from './modules/users/firestore-user.reposito
 export async function createRuntimeApp(config: AppConfig, logger: FastifyBaseLogger): Promise<FastifyInstance> {
   const firebase = initFirebaseAdmin(config);
   const auth = firebaseAuth(firebase);
+  const db = firestore(firebase);
   return buildApp({
     config,
     logger,
     verifier: new FirebaseTokenVerifier(auth, { checkRevoked: config.authCheckRevoked }),
-    users: new FirestoreUserRepository(firestore(firebase)),
+    users: new FirestoreUserRepository(db),
+    conversations: new FirestoreConversationRepository(db),
+    // Without GEMINI_API_KEY voice is unavailable (503 VOICE_UNAVAILABLE), never a crash.
+    ai: createAIProvider(config),
     identity: new FirebaseIdentityAdmin(auth),
     appCheck: config.appCheckMode === 'off' ? undefined : new FirebaseAppCheckVerifier(firebaseAppCheck(firebase)),
   });

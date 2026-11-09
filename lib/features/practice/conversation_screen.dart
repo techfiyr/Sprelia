@@ -12,9 +12,12 @@ import 'conversation_state.dart';
 import 'data/catalog_repository.dart';
 
 class ConversationScreen extends ConsumerStatefulWidget {
-  const ConversationScreen({super.key, required this.tutorId});
+  const ConversationScreen({super.key, required this.tutorId, this.scenarioId});
 
   final String tutorId;
+
+  /// Practice scenario, or null for free conversation.
+  final String? scenarioId;
 
   @override
   ConsumerState<ConversationScreen> createState() => _ConversationScreenState();
@@ -27,7 +30,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(conversationControllerProvider(widget.tutorId).notifier).start();
+      ref.read(conversationControllerProvider(widget.tutorId).notifier).start(scenarioId: widget.scenarioId);
     });
   }
 

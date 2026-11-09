@@ -28,6 +28,12 @@ export const REDACT_PATHS = [
   '*.firebaseServiceAccount',
   'FIREBASE_SERVICE_ACCOUNT_JSON',
   '*.FIREBASE_SERVICE_ACCOUNT_JSON',
+  'geminiApiKey',
+  '*.geminiApiKey',
+  'GEMINI_API_KEY',
+  '*.GEMINI_API_KEY',
+  'realtime.token',
+  '*.realtime.token',
 ];
 
 const SEVERITY: Record<string, string> = {

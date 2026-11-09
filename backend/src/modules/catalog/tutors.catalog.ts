@@ -18,7 +18,7 @@ export interface PublicTutor {
   categoryIds: string[];
   /** Brand tone for the placeholder avatar (BRAND §6 portraits not yet designed). */
   tone: 'primary' | 'primaryDark' | 'accent';
-  /** Voice conversations are currently available (prototype: Emma only). */
+  /** Voice conversations are available (server persona exists; Phase 6). */
   voiceAvailable: boolean;
   voiceSampleAvailable: boolean;
 }
@@ -47,7 +47,7 @@ export const TUTORS: readonly PublicTutor[] = [
     // social added 2026-11-09 (owner decision): professional networking.
     categoryIds: ['professional', 'academic', 'social'],
     tone: 'primaryDark',
-    voiceAvailable: false,
+    voiceAvailable: true,
     voiceSampleAvailable: false,
   },
   {
@@ -59,7 +59,7 @@ export const TUTORS: readonly PublicTutor[] = [
     levels: { min: 'A1', max: 'B2' },
     categoryIds: ['everyday', 'travel', 'social'],
     tone: 'accent',
-    voiceAvailable: false,
+    voiceAvailable: true,
     voiceSampleAvailable: false,
   },
 ];

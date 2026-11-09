@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch --env-file=.env src/main.ts",
-    "dev:sprelia": "tsx watch --env-file=.env.sprelia.local src/main.ts",
+    "dev:sprelia": "tsx watch --env-file-if-exists=../.env --env-file=.env.sprelia.local src/main.ts",
     "dev:prototype": "tsx watch --env-file=.env src/server.ts",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/main.js",
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:live": "node --env-file-if-exists=../.env ./node_modules/vitest/vitest.mjs run --config vitest.live.config.ts",
     "test:integration": "GOOGLE_CLOUD_PROJECT=demo-sprelia firebase emulators:exec --only auth,firestore --project demo-sprelia --config ../firebase.json \"vitest run --config vitest.integration.config.ts\""
   },
   "dependencies": {

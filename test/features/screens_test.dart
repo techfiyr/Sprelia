@@ -155,7 +155,7 @@ void main() {
       expect(start.onPressed, isNotNull);
     });
 
-    testWidgets('production builds never launch the prototype', (tester) async {
+    testWidgets('voice practice is available in production builds when time remains', (tester) async {
       final prod = AppConfig.fromValues(
         appEnv: 'production',
         apiBaseUrl: 'https://api.example.com',
@@ -167,6 +167,29 @@ void main() {
       await pumpSpreliaApp(tester, backend: _signedIn(), prefs: await freshPrefs(), config: prod);
       await tester.tap(find.byKey(const ValueKey('home-start-speaking')));
       await tester.pumpAndSettle();
+      final start = tester.widget<FilledButton>(
+        find.descendant(of: find.byKey(const ValueKey('prepare-start')), matching: find.byType(FilledButton)),
+      );
+      expect(start.onPressed, isNotNull);
+    });
+
+    testWidgets('no free time left today blocks Start with an explanation', (tester) async {
+      final backend = _signedIn();
+      backend.profiles.dashboard = const Dashboard(
+        displayName: 'Rahim',
+        dailyGoalMinutes: 10,
+        todaySpeakingSeconds: 590,
+        freeAllowanceSeconds: 600,
+        remainingFreeSeconds: 10,
+        streakDays: 1,
+        weeklySpeakingSeconds: 590,
+        weeklySessions: 1,
+        recommendation: LearningPlan(tutorId: 'emma', scenarioId: 'introductions', categoryIds: ['everyday']),
+      );
+      await pumpSpreliaApp(tester, backend: backend, prefs: await freshPrefs());
+      await tester.tap(find.byKey(const ValueKey('home-start-speaking')));
+      await tester.pumpAndSettle();
+      expect(find.textContaining("You've used today's free speaking time"), findsOneWidget);
       final start = tester.widget<FilledButton>(
         find.descendant(of: find.byKey(const ValueKey('prepare-start')), matching: find.byType(FilledButton)),
       );

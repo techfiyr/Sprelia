@@ -133,6 +133,23 @@ const EnvSchema = z
      */
     FIREBASE_SERVICE_ACCOUNT_JSON: z.string().min(1).optional(),
 
+    /**
+     * SECRET (optional). Gemini API key, backend only (never in the app). Without it, voice
+     * sessions and AI analysis are unavailable (503 VOICE_UNAVAILABLE).
+     */
+    GEMINI_API_KEY: z.string().min(20).optional(),
+    /** Live model (verified 2026-11-09: `gemini-3.8-live` is the default Live API model). */
+    GEMINI_LIVE_MODEL: z.string().regex(/^[a-z0-9.-]{3,80}$/).default('gemini-3.8-live'),
+    /** Post-session analysis model (APP_DEVELOPMENT §9 verified facts). */
+    GEMINI_ANALYSIS_MODEL: z.string().regex(/^[a-z0-9.-]{3,80}$/).default('gemini-3.8-flash'),
+    /**
+     * Longest single voice session. Kept at or below the Live API connection lifetime
+     * (about 10 minutes) so sessions never need resumption.
+     */
+    MAX_SESSION_SECONDS: z.coerce.number().int().min(60).max(600).default(600),
+    /** A session is not started with less allowance than this. */
+    MIN_SESSION_SECONDS: z.coerce.number().int().min(10).max(120).default(30),
+
     /** Sensitive operations (account deletion) need a sign-in at most this many seconds ago. */
     RECENT_AUTH_MAX_AGE_SECONDS: z.coerce.number().int().min(60).max(3600).default(300),
   })
@@ -225,6 +242,12 @@ export interface AppConfig {
   appCheckMode: AppCheckMode;
   requireEmailVerification: boolean;
   recentAuthMaxAgeSeconds: number;
+  /** Backend-only secret; absent = voice and analysis unavailable. */
+  geminiApiKey?: string;
+  geminiLiveModel: string;
+  geminiAnalysisModel: string;
+  maxSessionSeconds: number;
+  minSessionSeconds: number;
   /** Set only when FIREBASE_SERVICE_ACCOUNT_JSON is provided (its private key is non-enumerable). */
   firebaseServiceAccount?: FirebaseServiceAccount;
 }
@@ -245,7 +268,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     );
   }
   const e = parsed.data;
-  return {
+  const config: AppConfig = {
     appEnv: e.APP_ENV,
     port: e.PORT,
     host: e.HOST,
@@ -261,8 +284,17 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     appCheckMode: e.APP_CHECK_MODE ?? (e.APP_ENV === 'production' ? 'enforce' : e.APP_ENV === 'staging' ? 'monitor' : 'off'),
     requireEmailVerification: e.REQUIRE_EMAIL_VERIFICATION,
     recentAuthMaxAgeSeconds: e.RECENT_AUTH_MAX_AGE_SECONDS,
+    geminiLiveModel: e.GEMINI_LIVE_MODEL,
+    geminiAnalysisModel: e.GEMINI_ANALYSIS_MODEL,
+    maxSessionSeconds: e.MAX_SESSION_SECONDS,
+    minSessionSeconds: e.MIN_SESSION_SECONDS,
     firebaseServiceAccount: serviceAccount(e.FIREBASE_SERVICE_ACCOUNT_JSON, e.FIREBASE_PROJECT_ID),
   };
+  // Secret: non-enumerable, so serializing or logging the config never includes it.
+  if (e.GEMINI_API_KEY !== undefined) {
+    Object.defineProperty(config, 'geminiApiKey', { value: e.GEMINI_API_KEY, enumerable: false, writable: false });
+  }
+  return config;
 }
 
 function serviceAccount(raw: string | undefined, projectId: string): FirebaseServiceAccount | undefined {
