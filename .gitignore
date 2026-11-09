@@ -74,6 +74,7 @@ lib/core/firebase/options/
 # Release build environments (created from env/*.example.json)
 env/staging.json
 env/production.json
+env/*.local.json
 
 # Firebase CLI / emulators
 .firebase/

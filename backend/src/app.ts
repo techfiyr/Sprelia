@@ -5,8 +5,11 @@ import Fastify, { type FastifyBaseLogger, type FastifyInstance } from 'fastify';
 import { registerErrorHandling } from './common/error-handler.js';
 import type { AppConfig } from './config/env.js';
 import type { TokenVerifier } from './modules/auth/token-verifier.js';
+import { catalogRoutes } from './modules/catalog/catalog.routes.js';
 import { healthRoutes } from './modules/health/health.routes.js';
 import { meRoutes } from './modules/users/me.routes.js';
+import { profileRoutes } from './modules/users/profile.routes.js';
+import type { UserRepository } from './modules/users/user.repository.js';
 
 export const API_PREFIX = '/api/v1';
 const BODY_LIMIT_BYTES = 64 * 1024;
@@ -16,13 +19,16 @@ export interface AppDependencies {
   config: AppConfig;
   logger: FastifyBaseLogger;
   verifier: TokenVerifier;
+  users: UserRepository;
+  /** Injectable clock for deterministic tests. */
+  now?: () => Date;
 }
 
 /**
  * Builds the HTTP application without listening, so tests can use `app.inject()`.
  * External services are injected (`verifier`) to keep modules testable.
  */
-export async function buildApp({ config, logger, verifier }: AppDependencies): Promise<FastifyInstance> {
+export async function buildApp({ config, logger, verifier, users, now = () => new Date() }: AppDependencies): Promise<FastifyInstance> {
   const app = Fastify({
     loggerInstance: logger,
     bodyLimit: BODY_LIMIT_BYTES,
@@ -54,6 +60,8 @@ export async function buildApp({ config, logger, verifier }: AppDependencies): P
     async (api) => {
       await api.register(healthRoutes);
       await api.register(meRoutes, { verifier });
+      await api.register(profileRoutes, { verifier, users, freeDailySeconds: config.freeDailySeconds, now });
+      await api.register(catalogRoutes, { verifier });
     },
     { prefix: API_PREFIX },
   );

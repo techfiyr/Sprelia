@@ -8,9 +8,24 @@ Not installed yet: `gcloud` CLI. Some Android SDK licenses are not accepted yet
 
 ## Commands
 
+### Full local stack (no real Firebase project needed)
+```bash
+# 1) Firebase emulators (repo root): Auth :9099, Firestore :8180, UI http://127.0.0.1:4000
+firebase emulators:start --only auth,firestore --project demo-sprelia
+# 2) API against the emulators (backend/.env from .env.example, then uncomment the two
+#    emulator lines), or inline:
+cd backend && APP_ENV=development FIREBASE_PROJECT_ID=demo-sprelia \
+  FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 FIRESTORE_EMULATOR_HOST=127.0.0.1:8180 npm run dev
+# 3) App on the Android emulator (uses 10.0.2.2 for the API and the Auth emulator)
+flutter run --dart-define-from-file=env/development.json
+```
+Create an account in the app with any email and an 8+ character password. Accounts live
+only in the Auth emulator.
+
 ### Flutter app (repo root)
 ```bash
 flutter pub get
+flutter gen-l10n                                                # after editing lib/l10n/*.arb (also runs on build)
 flutter analyze
 flutter test
 flutter run --dart-define-from-file=env/development.json        # Android emulator → host 10.0.2.2:8080
@@ -25,7 +40,8 @@ npm install
 cp .env.example .env            # placeholders only; never commit .env
 npm run dev                     # Sprelia API (Fastify) → http://localhost:8080/api/v1/health
 npm run typecheck               # tsc over src + test
-npm test                        # Vitest
+npm test                        # Vitest unit tests
+npm run test:integration        # Auth + Firestore emulators: real tokens, Firestore, security rules (needs Java)
 npm run build && npm start      # compiled dist/main.js
 npm run dev:prototype           # LEGACY Express voice prototype (needs GEMINI_API_KEY, DEV_SKIP_AUTH=true locally)
 ```
@@ -73,9 +89,14 @@ firebase emulators:start --project demo-sprelia    # Auth :9099, Firestore :8180
 - Flutter: unit tests for config, errors and models. Widget tests for components and
   routing (`test/helpers/pump_app.dart`).
 - Backend: `app.inject()` tests per route, covering the **unauthenticated, invalid-token,
-  invalid-input and success** paths for every protected endpoint. Plus tests showing that
-  error responses and logs leak nothing.
-- Firestore rules (from Phase 4): Emulator Suite tests for every allow and deny path.
+  invalid-input, ownership and success** paths for every protected endpoint. Plus tests showing
+  that error responses and logs leak nothing.
+- Backend integration (`test/integration`, run in `firebase emulators:exec`): real Auth emulator
+  tokens, real Admin SDK verification (including revocation), real Firestore repositories.
+- Firestore rules: Emulator Suite tests for every allow and deny path (`firestore.rules.test.ts`).
+- Flutter app-level tests use `test/helpers/pump_app.dart` + `fakes.dart` (fake auth, profile and
+  catalogue repositories). Simulate an app restart by pumping again with the same `TestBackend`
+  and `SharedPreferences`.
 - Tests never call real Firebase, Google or Gemini services or use real credentials.
 - A bug fix comes with a test that fails without the fix.
 
@@ -86,6 +107,8 @@ firebase emulators:start --project demo-sprelia    # Auth :9099, Firestore :8180
 4. `flutter build apk --debug --dart-define-from-file=env/development.json` succeeds
    for changes touching native config or dependencies.
 5. Security checklist (`security.md`) reviewed for security-sensitive changes.
+5a. Asset changes: `AppAssets`, `doc/ASSET_LIBRARY.md`, `pubspec.yaml` and
+    `assets/ATTRIBUTION.md` updated together (`flutter test test/core/assets/`).
 6. Docs in `.agents/` updated when a decision or convention changes.
 
 ## Git
@@ -97,8 +120,8 @@ firebase emulators:start --project demo-sprelia    # Auth :9099, Firestore :8180
 
 | Phase | Status |
 |---|---|
-| 1. Foundation (architecture, design system, routing, env config, error handling, Fastify API with auth middleware, Firebase scaffolding, guardrails) | **Done**, awaiting approval |
-| 2. Flutter architecture & design system (l10n, Inter font, remaining components, onboarding UI) | Not started |
+| 1. Foundation (architecture, design system, routing, env config, error handling, Fastify API with auth middleware, Firebase scaffolding, guardrails) | **Done** (branch `phase-1-foundation`) |
+| 2. Experience: docs completed, contrast fixes, Inter, l10n, email auth, onboarding with persistence, home dashboard, tutors, practice categories, preparation; profile, onboarding, dashboard and catalogue APIs | **Done**, awaiting approval (branch `phase-2-experience`) |
 | 3. Backend foundation: remaining modules, `AIProvider`, Dockerfile | Not started |
 | 4. Firebase projects, Auth, App Check, Firestore rules + emulator tests, Crashlytics/Analytics | Not started (needs approval to create projects) |
 | 5–10. Onboarding/profile, Gemini realtime, quotas, feedback, monetization, release | Not started |

@@ -39,17 +39,24 @@ paid tier for learner data.
 5. **Cloud Run service account**: grant it only the roles it needs (Firebase Auth admin
    for token revocation checks, Datastore user for Firestore). Use no key files.
 
-## 3. Flutter wiring (Phase 4; not done yet)
-- Packages: `firebase_core`, `firebase_auth`, `google_sign_in`, `cloud_firestore`,
-  `firebase_app_check`, `firebase_analytics`, `firebase_crashlytics`, `firebase_messaging`.
-  Add them with `flutter pub add` and verify versions at that time.
-- Generate options with the FlutterFire CLI per environment. The generated
-  `lib/firebase_options*.dart`, `google-services.json` and `GoogleService-Info.plist`
-  are **gitignored**; CI supplies them from secrets.
-- Initialize in `lib/main.dart` before `runApp` (a placeholder comment marks the spot),
-  then activate App Check.
-- Add the Dio interceptor: `Authorization: Bearer <ID token>`, App Check header, and
-  token refresh with a single retry on 401.
+## 3. Flutter wiring
+Done in Phase 2:
+- `firebase_core` and `firebase_auth`. Options come from dart-defines (`env/*.json`) through
+  `AppConfig.firebase`. No `google-services.json` or FlutterFire file is needed or committed.
+- Development: Auth emulator with `demo-sprelia` (`env/development.json`).
+- Dio interceptor: `Authorization: Bearer <ID token>`, with one forced refresh and retry on 401.
+
+To run the app against the real `sprelia` project (owner decision; do not commit the file):
+1. In Firebase console → Authentication, enable **Email/Password**.
+2. Create `env/sprelia.local.json` (gitignored by `env/*.local.json`) with `APP_ENV`
+   `development`, your API URL, `FIREBASE_PROJECT_ID=sprelia`, and `FIREBASE_API_KEY`,
+   `FIREBASE_APP_ID` (`1:756773147926:android:1bc8ce332ae6b5ccce2c37`) and
+   `FIREBASE_MESSAGING_SENDER_ID` (`756773147926`) from the Android app's config. Leave out
+   `FIREBASE_AUTH_EMULATOR_HOST`.
+3. Run the backend with `FIREBASE_PROJECT_ID=sprelia` and Application Default Credentials
+   (`gcloud auth application-default login`), no emulator variables.
+
+Phase 4: App Check, Google sign-in (needs SHA fingerprints), Crashlytics and Analytics.
 
 ## 4. Backend wiring (done in Phase 1)
 - `FIREBASE_PROJECT_ID` selects the project whose ID tokens are accepted.
@@ -60,7 +67,7 @@ paid tier for learner data.
   production refuse to start with it).
 
 ## 5. Security rules roadmap
-Phase 1 denies all client access. Phase 4 adds the owner-scoped rules described in
+Phases 1–2 deny all client access, verified by `backend/test/integration/firestore.rules.test.ts`. Phase 4 adds the owner-scoped rules described in
 `.agents/architecture.md` together with `@firebase/rules-unit-testing` tests run on
 the emulator. A rule change without tests is not mergeable.
 

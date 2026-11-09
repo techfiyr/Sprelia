@@ -1,41 +1,43 @@
 # Sprelia
 
-AI English-speaking coach (provisional brand; the code package is still `speakdaily`).
+AI English-speaking coach (provisional brand; app ID `com.techfiyr.sprelia`, Dart package `speakdaily`).
 Flutter (Android first, iOS-ready) + Node.js/TypeScript (Fastify) backend + Firebase + Gemini.
 
-**Status: Phase 1 (foundation) complete.** It includes the design system, routing,
-environment config, error handling, and a Fastify API with Firebase ID token
-verification. The Emma voice prototype still runs on the legacy Express server.
+**Status: Phase 2 (application experience) complete.** It includes email sign-in,
+onboarding that survives app restarts, the home dashboard, tutor selection, practice
+categories and preparation, backed by authenticated profile, onboarding, dashboard and
+catalogue APIs. Live voice sessions are not part of Phase 2. The legacy Emma prototype
+runs only in development builds.
 
-## Quick start
+## Run everything locally (no real Firebase project needed)
 
 ```bash
-# Backend API
-cd backend
-npm install
-cp .env.example .env          # placeholders only; never commit .env
-npm run dev                   # http://localhost:8080/api/v1/health → {"status":"ok"}
-npm test && npm run typecheck
+# 1. Firebase emulators (repo root; needs Java): Auth :9099, Firestore :8180, UI :4000
+firebase emulators:start --only auth,firestore --project demo-sprelia
 
-# Flutter app (repo root)
+# 2. API (new terminal)
+cd backend && npm install && cp -n .env.example .env   # placeholders only
+APP_ENV=development FIREBASE_PROJECT_ID=demo-sprelia \
+  FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 FIRESTORE_EMULATOR_HOST=127.0.0.1:8180 npm run dev
+#    → http://localhost:8080/api/v1/health
+
+# 3. App on an Android emulator (new terminal, repo root)
 flutter pub get
 flutter run --dart-define-from-file=env/development.json
-flutter analyze && flutter test
 ```
+Then create an account with any email and an 8+ character password.
 
-### Legacy voice prototype (Emma on Gemini Live)
+## Checks
 ```bash
-cd backend
-# in .env: GEMINI_API_KEY=<your key>, DEV_SKIP_AUTH=true (local machine only)
-npm run dev:prototype         # serves /v1/conversations on :8080
+flutter analyze && flutter test
+cd backend && npm run typecheck && npm test && npm run build
+cd backend && npm run test:integration   # emulator-backed API + Firestore rules tests
 ```
-Then run the app as above and tap **Start Speaking**. The prototype uses
-superseded Gemini model IDs and a v1alpha token endpoint; Phase 6 replaces it.
 
 ## Documentation
 - `CLAUDE.md`: rules for AI agents (start here)
-- `.agents/architecture.md`: architecture and implemented decisions
+- `.agents/architecture.md`: architecture, implemented decisions, API reference
 - `.agents/security.md`: security requirements and review checklist
 - `.agents/development.md`: commands, conventions, testing, phase status
-- `doc/FIREBASE_SETUP.md`: required Firebase configuration
+- `doc/FIREBASE_SETUP.md`: Firebase status and configuration
 - `doc/`: approved product, flow, brand and design specifications

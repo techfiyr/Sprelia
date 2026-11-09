@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'app_brand.dart';
 
-/// PLACEHOLDER logo. The final Sprelia logo (speech bubble + voice wave,
-/// `doc/BRAND.md` §5) has not been designed yet. This uses a stock Material
-/// icon in a brand-colored tile and must be replaced by the approved asset
-/// under `assets/branding/logo/` once it exists.
+/// PLACEHOLDER logo ([AppAssets.logoPlaceholder]). The final Sprelia logo
+/// (speech bubble + voice wave, `doc/BRAND.md` §5) has not been designed yet.
+/// This uses a stock Material icon in a brand-colored tile. When
+/// [AppAssets.logoMark] is approved (SVG), add `flutter_svg`, register the file,
+/// and render it here when `AppAssets.logoMark.isUsable`.
 class BrandLogo extends StatelessWidget {
   const BrandLogo({super.key, this.size = 64, this.showWordmark = false});
 

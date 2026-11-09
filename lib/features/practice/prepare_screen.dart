@@ -1,61 +1,136 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/config/app_config.dart';
 import '../../core/routing/app_routes.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/widgets.dart';
-import '../tutors/tutor.dart';
+import '../../l10n/l10n.dart';
+import '../profile/data/profile_repository.dart';
 import '../tutors/tutor_avatar.dart';
+import 'data/catalog_repository.dart';
 
-class PrepareScreen extends StatelessWidget {
-  const PrepareScreen({super.key, required this.tutorId});
+/// Conversation preparation (APP_FLOW §9): tutor, scenario, objective,
+/// duration and remaining free time. No AI session is created here.
+///
+/// Phase 2: live voice sessions are not part of this phase. In development
+/// builds the existing Emma prototype can still be launched; elsewhere the
+/// start button explains that voice practice is coming soon.
+class PrepareScreen extends ConsumerWidget {
+  const PrepareScreen({super.key, required this.tutorId, this.scenarioId});
 
   final String tutorId;
+  final String? scenarioId;
 
   @override
-  Widget build(BuildContext context) {
-    final tutor = tutorById(tutorId);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
     final text = context.textStyles;
+    final tutor = ref.watch(tutorByIdProvider(tutorId));
+    final match = scenarioId == null ? null : ref.watch(scenarioByIdProvider(scenarioId!));
+    final scenario = match?.$2;
+    final remaining = ref.watch(dashboardProvider).value?.remainingFreeSeconds;
+    final canStart = tutor.voiceAvailable && ref.watch(appConfigProvider).voicePrototypeEnabled;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Get ready')),
+      appBar: AppBar(title: Text(l10n.prepareTitle)),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Center(child: TutorAvatar(tutor: tutor, size: 96)),
-              const SizedBox(height: 16),
-              Text(tutor.name, textAlign: TextAlign.center, style: text.headlineSmall),
-              Text(tutor.title,
-                  textAlign: TextAlign.center,
-                  style: text.bodyMedium?.copyWith(color: context.palette.textSecondary)),
-              Gap.xl,
-              _InfoRow(icon: Icons.chat_bubble_outline, label: 'Mode', value: 'Free conversation'),
-              _InfoRow(icon: Icons.flag_outlined, label: 'Goal', value: 'Speak naturally for a few minutes'),
-              _InfoRow(
-                icon: Icons.timer_outlined,
-                label: 'Daily free time',
-                value: '${AppConfig.freeDailySecondsDisplay ~/ 60} minutes',
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                children: [
+                  Center(child: TutorAvatar(tutor: tutor, size: 96)),
+                  Gap.lg,
+                  Text(tutor.name, textAlign: TextAlign.center, style: text.headlineSmall),
+                  if (tutor.title.isNotEmpty)
+                    Text(tutor.title, textAlign: TextAlign.center, style: text.bodyMedium?.copyWith(color: context.palette.textSecondary)),
+                  Center(
+                    child: AppButton.text(
+                      key: const ValueKey('prepare-change-tutor'),
+                      label: l10n.prepareChangeTutor,
+                      onPressed: () => context.pushReplacement(AppRoutes.tutorsFor(scenarioId: scenarioId)),
+                    ),
+                  ),
+                  Gap.md,
+                  AppCard(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(scenario?.title ?? l10n.practiceFreeConversation, style: text.titleMedium),
+                        if (scenario != null) ...[Gap.xs, Text(scenario.description, style: text.bodyMedium)],
+                        Gap.lg,
+                        Text(l10n.prepareObjectives, style: text.labelLarge),
+                        Gap.xs,
+                        for (final o in scenario?.objectives ?? [l10n.prepareFreeConversationObjective])
+                          Padding(
+                            padding: const EdgeInsets.only(top: AppSpacing.xs),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(Icons.check_rounded, size: 18, color: context.colors.primary),
+                                Gap.sm,
+                                Expanded(child: Text(o, style: text.bodyMedium)),
+                              ],
+                            ),
+                          ),
+                        if (scenario != null && scenario.vocabulary.isNotEmpty) ...[
+                          Gap.lg,
+                          Text(l10n.prepareVocabulary, style: text.labelLarge),
+                          Gap.sm,
+                          Wrap(
+                            spacing: AppSpacing.sm,
+                            runSpacing: AppSpacing.sm,
+                            children: [for (final v in scenario.vocabulary) Chip(label: Text(v))],
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  Gap.md,
+                  _InfoRow(
+                    icon: Icons.timer_outlined,
+                    label: l10n.prepareDuration,
+                    value: l10n.prepareMinutes(scenario?.estimatedMinutes ?? 5),
+                  ),
+                  if (remaining != null)
+                    _InfoRow(icon: Icons.hourglass_bottom_rounded, label: l10n.prepareFreeTime, value: l10n.prepareMinutes(remaining ~/ 60)),
+                  Gap.md,
+                  AppCard(
+                    tone: AppCardTone.tinted,
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(l10n.prepareMicrophoneNote, style: text.bodySmall?.copyWith(color: context.palette.textPrimary)),
+                        Gap.sm,
+                        Text(l10n.preparePrivacyNote, style: text.bodySmall?.copyWith(color: context.palette.textPrimary)),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const Spacer(),
-              AppCard(
-                tone: AppCardTone.tinted,
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Text(
-                  'Your voice is streamed to our AI provider to power the conversation. '
-                  'We save the text transcript to create your feedback. Raw audio is not stored.',
-                  style: text.bodySmall,
-                ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                children: [
+                  if (!canStart) ...[
+                    Text(l10n.prepareVoiceComingSoon(tutor.name), textAlign: TextAlign.center, style: text.bodyMedium),
+                    Gap.md,
+                  ],
+                  AppButton(
+                    key: const ValueKey('prepare-start'),
+                    label: l10n.prepareStart,
+                    icon: Icons.mic_rounded,
+                    onPressed: canStart ? () => context.pushReplacement(AppRoutes.conversation(tutor.id)) : null,
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              AppButton(
-                label: 'Start Conversation',
-                onPressed: () => context.pushReplacement(AppRoutes.conversation(tutor.id)),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -74,14 +149,13 @@ class _InfoRow extends StatelessWidget {
     final text = context.textStyles;
     final muted = context.palette.textSecondary;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Row(
         children: [
           Icon(icon, size: 20, color: muted),
-          const SizedBox(width: 12),
-          Text(label, style: text.bodyMedium?.copyWith(color: muted)),
-          const Spacer(),
-          Flexible(child: Text(value, textAlign: TextAlign.end, style: text.bodyMedium)),
+          Gap.md,
+          Expanded(child: Text(label, style: text.bodyMedium?.copyWith(color: muted))),
+          Text(value, style: text.titleSmall),
         ],
       ),
     );

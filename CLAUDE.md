@@ -21,15 +21,19 @@ Node.js/TypeScript backend + Firebase + Gemini.
 | Screens, flows, copy, acceptance criteria | `doc/APP_FLOW.md` |
 | Name, colors, logo, tutor visuals, voice & tone | `doc/BRAND.md` (Sprelia, purple) |
 | Type scale, spacing names, components, accessibility | `doc/DESIGN_SYSTEM.md` (its teal palette and "SpeakDaily" name are **superseded** by BRAND.md) |
+| Assets: rules, inventory, specs, licences | `doc/ASSET_LIBRARY.md` (enforced by `test/core/assets/`) |
 | Strategy / future ideas (not approved scope) | `doc/TARGET.md` |
 
-`APP_DEVELOPMENT.md` (§9 onward) and `BRAND.md` (§11) are truncated; ask before
-assuming content that is missing. Report conflicts instead of silently choosing.
+`APP_DEVELOPMENT.md` §9 to §19 and `BRAND.md` §11 to §14 were completed by engineering
+on 2026-11-09 and are marked as pending owner review. Report conflicts instead of
+silently choosing.
 
 ## Current status
 
-- **Phase 1 (foundation) is complete.** See `.agents/development.md` → "Phase status".
-- Do not start the next phase (or Gemini voice, subscriptions, ads, deployment) without approval.
+- **Phase 2 (application experience) is complete**, on branch `phase-2-experience`, awaiting approval.
+  See `.agents/development.md` → "Phase status".
+- Do not start the next phase (or Gemini voice, subscriptions, ads, deployment, or
+  configuring the real `sprelia` Firebase project) without approval.
 
 ## Non-negotiable rules
 

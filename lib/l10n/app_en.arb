@@ -1,0 +1,254 @@
+{
+  "@@locale": "en",
+  "actionContinue": "Continue",
+  "actionBack": "Back",
+  "actionTryAgain": "Try again",
+  "stepProgress": "Step {current} of {total}",
+  "@stepProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "welcomeContinueWithEmail": "Continue with Email",
+  "welcomeSignInUnavailable": "Sign-in isn't set up in this build yet.",
+  "authSignInTitle": "Welcome back",
+  "authSignInSubtitle": "Sign in to continue your practice.",
+  "authCreateTitle": "Create your account",
+  "authCreateSubtitle": "It only takes a minute.",
+  "authEmailLabel": "Email",
+  "authPasswordLabel": "Password",
+  "authSignInAction": "Sign in",
+  "authCreateAction": "Create account",
+  "authSwitchToCreate": "New here? Create an account",
+  "authSwitchToSignIn": "Already have an account? Sign in",
+  "authForgotPassword": "Forgot password?",
+  "authResetSent": "If an account exists for {email}, we've sent a link to reset your password.",
+  "@authResetSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authEmailInvalid": "Please enter a valid email address.",
+  "authPasswordTooShort": "Use at least 8 characters.",
+  "splashLoading": "Getting things ready…",
+  "onboardingInterfaceLanguageTitle": "Which language should the app use?",
+  "onboardingInterfaceLanguageSubtitle": "You can change this later in your profile.",
+  "onboardingMoreLanguagesSoon": "More app languages are coming soon.",
+  "onboardingNativeLanguageTitle": "What's your first language?",
+  "onboardingNativeLanguageSubtitle": "We'll use it to make explanations clearer for you.",
+  "onboardingSearchLanguages": "Search languages",
+  "onboardingNoLanguageMatch": "No languages match your search.",
+  "onboardingGoalsTitle": "What would you like to practise?",
+  "onboardingGoalsSubtitle": "Choose all that apply.",
+  "goalEveryday": "Everyday English",
+  "goalEverydayDescription": "Daily conversations and routines",
+  "goalCareer": "Career and interviews",
+  "goalCareerDescription": "Job interviews and talking about your work",
+  "goalBusiness": "Business communication",
+  "goalBusinessDescription": "Meetings, presentations and clients",
+  "goalTravelSocial": "Travel and social life",
+  "goalTravelSocialDescription": "Trips, new places and making friends",
+  "goalAcademic": "Academic English",
+  "goalAcademicDescription": "Class discussions and explaining ideas",
+  "goalConfidence": "Speaking confidence",
+  "goalConfidenceDescription": "Feel relaxed when you speak",
+  "onboardingLevelTitle": "How would you describe your English today?",
+  "onboardingLevelSubtitle": "This is a starting point, not a test. You can change it anytime.",
+  "levelA1": "Beginner",
+  "levelA1Description": "I can use simple words and phrases.",
+  "levelA2": "Elementary",
+  "levelA2Description": "I can talk about familiar, everyday topics.",
+  "levelB1": "Intermediate",
+  "levelB1Description": "I can handle most daily situations and share opinions.",
+  "levelB2": "Upper intermediate",
+  "levelB2Description": "I can discuss many topics and speak fairly fluently.",
+  "levelNotSure": "I'm not sure",
+  "levelNotSureDescription": "No problem. We'll start gently and adjust as you practise.",
+  "onboardingDailyGoalTitle": "How long would you like to practise each day?",
+  "onboardingDailyGoalSubtitle": "A small daily habit makes a big difference.",
+  "dailyGoalMinutes": "{minutes} minutes a day",
+  "@dailyGoalMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "dailyGoal5": "A quick daily warm-up",
+  "dailyGoal10": "A great everyday habit",
+  "dailyGoal15": "Steady, noticeable progress",
+  "dailyGoal20": "For focused learners",
+  "onboardingAccentTitle": "Which accent would you like to hear?",
+  "onboardingAccentSubtitle": "Every accent is correct English. This only changes how your tutor sounds.",
+  "accentAmerican": "American English",
+  "accentBritish": "British English",
+  "accentAustralian": "Australian English",
+  "accentInternational": "International / no preference",
+  "onboardingCreatePlan": "Create my plan",
+  "onboardingSaving": "Saving your answers…",
+  "planTitle": "Your learning plan is ready",
+  "planSubtitle": "Here's how we'll start. Your plan adapts as you practise.",
+  "planGoals": "Your goals",
+  "planLevel": "Starting point",
+  "planDailyTarget": "Daily target",
+  "planSuggestedPractice": "Suggested practice",
+  "planRecommendedTutor": "Recommended tutor",
+  "planStartPractising": "Start practising",
+  "homeGreetingMorning": "Good morning!",
+  "homeGreetingAfternoon": "Good afternoon!",
+  "homeGreetingEvening": "Good evening!",
+  "homeGreetingMorningName": "Good morning, {name}!",
+  "@homeGreetingMorningName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeGreetingAfternoonName": "Good afternoon, {name}!",
+  "@homeGreetingAfternoonName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeGreetingEveningName": "Good evening, {name}!",
+  "@homeGreetingEveningName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeSubtitle": "Ready to practise your English?",
+  "homeTodayGoal": "Today's goal",
+  "homeTodayProgress": "{done} of {goal} minutes",
+  "@homeTodayProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "homeTodayMinutes": "{minutes} minutes today",
+  "@homeTodayMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeFreeTimeLeft": "{minutes} min of free speaking time left today",
+  "@homeFreeTimeLeft": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeStartSpeaking": "Start Speaking",
+  "homeRecommended": "Recommended for you",
+  "homeReview": "Review",
+  "homeMistakeVault": "Mistake Vault",
+  "homeMistakeVaultEmpty": "Your corrections will appear here after practice.",
+  "homeVocabulary": "Vocabulary",
+  "homeVocabularyEmpty": "Useful new words will appear here after practice.",
+  "homeYourProgress": "Your progress",
+  "homeStreak": "{count, plural, =0{No streak yet} =1{1-day streak} other{{count}-day streak}}",
+  "@homeStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeWeeklyMinutes": "{minutes} min this week",
+  "@homeWeeklyMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "homeWeeklySessions": "{count, plural, =0{No sessions this week} =1{1 session this week} other{{count} sessions this week}}",
+  "@homeWeeklySessions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "practiceTitle": "Practice",
+  "practiceSubtitle": "Choose a real-life situation to practise.",
+  "practiceFreeConversation": "Free conversation",
+  "practiceFreeConversationDescription": "Talk about anything with a tutor of your choice.",
+  "practiceScenarioCount": "{count, plural, =1{1 scenario} other{{count} scenarios}}",
+  "@practiceScenarioCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "practiceAboutMinutes": "About {minutes} min",
+  "@practiceAboutMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "practiceLevels": "Levels {range}",
+  "@practiceLevels": {
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "tutorsTitle": "Choose your tutor",
+  "tutorsVoiceSoon": "Voice coming soon",
+  "tutorsRecommended": "Recommended",
+  "prepareTitle": "Get ready",
+  "prepareObjectives": "What you'll practise",
+  "prepareVocabulary": "Useful words and phrases",
+  "prepareFreeConversationObjective": "Speak naturally about a topic you choose.",
+  "prepareDuration": "Recommended duration",
+  "prepareFreeTime": "Free speaking time left today",
+  "prepareMinutes": "{minutes} min",
+  "@prepareMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "prepareChangeTutor": "Change tutor",
+  "prepareStart": "Start conversation",
+  "prepareVoiceComingSoon": "Voice practice with {name} is coming soon.",
+  "@prepareVoiceComingSoon": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "prepareMicrophoneNote": "When you start, we'll ask to use your microphone so you can talk with your tutor.",
+  "preparePrivacyNote": "Your voice is streamed to our AI provider to power the conversation. We save the text transcript to create your feedback. Raw audio is not stored.",
+  "profileTitle": "Profile",
+  "profileSignOut": "Sign out",
+  "profileLearningPreferences": "Learning preferences",
+  "profileAccent": "Preferred accent",
+  "profileNativeLanguage": "First language"
+}

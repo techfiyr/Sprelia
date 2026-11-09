@@ -1,5 +1,5 @@
 name: speakdaily
-description: "A new Flutter project."
+description: "Sprelia — AI English speaking coach."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -40,6 +40,13 @@ dependencies:
   web_socket_channel: ^3.0.3
   record: ^7.1.2
   flutter_pcm_sound: ^3.3.3
+  firebase_core: ^5.1.0
+  firebase_auth: ^7.0.1
+  shared_preferences: ^2.5.6
+  flutter_timezone: ^5.1.1
+  intl: any
+  flutter_localizations:
+    sdk: flutter
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -50,17 +57,38 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  crypto: ^3.0.8
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
 flutter:
+  generate: true
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Bundled assets. Every entry is listed in lib/core/assets/app_assets.dart and
+  # doc/ASSET_LIBRARY.md; test/core/assets/asset_library_test.dart keeps them in sync.
+  # Register only folders/files that contain shipped assets (never README files).
+  assets:
+    - assets/fonts/inter/license_ofl.txt   # shown in the in-app licenses page (OFL requirement)
+
+  # Brand typeface: Inter v4.1, SIL Open Font License 1.1.
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/inter/inter_regular.ttf
+          weight: 400
+        - asset: assets/fonts/inter/inter_medium.ttf
+          weight: 500
+        - asset: assets/fonts/inter/inter_semibold.ttf
+          weight: 600
+        - asset: assets/fonts/inter/inter_bold.ttf
+          weight: 700
 
   # To add assets to your application, add an assets section, like this:
   # assets:

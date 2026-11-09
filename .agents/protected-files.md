@@ -13,7 +13,17 @@ seems to require it, stop and explain why.
 - `backend/src/modules/auth/*`: ID token verification and the auth middleware.
 - `backend/src/common/logger.ts`: log redaction list. You may add paths; never remove any.
 - `backend/src/tokens.ts`: Gemini ephemeral token constraints (legacy prototype).
+- `backend/src/modules/users/profile.routes.ts`, `user.schemas.ts` and the repositories (ownership and validation).
+- `backend/test/integration/firestore.rules.test.ts` (may be extended; never weakened).
+- `lib/core/routing/app_router.dart` `sessionRedirect` (access rules) and `lib/core/auth/*`.
+- `android/app/src/debug/res/xml/network_security_config.xml` (cleartext scope).
 - Future: usage, subscription, entitlement and webhook modules.
+
+## Assets
+- `lib/core/assets/app_assets.dart` status and licence fields, and `assets/ATTRIBUTION.md`:
+  marking an asset `available` or `bundled` needs owner approval of its licence and, for
+  branding, brand approval.
+- `test/core/assets/asset_library_test.dart` (may be extended; never weakened).
 
 ## Contracts
 - `lib/core/services/realtime/realtime_provider.dart`: realtime provider contract.

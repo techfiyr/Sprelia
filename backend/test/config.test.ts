@@ -41,3 +41,13 @@ describe('loadConfig', () => {
     }
   });
 });
+
+describe('FIREBASE_PROJECT_ID', () => {
+  it('rejects a project number', () => {
+    expect(() => loadConfig({ FIREBASE_PROJECT_ID: '756773147926' })).toThrowError(/project number/);
+  });
+  it('accepts real and demo project IDs', () => {
+    expect(loadConfig({ FIREBASE_PROJECT_ID: 'sprelia' }).firebaseProjectId).toBe('sprelia');
+    expect(loadConfig({ FIREBASE_PROJECT_ID: 'demo-sprelia' }).firebaseProjectId).toBe('demo-sprelia');
+  });
+});

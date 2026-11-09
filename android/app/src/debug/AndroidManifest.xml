@@ -4,6 +4,7 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- Debug only: allow http to the local backend (10.0.2.2). -->
-    <application android:usesCleartextTraffic="true" />
+    <!-- Debug only: allow http to LOCAL development hosts only (backend and
+         Firebase emulators); see res/xml/network_security_config.xml. -->
+    <application android:networkSecurityConfig="@xml/network_security_config" />
 </manifest>

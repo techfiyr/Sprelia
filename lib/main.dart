@@ -1,17 +1,24 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
+import 'core/assets/app_assets.dart';
+import 'core/auth/auth_repository.dart';
 import 'core/config/app_config.dart';
 import 'core/errors/app_provider_observer.dart';
 import 'core/errors/error_reporter.dart';
+import 'core/firebase/firebase_bootstrap.dart';
+import 'core/storage/local_storage.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   const ErrorReporter reporter = DebugErrorReporter();
   installGlobalErrorHandlers(reporter);
+  registerAssetLicenses();
 
   final AppConfig config;
   try {
@@ -21,19 +28,40 @@ void main() {
     return;
   }
 
-  // Phase 4: Firebase.initializeApp(options: <flavor options>) and App Check
-  // activation go here, before runApp. See doc/FIREBASE_SETUP.md.
+  final AuthRepository auth;
+  final SharedPreferences prefs;
+  try {
+    (auth, prefs) = await (initializeFirebase(config), SharedPreferences.getInstance()).wait;
+  } catch (e, st) {
+    reporter.report(e, st, reason: 'Startup failed', fatal: true);
+    runApp(const ConfigErrorApp(message: 'The app could not start. Please try again later.'));
+    return;
+  }
 
   runApp(
     ProviderScope(
       overrides: [
         appConfigProvider.overrideWithValue(config),
         errorReporterProvider.overrideWithValue(reporter),
+        authRepositoryProvider.overrideWithValue(auth),
+        sharedPreferencesProvider.overrideWithValue(prefs),
       ],
       observers: [AppProviderObserver(reporter)],
+      // Failed requests are retried by the user (retry buttons), never silently
+      // in a loop, so the backend is not hammered and errors stay visible.
+      retry: (_, _) => null,
       child: const SpreliaApp(),
     ),
   );
+}
+
+/// Adds bundled third-party asset licences (Inter, SIL OFL 1.1) to the in-app
+/// licences page (`showLicensePage`). Package licences are added by Flutter.
+void registerAssetLicenses() {
+  LicenseRegistry.addLicense(() async* {
+    final text = await rootBundle.loadString(AppAssets.interLicense.path);
+    yield LicenseEntryWithLineBreaks(const ['Inter (font)'], text);
+  });
 }
 
 /// Routes every uncaught error to [reporter] so nothing fails silently.

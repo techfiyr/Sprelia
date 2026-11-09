@@ -6,5 +6,6 @@ export '../branding/brand_logo.dart';
 export 'app_button.dart';
 export 'app_card.dart';
 export 'app_loading.dart';
+export 'app_selection_tile.dart';
 export 'app_state_view.dart';
 export 'app_text_field.dart';

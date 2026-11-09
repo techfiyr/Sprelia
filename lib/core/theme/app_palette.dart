@@ -15,7 +15,9 @@ class AppPalette extends ThemeExtension<AppPalette> {
     required this.textSecondary,
     required this.border,
     required this.success,
+    required this.successText,
     required this.warning,
+    required this.warningText,
     required this.danger,
   });
 
@@ -27,8 +29,10 @@ class AppPalette extends ThemeExtension<AppPalette> {
     textSecondary: AppColors.textSecondary,
     border: AppColors.border,
     success: AppColors.success,
+    successText: AppColors.successText,
     warning: AppColors.warning,
-    danger: AppColors.error,
+    warningText: AppColors.warningText,
+    danger: AppColors.errorText,
   );
 
   final Color primaryDark;
@@ -39,8 +43,16 @@ class AppPalette extends ThemeExtension<AppPalette> {
   final Color textPrimary;
   final Color textSecondary;
   final Color border;
+
+  /// Success icon/fill color. Use [successText] for text.
   final Color success;
+  final Color successText;
+
+  /// Decorative only. Always pair with text; use [warningText] for text.
   final Color warning;
+  final Color warningText;
+
+  /// Accessible error color, safe for text and for fills behind white labels.
   final Color danger;
 
   @override
@@ -52,7 +64,9 @@ class AppPalette extends ThemeExtension<AppPalette> {
     Color? textSecondary,
     Color? border,
     Color? success,
+    Color? successText,
     Color? warning,
+    Color? warningText,
     Color? danger,
   }) {
     return AppPalette(
@@ -63,7 +77,9 @@ class AppPalette extends ThemeExtension<AppPalette> {
       textSecondary: textSecondary ?? this.textSecondary,
       border: border ?? this.border,
       success: success ?? this.success,
+      successText: successText ?? this.successText,
       warning: warning ?? this.warning,
+      warningText: warningText ?? this.warningText,
       danger: danger ?? this.danger,
     );
   }
@@ -79,7 +95,9 @@ class AppPalette extends ThemeExtension<AppPalette> {
       textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
       border: Color.lerp(border, other.border, t)!,
       success: Color.lerp(success, other.success, t)!,
+      successText: Color.lerp(successText, other.successText, t)!,
       warning: Color.lerp(warning, other.warning, t)!,
+      warningText: Color.lerp(warningText, other.warningText, t)!,
       danger: Color.lerp(danger, other.danger, t)!,
     );
   }

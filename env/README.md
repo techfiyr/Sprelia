@@ -11,11 +11,16 @@ flutter build appbundle --release --dart-define-from-file=env/staging.json
 |---|---|---|
 | `APP_ENV` | yes | `development`, `staging` or `production` |
 | `API_BASE_URL` | outside development | Absolute URL. Must be `https` outside development. Defaults to `http://10.0.2.2:8080` (Android emulator → host) in development. |
+| `FIREBASE_PROJECT_ID` | outside development | The project **ID** (e.g. `sprelia`), not the project number |
+| `FIREBASE_API_KEY`, `FIREBASE_APP_ID`, `FIREBASE_MESSAGING_SENDER_ID` | with Firebase | From the Firebase app config. Public identifiers, but real values still only go in gitignored files or CI. |
+| `FIREBASE_AUTH_EMULATOR_HOST` | no | `host:port`. **Development only.** Required for `demo-*` projects. |
 | `DEV_USER_ID` | no | Development only (legacy prototype). Rejected in staging/production. |
 
-**These values are compiled into the app and can be extracted from the binary.
-Never put API keys, secrets, tokens or credentials here.**
+`development.json` targets the **Firebase Emulator Suite** (`demo-sprelia`). Its Firebase
+values are placeholders that only the emulator accepts; they are not credentials.
 
-`staging.json` and `production.json` are created from the `*.example.json` files
-once the Cloud Run URLs exist. They contain no secrets, but are gitignored so a
-local edit cannot silently ship to a release build.
+`staging.json`, `production.json` and `*.local.json` are gitignored. Create them from the
+`*.example.json` files. See `doc/FIREBASE_SETUP.md` for running against the real `sprelia` project.
+
+**Everything here is compiled into the app binary and can be extracted. Never put
+secrets, server API keys, tokens or credentials here.**

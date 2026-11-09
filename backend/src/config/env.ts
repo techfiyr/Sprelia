@@ -23,13 +23,19 @@ const EnvSchema = z
     /** Firebase / Google Cloud project that issues the ID tokens we accept. */
     FIREBASE_PROJECT_ID: z
       .string()
-      .regex(/^[a-z0-9-]{4,30}$/, 'must be a Firebase project ID'),
+      .regex(/^[a-z][a-z0-9-]{4,28}[a-z0-9]$/, 'must be a Firebase project ID (not the project number)'),
 
     /**
      * Local development only. When set, firebase-admin accepts tokens from the Auth
      * emulator (which are unsigned). Forbidden outside development/test.
      */
     FIREBASE_AUTH_EMULATOR_HOST: z.string().min(1).optional(),
+
+    /** Local development only: use the Firestore emulator. Forbidden outside development/test. */
+    FIRESTORE_EMULATOR_HOST: z.string().min(1).optional(),
+
+    /** Free plan AI speaking allowance per local day (APP_DEVELOPMENT §2: 10 minutes). */
+    FREE_DAILY_SECONDS: z.coerce.number().int().min(0).max(24 * 3600).default(600),
 
     /** Also reject tokens revoked via revokeRefreshTokens (one extra Auth API call). */
     AUTH_CHECK_REVOKED: booleanString.default(true),
@@ -49,6 +55,13 @@ const EnvSchema = z
         message: 'must not be set in staging/production (emulator tokens are unsigned)',
       });
     }
+    if (deployed && env.FIRESTORE_EMULATOR_HOST) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['FIRESTORE_EMULATOR_HOST'],
+        message: 'must not be set in staging/production',
+      });
+    }
     if (deployed && !env.AUTH_CHECK_REVOKED) {
       ctx.addIssue({
         code: 'custom',
@@ -65,6 +78,8 @@ export interface AppConfig {
   logLevel: 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'silent';
   firebaseProjectId: string;
   firebaseAuthEmulatorHost?: string;
+  firestoreEmulatorHost?: string;
+  freeDailySeconds: number;
   authCheckRevoked: boolean;
   trustProxyHops: number;
   rateLimitPerMinute: number;
@@ -93,6 +108,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     logLevel: e.LOG_LEVEL,
     firebaseProjectId: e.FIREBASE_PROJECT_ID,
     firebaseAuthEmulatorHost: e.FIREBASE_AUTH_EMULATOR_HOST,
+    firestoreEmulatorHost: e.FIRESTORE_EMULATOR_HOST,
+    freeDailySeconds: e.FREE_DAILY_SECONDS,
     authCheckRevoked: e.AUTH_CHECK_REVOKED,
     trustProxyHops: e.TRUST_PROXY_HOPS,
     rateLimitPerMinute: e.RATE_LIMIT_PER_MINUTE,

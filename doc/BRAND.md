@@ -112,11 +112,11 @@ Use purple as the dominant brand color.
 | Background | `#FAF9FF` | Main light-theme background |
 | Surface | `#FFFFFF` | Cards, dialogs and panels |
 | Text primary | `#20213A` | Main text |
-| Text secondary | `#77758B` | Supporting text |
+| Text secondary | `#6A687C` | Supporting text (darkened from `#77758B` for WCAG AA; see §12) |
 | Border | `#EAE7F2` | Dividers and card outlines |
-| Success | `#249B70` | Positive progress and completion |
-| Warning | `#E9A23B` | Warnings |
-| Error | `#D95757` | Errors and destructive actions |
+| Success | `#249B70` | Positive progress icons and fills (text uses Success text `#1C7857`, §12) |
+| Warning | `#E9A23B` | Decorative warning accents (text uses Warning text `#945E11`, §12) |
+| Error | `#D95757` | Error icons and borders (text and destructive fills use Error text `#C82D2D`, §12) |
 
 ### Color usage rules
 
@@ -534,4 +534,104 @@ assets/
 4. Keep assets organized by purpose.
 5. Use scalable SVG or vector assets where appropriate.
 6. Use optimized raster assets for illustrations and avatars.
-7. Support different screen
+7. Support different screen sizes and pixel densities (vector assets, or 1x/2x/3x raster variants).
+8. Keep the brand name in one configurable place (`lib/core/branding/app_brand.dart`).
+9. Mark every temporary asset clearly as a placeholder until the approved asset exists.
+10. Respect the accessibility rules in §12.
+
+> **Sections 11 (end) to 14** were completed on 2026-11-09 by engineering from the
+> approved brand direction and Phase 2 requirements. They are pending owner review.
+
+### Typeface delivery
+
+Inter (SIL Open Font License 1.1) is bundled with the app in `assets/fonts/inter/`
+(Regular 400, Medium 500, SemiBold 600, Bold 700). Fonts are never downloaded at runtime.
+
+---
+
+## 12. Accessibility and Color Contrast
+
+All text must meet **WCAG 2.2 AA**: at least 4.5:1, or 3:1 for large text (24 px, or
+18.66 px bold). Non-text UI elements (icons, borders that convey meaning) need at least 3:1.
+
+### Accessible text tokens
+
+The original palette kept the purple identity, but four colors failed AA when used as
+text. The fix keeps every hue and only darkens it where the color is used for text.
+
+| Token | Hex | Use | Contrast |
+|---|---|---|---|
+| Text secondary | `#6A687C` (was `#77758B`) | Supporting text on any surface | 5.16 on background, 5.41 on white, 4.65 on primary light |
+| Error text | `#C82D2D` | Error messages and destructive button fills (white label) | 5.43 with white |
+| Success text | `#1C7857` | Positive text such as an improved sentence | 5.42 on white |
+| Warning text | `#945E11` | Warning text | 5.43 on white |
+
+The base Error `#D95757` and Success `#249B70` remain the brand colors for icons,
+borders and decorative fills, where they pass 3:1 against white. Warning `#E9A23B` is
+decorative only (2.17:1) and must always be paired with text.
+
+### Verified pairs
+
+| Pair | Ratio | Result |
+|---|---:|---|
+| White text on Primary `#7656D9` (primary button) | 5.12 | Pass |
+| Text primary on background / white | 15.4 / 16.1 | Pass |
+| Primary dark on primary light (tinted surfaces) | 7.42 | Pass |
+| Primary `#7656D9` text on primary light | 4.40 | Fail. Use Primary dark on tinted surfaces. |
+| Text primary on Accent coral | 6.51 | Pass. Never use white text on coral. |
+
+### Rules
+- Never use color alone to convey status. Pair it with text or an icon.
+- Minimum touch target: 48 × 48 px.
+- Support system text scaling. Layouts must not clip at 200% text size.
+- Automated tests in `test/core/theme/` enforce these ratios.
+
+---
+
+## 13. Provisional Name and Rebranding Requirements
+
+Sprelia is provisional. It must not be presented as trademarked, and no store listing,
+domain purchase or trademark filing happens without explicit authorization.
+
+Current identity (local development):
+
+| Item | Value |
+|---|---|
+| Visible app name | Sprelia (Android `android:label`, iOS `CFBundleDisplayName`, `CFBundleName`) |
+| Android application ID / namespace | `com.techfiyr.sprelia` |
+| iOS bundle ID | `com.techfiyr.sprelia` (tests: `com.techfiyr.sprelia.RunnerTests`) |
+| Firebase project | `sprelia` (project number 756773147926) |
+| Dart package name | `speakdaily` (internal, not user-visible) |
+| Repository | `techfiyr/Sprelia` |
+
+If the name changes **before** the first store upload, update all of the following:
+1. `lib/core/branding/app_brand.dart` (name, tagline).
+2. Android `android:label`, and iOS `CFBundleDisplayName` and `CFBundleName`.
+3. Application and bundle IDs (they are **permanent after the first store upload**), the
+   Kotlin `MainActivity` package path, and the Firebase app registrations and config files.
+4. Firebase project display name. Project IDs cannot be renamed, so create new projects if the ID must change.
+5. Permission strings (microphone usage text), notification copy and email templates.
+6. Logo, app icon, splash and banners (`assets/branding/`).
+7. Store listings, privacy policy, terms, website and support pages.
+8. Backend user-facing strings, the AI tutor system prompts ("Sprelia English tutor") and analytics property names.
+9. This document and `doc/DESIGN_SYSTEM.md`.
+
+If the name changes **after** publication: the application ID stays the same, and only the
+visible name, assets and listings change.
+
+---
+
+## 14. Asset Status
+
+| Asset | Status |
+|---|---|
+| Logo (all variants) | **Not designed.** The app shows a labelled placeholder (`BrandLogo`). |
+| App icon | **Not designed.** Flutter default icon. |
+| Tutor portraits (Emma, Alex, Sofia) | **Not designed.** Initial-letter placeholders (`TutorAvatar`). |
+| Marketing banners | Not designed |
+| Inter typeface | Bundled (v4.1, OFL) |
+
+Do not generate or ship invented final assets. Replace each placeholder only with an approved asset.
+The full inventory, specs and licence status are in `doc/ASSET_LIBRARY.md`.
+
+**End of brand guidelines.**
