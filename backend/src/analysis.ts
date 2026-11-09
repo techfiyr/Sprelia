@@ -28,7 +28,7 @@ export interface TranscriptLine {
 }
 
 const ANALYSIS_PROMPT = `
-You are Sprelia's English learning analyst. You receive the transcript of a spoken
+You are Hermione's English learning analyst. You receive the transcript of a spoken
 practice conversation between a learner ("user") and an AI tutor ("tutor").
 
 Produce feedback for the LEARNER only:

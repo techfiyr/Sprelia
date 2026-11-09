@@ -1,6 +1,6 @@
 import 'package:flutter/painting.dart';
 
-/// Raw brand color tokens from `doc/BRAND.md` §4 and §12 (Sprelia, purple-led).
+/// Raw brand color tokens from `doc/BRAND.md` §4 and §12 (Hermione, purple-led).
 ///
 /// Only the theme layer (`lib/core/theme/`) may reference these directly.
 /// Feature code reads colors through `Theme.of(context).colorScheme` or

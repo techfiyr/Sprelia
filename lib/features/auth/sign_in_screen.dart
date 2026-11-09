@@ -6,6 +6,7 @@ import '../../core/errors/error_reporter.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/widgets.dart';
 import '../../l10n/l10n.dart';
+import '../premium/ad_banner.dart';
 import 'google_sign_in_button.dart';
 
 /// Email sign-in and account creation (APP_FLOW §4). After success the
@@ -86,6 +87,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
     final text = context.textStyles;
     return Scaffold(
       appBar: AppBar(),
+      bottomNavigationBar: const AdBannerArea(),
       body: SafeArea(
         child: AutofillGroup(
           child: Form(

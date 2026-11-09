@@ -1,5 +1,5 @@
 /*
- * Sprelia cookie and storage consent (first-party, no third-party scripts).
+ * Hermione cookie and storage consent (first-party, no third-party scripts).
  *
  * What this site actually does today: it sets NO cookies and loads NO analytics, advertising
  * or other third-party scripts. The only thing stored is this consent choice, in the browser's

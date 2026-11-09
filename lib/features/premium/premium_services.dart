@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/errors/app_failure.dart';
@@ -69,25 +70,32 @@ class UnavailablePurchaseService implements PurchaseService {
 
 final purchaseServiceProvider = Provider<PurchaseService>((ref) => const UnavailablePurchaseService());
 
-/// Where an ad could appear. Policy (APP_FLOW §16, APP_DEVELOPMENT §11): free plan only, never
-/// during a conversation, never on the paywall or before a paywall decision.
-enum AdPlacement { homeBanner, afterFeedback, conversation, paywall }
+/// Where an ad could appear. Policy: non-subscribers only, on every screen they can reach until they
+/// subscribe (welcome, sample lesson, sign-in, email verification, paywall), never during a live
+/// conversation and never on the transient splash. Owner decision 2026-11-09 (supersedes the earlier
+/// "never on the paywall" rule in APP_FLOW §16).
+enum AdPlacement { homeBanner, bottomBanner, afterFeedback, conversation, paywall }
 
 bool adAllowed(Plan plan, AdPlacement placement) => switch (placement) {
-      AdPlacement.conversation || AdPlacement.paywall => false,
-      AdPlacement.homeBanner || AdPlacement.afterFeedback => plan == Plan.free,
+      AdPlacement.conversation => false,
+      AdPlacement.homeBanner || AdPlacement.bottomBanner || AdPlacement.afterFeedback || AdPlacement.paywall => plan == Plan.free,
     };
 
 /// Ads (AdMob SDK). Unavailable until the AdMob app and ad unit IDs and the consent flow exist
 /// (owner action); nothing is shown or loaded meanwhile.
 abstract interface class AdService {
   bool get available;
+
+  /// The real banner widget once an SDK-backed service exists. Never fake an ad here.
+  Widget buildBanner(BuildContext context);
 }
 
 class UnavailableAdService implements AdService {
   const UnavailableAdService();
   @override
   bool get available => false;
+  @override
+  Widget buildBanner(BuildContext context) => const SizedBox.shrink();
 }
 
 final adServiceProvider = Provider<AdService>((ref) => const UnavailableAdService());

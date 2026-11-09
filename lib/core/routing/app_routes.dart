@@ -5,6 +5,7 @@ abstract final class AppRoutes {
   static const signIn = '/sign-in';
   static const onboarding = '/onboarding';
   static const verifyEmail = '/verify-email';
+  static const guestLesson = '/guest-lesson';
 
   // Main navigation tabs (APP_FLOW §1).
   static const home = '/home';
@@ -41,5 +42,5 @@ abstract final class AppRoutes {
   static String feedback(String conversationId) => '/feedback/${Uri.encodeComponent(conversationId)}';
 
   /// Routes reachable without signing in.
-  static const publicRoutes = {splash, welcome, signIn};
+  static const publicRoutes = {splash, welcome, signIn, guestLesson};
 }

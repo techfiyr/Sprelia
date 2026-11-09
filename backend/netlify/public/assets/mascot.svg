@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-labelledby="t">
+  <title id="t">A friendly tutor with a hair bun and glasses holding an open book, with a speech bubble</title>
+  <circle cx="200" cy="208" r="184" fill="#ffe3d0"/>
+  <circle cx="200" cy="208" r="136" fill="#fff7ec"/>
+  <rect x="232" y="24" width="136" height="68" rx="24" fill="#ff7a6b"/>
+  <path d="M256 88l-16 32 48-32z" fill="#ff7a6b"/>
+  <circle cx="268" cy="58" r="6.5" fill="#fff"/><circle cx="296" cy="58" r="6.5" fill="#fff"/><circle cx="324" cy="58" r="6.5" fill="#fff"/>
+  <path d="M88 392Q88 264 200 256Q312 264 312 392z" fill="#2fa39a"/>
+  <path d="M168 260l32 60 32-60z" fill="#fff7ec"/>
+  <circle cx="200" cy="68" r="36" fill="#4a2a2f"/>
+  <circle cx="200" cy="160" r="94" fill="#4a2a2f"/>
+  <ellipse cx="200" cy="180" rx="76" ry="60" fill="#f2b98f"/>
+  <path d="M124 168Q200 88 276 168Q200 132 124 168z" fill="#4a2a2f"/>
+  <g fill="none" stroke="#3c1f66" stroke-width="5.5"><rect x="146" y="169" width="52" height="30" rx="8"/><rect x="202" y="169" width="52" height="30" rx="8"/><path d="M198 184h4"/></g>
+  <circle cx="168" cy="184" r="4.5" fill="#2a1b3d"/><circle cx="232" cy="184" r="4.5" fill="#2a1b3d"/>
+  <circle cx="148" cy="212" r="10" fill="#ff7a6b" opacity=".35"/><circle cx="252" cy="212" r="10" fill="#ff7a6b" opacity=".35"/>
+  <path d="M176 216Q200 240 224 216" fill="none" stroke="#2a1b3d" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="M200 336Q144 296 96 316v64q48-16 104 12 56-28 104-12v-64q-48-20-104 20z" fill="#fff7ec" stroke="#5b2f8f" stroke-width="5.5" stroke-linejoin="round"/>
+  <path d="M200 336v56" stroke="#5b2f8f" stroke-width="5"/>
+  <circle cx="64" cy="120" r="12" fill="#ffc857"/><circle cx="344" cy="200" r="9.5" fill="#ffc857"/><circle cx="80" cy="280" r="8" fill="#ffc857"/>
+</svg>

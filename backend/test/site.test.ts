@@ -77,7 +77,7 @@ describe('static site', () => {
 
   it('marks unapproved policy choices as pending instead of asserting them', () => {
     const privacy = read('privacy/index.html');
-    expect(privacy).toMatch(/Pending decision:<\/strong> Sprelia currently deletes/);
+    expect(privacy).toMatch(/Pending decision:<\/strong> Hermione currently deletes/);
     expect(privacy).toMatch(/Pending decision:<\/strong> how long transcripts are kept/);
     expect(privacy).toMatch(/Pending decision:<\/strong> how age is confirmed/);
     expect(read('terms/index.html')).toMatch(/Pending decision:<\/strong> Premium prices, trial offers, renewal terms and the refund policy/);

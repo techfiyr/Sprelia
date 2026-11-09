@@ -1,5 +1,5 @@
 name: speakdaily
-description: "Sprelia — AI English speaking coach."
+description: "Hermione — AI English speaking coach."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -79,6 +79,7 @@ flutter:
   # Register only folders/files that contain shipped assets (never README files).
   assets:
     - assets/fonts/inter/license_ofl.txt   # shown in the in-app licenses page (OFL requirement)
+    - assets/branding/animations/hermione_wave.gif   # splash animation (original mascot)
 
   # Brand typeface: Inter v4.1, SIL Open Font License 1.1.
   fonts:

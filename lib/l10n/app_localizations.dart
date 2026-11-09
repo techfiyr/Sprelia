@@ -985,7 +985,7 @@ abstract class AppLocalizations {
   /// No description provided for @deleteAccountBody.
   ///
   /// In en, this message translates to:
-  /// **'This permanently deletes your Sprelia account, profile, preferences and learning progress. This can\'t be undone.'**
+  /// **'This permanently deletes your Hermione account, profile, preferences and learning progress. This can\'t be undone.'**
   String get deleteAccountBody;
 
   /// No description provided for @deleteAccountConfirm.
@@ -1141,7 +1141,7 @@ abstract class AppLocalizations {
   /// No description provided for @profilePolicies.
   ///
   /// In en, this message translates to:
-  /// **'Privacy Policy and Terms are available on the Sprelia website.'**
+  /// **'Privacy Policy and Terms are available on the Hermione website.'**
   String get profilePolicies;
 
   /// No description provided for @prepareNoTimeLeft.
@@ -1267,7 +1267,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumTitle.
   ///
   /// In en, this message translates to:
-  /// **'Sprelia Premium'**
+  /// **'Hermione Premium'**
   String get premiumTitle;
 
   /// No description provided for @premiumHeadline.

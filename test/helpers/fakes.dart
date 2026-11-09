@@ -413,7 +413,7 @@ class FakeLearningRepository implements LearningRepository {
 }
 
 class FakeSubscriptionRepository implements SubscriptionRepository {
-  SubscriptionInfo info = const SubscriptionInfo(plan: Plan.free, dailyAllowanceSeconds: 600);
+  SubscriptionInfo info = const SubscriptionInfo(plan: Plan.premium, dailyAllowanceSeconds: 1800);
   @override
   Future<SubscriptionInfo> getSubscription() async => info;
 }

@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 /**
- * Branding regression check (backend + website): the user-facing name is "Sprelia".
+ * Branding regression check (backend + website): the user-facing name is "Hermione".
  * AI prompts (what tutors say), API messages and the published website must never use the
  * old product name. Technical identifiers (`speakdaily-backend` package name, repository
  * folder) are not user-facing and are not scanned.
@@ -28,11 +28,11 @@ describe('branding', () => {
     expect(hits(files)).toEqual([]);
   });
 
-  it('the Netlify function and website never use the old name, and say Sprelia', () => {
+  it('the Netlify function and website never use the old name, and say Hermione', () => {
     const files = [...walk(join(root, 'netlify'))].filter((f) => /\.(m?ts|html|js|css|txt)$/.test(f));
     expect(hits(files)).toEqual([]);
     for (const page of files.filter((f) => f.endsWith('.html'))) {
-      expect(readFileSync(page, 'utf8'), relative(root, page)).toMatch(/<title>[^<]*Sprelia[^<]*<\/title>/);
+      expect(readFileSync(page, 'utf8'), relative(root, page)).toMatch(/<title>[^<]*Hermione[^<]*<\/title>/);
     }
   });
 });

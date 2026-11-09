@@ -57,7 +57,7 @@ void main() {
     Future<TestBackend> createAccount(WidgetTester tester) async {
       final backend = TestBackend();
       await pumpSpreliaApp(tester, backend: backend, prefs: await freshPrefs());
-      await tester.tap(find.text('Continue with Email'));
+      await tester.tap(find.text('Sign in or create account'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('New here? Create an account'));
       await tester.pumpAndSettle();
@@ -103,7 +103,7 @@ void main() {
       await createAccount(tester);
       await tester.tap(find.byKey(const ValueKey('verify-sign-out')));
       await tester.pumpAndSettle();
-      expect(find.text('Continue with Email'), findsOneWidget);
+      expect(find.text('Sign in or create account'), findsOneWidget);
     });
   });
 
@@ -148,7 +148,7 @@ void main() {
     );
     await pumpSpreliaApp(tester, backend: backend, prefs: await freshPrefs());
     expect(backend.auth.signOutCalls, 1);
-    expect(find.text('Continue with Email'), findsOneWidget);
+    expect(find.text('Sign in or create account'), findsOneWidget);
   });
 
   group('Account deletion', () {
@@ -173,7 +173,7 @@ void main() {
       expect(backend.auth.reauthPasswords, ['correct-horse']);
       expect(backend.account.deleteCalls, 1);
       expect(prefs.getString('onboarding_draft_v1_uid-1'), isNull);
-      expect(find.text('Continue with Email'), findsOneWidget);
+      expect(find.text('Sign in or create account'), findsOneWidget);
     });
 
     testWidgets('cancelling the confirmation deletes nothing', (tester) async {

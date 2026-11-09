@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/errors/app_failure.dart';
+import '../../core/session/session_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/widgets.dart';
 import '../../l10n/l10n.dart';
+import 'ad_banner.dart';
+import 'entitlement.dart';
 import 'premium_services.dart';
 
 /// Premium paywall (APP_FLOW §16). Prices shown are the documented test hypotheses, clearly marked
@@ -18,6 +21,8 @@ class PaywallScreen extends ConsumerWidget {
     final text = context.textStyles;
     final purchases = ref.watch(purchaseServiceProvider);
     final subscription = ref.watch(subscriptionProvider).value;
+    // Signed in without an active subscription: the rest of the app is locked behind this page.
+    final locked = ref.watch(entitlementProvider).value != true && ref.watch(sessionProvider).value is SignedIn;
 
     Future<void> run(Future<void> Function() action) async {
       final messenger = ScaffoldMessenger.of(context);
@@ -31,9 +36,20 @@ class PaywallScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.premiumTitle)),
+      bottomNavigationBar: const AdBannerArea(),
       body: ListView(
         padding: AppSpacing.screenPadding,
         children: [
+          if (locked) ...[
+            AppCard(
+              tone: AppCardTone.tinted,
+              child: Text(
+                'Your free lesson is done. A Hermione subscription unlocks every lesson, tutor and conversation.',
+                style: text.bodyLarge,
+              ),
+            ),
+            Gap.lg,
+          ],
           Text(l10n.premiumHeadline, style: text.headlineSmall),
           Gap.md,
           if (subscription?.isPremium ?? false) ...[
@@ -83,6 +99,15 @@ class PaywallScreen extends ConsumerWidget {
           ),
           Gap.lg,
           Text(l10n.premiumManageNote, style: text.bodySmall),
+          if (locked) ...[
+            Gap.lg,
+            AppButton.text(
+              key: const ValueKey('paywall-sign-out'),
+              label: l10n.profileSignOut,
+              expand: true,
+              onPressed: () => ref.read(sessionProvider.notifier).signOut(),
+            ),
+          ],
         ],
       ),
     );

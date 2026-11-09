@@ -9,6 +9,7 @@ import '../../core/session/session_controller.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/widgets.dart';
 import '../../l10n/l10n.dart';
+import '../premium/ad_banner.dart';
 
 /// Email verification gate (APP_FLOW §4 "email verification as appropriate"; owner
 /// decision D1, recommended). Shown to signed-in email/password accounts whose email
@@ -105,6 +106,7 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> {
     final busy = _checking || _sending;
 
     return Scaffold(
+      bottomNavigationBar: const AdBannerArea(),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.xl),

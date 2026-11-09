@@ -25,8 +25,9 @@ fails if this file, `lib/core/assets/app_assets.dart`, `pubspec.yaml` and the fi
    README, attribution and unapproved files are not shipped.
 5. Formats: **SVG** for logos and vector artwork; **WebP** for photos and illustrations;
    **PNG** where transparency or exact pixels matter (icon sources); **Lottie JSON** for
-   animations; **TTF/OTF** for fonts. Bundled assets are never JPEG (enforced).
-   Size budgets (enforced): WebP ≤ 300 KB, PNG ≤ 500 KB, SVG ≤ 100 KB, Lottie ≤ 300 KB,
+   animations, plus **GIF** only for short, small looping brand animations (owner exception,
+   ≤ 100 KB); **TTF/OTF** for fonts. Bundled assets are never JPEG (enforced).
+   Size budgets (enforced): WebP ≤ 300 KB, PNG ≤ 500 KB, SVG ≤ 100 KB, GIF ≤ 100 KB, Lottie ≤ 300 KB,
    font ≤ 600 KB. Export rasters at the largest displayed size × 3 at most, or provide
    `2.0x/` and `3.0x/` variants.
 6. Names: lowercase `snake_case` files and folders, `<subject>_<variant>.<ext>` (enforced),
@@ -156,6 +157,7 @@ illustrations are planned for the MVP.
 | `AppAssets.welcomeIllustration` | `assets/illustrations/welcome_illustration.webp` | WebP | Friendly welcome illustration (APP_FLOW §3) | planned | TBD |
 | `AppAssets.onboardingIllustration` | `assets/illustrations/onboarding_illustration.webp` | WebP | Portrait onboarding illustration (DESIGN_SYSTEM §8) | planned | TBD |
 | `AppAssets.voiceActivity` | `assets/animations/voice_activity.json` | Lottie | Subtle voice activity indicator (conversation screen); respects reduced motion | planned | TBD |
+| `AppAssets.splashWave` | `assets/branding/animations/hermione_wave.gif` | GIF 240², ~80 KB | Looping splash animation of the original Hermione tutor mascot (static logo is the fallback; skipped when reduced motion is on) | available, bundled | Original work created in this repo; owner-approved GIF exception (≤ 100 KB budget) |
 
 ### Missing illustrations by screen (Phase 2 close-out)
 

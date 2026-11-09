@@ -544,7 +544,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountBody =>
-      'This permanently deletes your Sprelia account, profile, preferences and learning progress. This can\'t be undone.';
+      'This permanently deletes your Hermione account, profile, preferences and learning progress. This can\'t be undone.';
 
   @override
   String get deleteAccountConfirm => 'Delete permanently';
@@ -630,7 +630,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profilePolicies =>
-      'Privacy Policy and Terms are available on the Sprelia website.';
+      'Privacy Policy and Terms are available on the Hermione website.';
 
   @override
   String get prepareNoTimeLeft =>
@@ -710,7 +710,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get premiumTitle => 'Sprelia Premium';
+  String get premiumTitle => 'Hermione Premium';
 
   @override
   String get premiumHeadline => 'Practice more, learn faster.';

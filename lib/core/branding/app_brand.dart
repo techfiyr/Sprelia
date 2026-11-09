@@ -1,13 +1,13 @@
-/// Brand identity in one place (`doc/BRAND.md` §1).
+/// Brand identity in one place.
 ///
-/// "Sprelia" is PROVISIONAL (no trademark, domain or store-name clearance).
-/// Never hardcode the product name in features: use [AppBrand.name] so a
-/// rename touches this file only. Also renamed on a brand change: AndroidManifest
-/// `android:label`, iOS `CFBundleDisplayName`/`CFBundleName`, and the app/bundle
-/// ID `com.techfiyr.sprelia` (the ID is permanent once published). See BRAND.md §13.
+/// "Hermione" is the owner-decided app name. It has not been cleared as a trademark, domain or
+/// store name, and it is not affiliated with any book, film or game franchise. Never hardcode
+/// the product name in features: use [AppBrand.name] so a rename touches this file only. The
+/// app/bundle ID `com.techfiyr.sprelia` is permanent once published and deliberately unchanged.
 abstract final class AppBrand {
-  static const name = 'Sprelia';
-  static const tagline = 'Find your voice. Speak with confidence.';
+  static const name = 'Hermione';
+  static const headline = 'Learn English with Hermione';
+  static const tagline = 'Learn smarter. Speak with confidence.';
   static const supportingText =
-      'Build confidence through daily conversations with your personal AI English coach.';
+      'Friendly daily conversations with your personal AI English coach, with feedback after every chat.';
 }

@@ -79,10 +79,10 @@ void main() {
     expect(taps, 1);
   });
 
-  testWidgets('BrandLogo is labelled as a placeholder', (tester) async {
+  testWidgets('BrandLogo is labelled with the product name', (tester) async {
     await pumpThemed(tester, const BrandLogo());
-    expect(find.byKey(const ValueKey('brand-logo-placeholder')), findsOneWidget);
-    expect(find.bySemanticsLabel(RegExp('placeholder')), findsOneWidget);
+    expect(find.byKey(const ValueKey('brand-logo')), findsOneWidget);
+    expect(find.bySemanticsLabel('Hermione logo'), findsOneWidget);
   });
 
   testWidgets('AppLoadingView shows its message', (tester) async {

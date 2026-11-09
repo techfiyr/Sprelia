@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:speakdaily/core/branding/app_brand.dart';
 
-/// Branding regression check: the user-facing product name is "Sprelia".
+/// Branding regression check: the user-facing product name is "Hermione".
 ///
 /// The old name ("SpeakDaily", "Speaks Daily", "SpeaksDaily", any case or spacing) must not
 /// appear in user-visible app text or native metadata. Technical identifiers are allowed and
@@ -31,8 +31,8 @@ List<String> _staleHits(File f) {
 }
 
 void main() {
-  test('the brand constant is Sprelia', () {
-    expect(AppBrand.name, 'Sprelia');
+  test('the brand constant is Hermione', () {
+    expect(AppBrand.name, 'Hermione');
   });
 
   test('app source and localization strings never show the old product name', () {
@@ -41,17 +41,17 @@ void main() {
     expect(files.expand(_staleHits).toList(), isEmpty);
   });
 
-  test('native display labels and metadata say Sprelia', () {
+  test('native display labels and metadata say Hermione', () {
     final manifest = File('android/app/src/main/AndroidManifest.xml').readAsStringSync();
-    expect(manifest, contains('android:label="Sprelia"'));
+    expect(manifest, contains('android:label="Hermione"'));
 
     final plist = File('ios/Runner/Info.plist').readAsStringSync();
     for (final key in ['CFBundleDisplayName', 'CFBundleName']) {
-      expect(RegExp('<key>$key</key>\\s*<string>Sprelia</string>').hasMatch(plist), isTrue, reason: key);
+      expect(RegExp('<key>$key</key>\\s*<string>Hermione</string>').hasMatch(plist), isTrue, reason: key);
     }
 
     final pubspec = File('pubspec.yaml').readAsStringSync();
-    expect(RegExp(r'^description: "Sprelia', multiLine: true).hasMatch(pubspec), isTrue);
+    expect(RegExp(r'^description: "Hermione', multiLine: true).hasMatch(pubspec), isTrue);
 
     for (final f in [
       File('android/app/src/main/AndroidManifest.xml'),

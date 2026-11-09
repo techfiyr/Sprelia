@@ -200,7 +200,7 @@ void main() {
   group('Sign in', () {
     Future<void> openSignIn(WidgetTester tester, TestBackend backend) async {
       await pumpSpreliaApp(tester, backend: backend, prefs: await freshPrefs());
-      await tester.tap(find.text('Continue with Email'));
+      await tester.tap(find.text('Sign in or create account'));
       await tester.pumpAndSettle();
     }
 

@@ -10,7 +10,7 @@ export 'app_palette.dart' show AppPalette, AppThemeContext;
 export 'app_radius.dart';
 export 'app_spacing.dart';
 
-/// Sprelia light theme. The single place where brand tokens become Material
+/// Hermione light theme. The single place where brand tokens become Material
 /// component styles. Features never style components ad hoc.
 abstract final class AppTheme {
   static ThemeData light() {

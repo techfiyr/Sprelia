@@ -37,9 +37,10 @@ void main() {
       expect(sessionRedirect(AsyncError<SessionState>(Exception('x'), StackTrace.empty), AppRoutes.home), AppRoutes.splash);
     });
 
-    test('signed out may only see welcome and sign-in', () {
+    test('signed out may only see welcome, the sample lesson and sign-in', () {
       expect(sessionRedirect(out, AppRoutes.welcome), isNull);
       expect(sessionRedirect(out, AppRoutes.signIn), isNull);
+      expect(sessionRedirect(out, AppRoutes.guestLesson), isNull);
       expect(sessionRedirect(out, AppRoutes.home), AppRoutes.welcome);
       expect(sessionRedirect(out, AppRoutes.prepare('emma')), AppRoutes.welcome);
       expect(sessionRedirect(out, AppRoutes.onboarding), AppRoutes.welcome);
@@ -49,6 +50,9 @@ void main() {
       expect(sessionRedirect(needsOnboarding, AppRoutes.home), AppRoutes.onboarding);
       expect(sessionRedirect(needsOnboarding, AppRoutes.tutors), AppRoutes.onboarding);
       expect(sessionRedirect(needsOnboarding, AppRoutes.onboarding), isNull);
+      // Onboarding comes after the subscription gate: a subscribed account reaches it.
+      const subscribed = AsyncData<bool?>(true);
+      expect(sessionRedirect(needsOnboarding, AppRoutes.home, entitlement: subscribed), AppRoutes.onboarding);
     });
 
     test('onboarded users skip entry screens', () {
@@ -56,20 +60,32 @@ void main() {
         expect(sessionRedirect(ready, entry), AppRoutes.home);
       }
       expect(sessionRedirect(ready, AppRoutes.category('travel')), isNull);
+      expect(sessionRedirect(ready, AppRoutes.guestLesson), AppRoutes.home);
+    });
+
+    test('signed in without an active subscription is held on the paywall (fails closed)', () {
+      const unsubscribed = AsyncData<bool?>(false);
+      expect(sessionRedirect(ready, AppRoutes.home, entitlement: unsubscribed), AppRoutes.premium);
+      expect(sessionRedirect(needsOnboarding, AppRoutes.onboarding, entitlement: unsubscribed), AppRoutes.premium);
+      expect(sessionRedirect(ready, AppRoutes.premium, entitlement: unsubscribed), isNull);
+      expect(sessionRedirect(ready, AppRoutes.home, entitlement: AsyncError<bool?>('x', StackTrace.empty)), AppRoutes.premium);
+      expect(sessionRedirect(ready, AppRoutes.home, entitlement: const AsyncLoading<bool?>()), AppRoutes.splash);
+      expect(sessionRedirect(ready, AppRoutes.home, entitlement: const AsyncData<bool?>(true)), isNull);
     });
   });
 
   testWidgets('signed-out users land on Welcome with the brand tagline', (tester) async {
     await pumpSpreliaApp(tester, backend: TestBackend(), prefs: await freshPrefs());
     expect(find.text(AppBrand.tagline), findsOneWidget);
-    expect(find.text('Continue with Email'), findsOneWidget);
+    expect(find.text('Try a free lesson'), findsOneWidget);
+    expect(find.text('Sign in or create account'), findsOneWidget);
   });
 
   testWidgets('sign-in creates the profile (device time zone) and opens onboarding', (tester) async {
     final backend = TestBackend();
     await pumpSpreliaApp(tester, backend: backend, prefs: await freshPrefs());
 
-    await tester.tap(find.text('Continue with Email'));
+    await tester.tap(find.text('Sign in or create account'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byKey(const ValueKey('auth-email')), 'learner@example.com');
     await tester.enterText(find.byKey(const ValueKey('auth-password')), 'correct-horse');

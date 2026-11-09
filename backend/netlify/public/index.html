@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Sprelia: AI English speaking coach</title>
-  <meta name="description" content="Practice speaking English every day with friendly AI tutors, practical scenarios and feedback after each conversation.">
+  <title>Hermione: Learn English with your AI speaking coach</title>
+  <meta name="description" content="Learn English with Hermione. Learn smarter, speak with confidence: friendly AI tutors, practical scenarios and feedback after every conversation.">
   <meta name="color-scheme" content="light">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/site.css">
   <script type="module" src="/assets/consent.js"></script>
 </head>
@@ -13,7 +14,7 @@
   <a class="skip-link" href="#main">Skip to main content</a>
   <header class="site-header">
     <div class="container">
-      <a class="wordmark" href="/">Sprelia</a>
+      <a class="wordmark" href="/"><img src="/assets/logo-mark.svg" alt="" width="36" height="36">Hermione</a>
       <nav class="site-nav" aria-label="Main">
         <ul>
         <li><a href="/" aria-current="page">Home</a></li>
@@ -26,42 +27,84 @@
       </nav>
     </div>
   </header>
-  <main id="main" tabindex="-1">
+  <main id="main" tabindex="-1" class="landing">
     <div class="container">
       <section class="hero" aria-labelledby="hero-title">
-        <p class="badge">In development: not yet available</p>
-        <h1 id="hero-title">Find your voice. Speak with confidence.</h1>
-        <p class="lead">Build confidence through daily conversations with your personal AI English coach. Sprelia is being built for Android first, with iOS planned later.</p>
-      </section>
-
-      <section aria-labelledby="features-title">
-        <h2 id="features-title">How Sprelia helps you practice</h2>
-        <div class="grid">
-          <article class="card"><h3>Real conversations</h3><p>Speak out loud with an AI tutor in real time, at a pace that suits you.</p></article>
-          <article class="card"><h3>Practical scenarios</h3><p>Everyday life, work, study, travel and social situations, from beginner (A1) to advanced (C1) levels.</p></article>
-          <article class="card"><h3>Feedback after you speak</h3><p>Your tutor keeps the conversation natural. Corrections and suggestions come after the session, not in the middle of it.</p></article>
-          <article class="card"><h3>Track your progress</h3><p>Set a daily practice target of 5, 10 or 15 minutes and keep a streak going.</p></article>
+        <div>
+          <p class="badge">In development: not yet available</p>
+          <h1 id="hero-title">Learn English with <span>Hermione</span></h1>
+          <p class="tagline">Learn smarter. Speak with confidence.</p>
+          <p class="lead">Chat out loud with a friendly AI English coach every day. Get gentle, useful feedback after each conversation, and watch your confidence grow. Hermione is being built for Android first, with iOS planned later.</p>
+          <div class="cta-row">
+            <span class="pill">Coming soon to Android</span>
+            <a class="pill pill-soft" href="#how-it-works">See how it works</a>
+          </div>
+        </div>
+        <div class="hero-art">
+          <img src="/assets/mascot.svg" alt="Hermione's friendly tutor mascot: a smiling teacher with glasses holding an open book" width="400" height="400">
+          <span class="bubble bubble-1" aria-hidden="true">Hello! Ready to chat?</span>
+          <span class="bubble bubble-2" aria-hidden="true">Great job!</span>
         </div>
       </section>
 
+      <section aria-labelledby="features-title">
+        <h2 id="features-title" class="section-title">How Hermione helps you practice</h2>
+        <p class="section-sub">Short, friendly sessions that fit into your day.</p>
+        <div class="feature-grid">
+          <article class="feature"><div class="icon" aria-hidden="true">💬</div><h3>Real conversations</h3><p>Speak out loud with an AI tutor in real time, at a pace that suits you.</p></article>
+          <article class="feature"><div class="icon" aria-hidden="true">🧭</div><h3>Practical scenarios</h3><p>Everyday life, work, study, travel and social situations, from beginner (A1) to advanced (C1) levels.</p></article>
+          <article class="feature"><div class="icon" aria-hidden="true">✨</div><h3>Feedback after you speak</h3><p>Your tutor keeps the conversation natural. Corrections and suggestions come after the session, not in the middle of it.</p></article>
+          <article class="feature"><div class="icon" aria-hidden="true">🔥</div><h3>Track your progress</h3><p>Set a daily practice target of 5, 10 or 15 minutes and keep a streak going.</p></article>
+        </div>
+      </section>
+
+      <section aria-labelledby="progress-title">
+        <h2 id="progress-title" class="section-title">Watch your confidence grow</h2>
+        <p class="section-sub">An illustration of the progress you will see in the app. The numbers are examples, not real results.</p>
+        <div class="progress-panel">
+          <div>
+            <h3>Confidence builder (example)</h3>
+            <div class="meter"><div class="meter-label"><span>Speaking</span><span>Week 4</span></div><div class="meter-track"><span class="meter-fill fill-90"></span></div></div>
+            <div class="meter"><div class="meter-label"><span>Vocabulary</span><span>Week 4</span></div><div class="meter-track"><span class="meter-fill fill-70"></span></div></div>
+            <div class="meter"><div class="meter-label"><span>Fluency</span><span>Week 4</span></div><div class="meter-track"><span class="meter-fill fill-45"></span></div></div>
+          </div>
+          <div>
+            <h3>Daily streak (example)</h3>
+            <div class="streak" aria-label="Example: practised on five of the last seven days"><span class="done">M</span><span class="done">T</span><span class="done">W</span><span>T</span><span class="done">F</span><span class="done">S</span><span>S</span></div>
+            <h3>Words you are collecting (example)</h3>
+            <ul class="words"><li>appointment</li><li>itinerary</li><li class="new">reservation</li><li>reliable</li><li class="new">negotiate</li></ul>
+            <p class="note">Your Mistake Vault keeps the phrases you want to remember.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="how-it-works" aria-labelledby="how-title">
+        <h2 id="how-title" class="section-title">How it works</h2>
+        <ol class="steps">
+          <li><h3>Pick a tutor</h3><p>Choose a friendly AI coach and a scenario that matches your day.</p></li>
+          <li><h3>Start talking</h3><p>Have a relaxed voice conversation. No pressure, no interruptions.</p></li>
+          <li><h3>Learn from feedback</h3><p>Review what went well and what to practise next, then try again tomorrow.</p></li>
+        </ol>
+      </section>
+
       <section aria-labelledby="tutors-title">
-        <h2 id="tutors-title">Meet the tutors</h2>
-        <ul class="tutors grid">
-          <li class="card"><h3>Emma</h3><p>Friendly English coach for beginners and everyday practice.</p></li>
-          <li class="card"><h3>Alex</h3><p>Professional communication coach for interviews, meetings and presentations.</p></li>
-          <li class="card"><h3>Sofia</h3><p>Everyday conversation partner for travel, social life and small talk.</p></li>
+        <h2 id="tutors-title" class="section-title">Meet the tutors</h2>
+        <ul class="tutors feature-grid">
+          <li class="tutor-card"><h3>Emma</h3><p>Friendly English coach for beginners and everyday practice.</p></li>
+          <li class="tutor-card"><h3>Alex</h3><p>Professional communication coach for interviews, meetings and presentations.</p></li>
+          <li class="tutor-card"><h3>Sofia</h3><p>Everyday conversation partner for travel, social life and small talk.</p></li>
         </ul>
-        <p class="muted">All tutors are AI. They are not real people. See the <a href="/ai-disclaimer/">AI disclaimer</a>.</p>
+        <p class="fine">All tutors are AI. They are not real people. See the <a href="/ai-disclaimer/">AI disclaimer</a>.</p>
       </section>
 
       <section aria-labelledby="plans-title">
-        <h2 id="plans-title">Free and Premium</h2>
-        <p>The free plan includes 10 minutes of AI speaking practice per day, measured by your local calendar day. A Premium subscription with more practice time, advanced scenarios and no ads is planned. Prices are not final.</p>
+        <h2 id="plans-title" class="section-title">Free and Premium</h2>
+        <p class="fine">The free plan includes 10 minutes of AI speaking practice per day, measured by your local calendar day. A Premium subscription with more practice time, advanced scenarios and no ads is planned. Prices are not final.</p>
       </section>
 
       <section aria-labelledby="privacy-title">
-        <h2 id="privacy-title">Your privacy</h2>
-        <p>Sprelia is for adults (18+). Voice recordings are not stored by default, and you can delete your account and learning data from the app. Read the draft <a href="/privacy/">Privacy Policy</a>.</p>
+        <h2 id="privacy-title" class="section-title">Your privacy</h2>
+        <p class="fine">Hermione is for adults (18+). Voice recordings are not stored by default, and you can delete your account and learning data from the app. Read the draft <a href="/privacy/">Privacy Policy</a>.</p>
       </section>
     </div>
   </main>
@@ -75,7 +118,7 @@
         <li><a href="/cookies/">Cookies</a></li>
         <li><button type="button" class="btn-link" data-consent-open>Cookie settings</button></li>
       </ul>
-      <p class="muted">Sprelia is a provisional product name. Operated by <span class="review">[Review: legal name of the operator]</span>. Contact: <span class="review">[Review: contact email]</span>.</p>
+      <p class="muted">Hermione is a provisional product name and is not affiliated with any book, film or game franchise. Operated by <span class="review">[Review: legal name of the operator]</span>. Contact: <span class="review">[Review: contact email]</span>.</p>
     </div>
   </footer>
 </body>

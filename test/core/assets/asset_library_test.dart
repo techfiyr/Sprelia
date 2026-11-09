@@ -71,7 +71,7 @@ void main() {
   });
 
   test('names are lowercase snake_case with allowed formats', () {
-    const allowed = {'png', 'webp', 'svg', 'json', 'ttf', 'otf', 'txt', 'jpeg', 'jpg'};
+    const allowed = {'png', 'webp', 'svg', 'gif', 'json', 'ttf', 'otf', 'txt', 'jpeg', 'jpg'};
     final name = RegExp(r'^[a-z0-9]+(_[a-z0-9]+)*\.[a-z0-9]+$');
     final dir = RegExp(r'^[a-z0-9_]+$');
     for (final e in fileEntries) {
@@ -89,7 +89,7 @@ void main() {
   });
 
   test('files stay within size budgets', () {
-    const budgetKb = {'png': 500, 'webp': 300, 'jpeg': 500, 'jpg': 500, 'svg': 100, 'json': 300, 'ttf': 600, 'otf': 600, 'txt': 50};
+    const budgetKb = {'png': 500, 'webp': 300, 'jpeg': 500, 'jpg': 500, 'svg': 100, 'gif': 100, 'json': 300, 'ttf': 600, 'otf': 600, 'txt': 50};
     for (final f in assetFiles()) {
       final ext = f.path.split('.').last;
       final kb = f.lengthSync() / 1024;

@@ -294,7 +294,7 @@
   "profileAccountSection": "Account",
   "profileDeleteAccount": "Delete account",
   "deleteAccountTitle": "Delete your account?",
-  "deleteAccountBody": "This permanently deletes your Sprelia account, profile, preferences and learning progress. This can't be undone.",
+  "deleteAccountBody": "This permanently deletes your Hermione account, profile, preferences and learning progress. This can't be undone.",
   "deleteAccountConfirm": "Delete permanently",
   "commonCancel": "Cancel",
   "reauthTitle": "Confirm it's you",
@@ -327,7 +327,7 @@
   "profileExportData": "Copy my data (JSON)",
   "profileExportDone": "Your data was copied to the clipboard.",
   "profileInterfaceLanguage": "App language",
-  "profilePolicies": "Privacy Policy and Terms are available on the Sprelia website.",
+  "profilePolicies": "Privacy Policy and Terms are available on the Hermione website.",
   "prepareNoTimeLeft": "You've used today's free speaking time. It resets at midnight in your time zone.",
   "conversationTryAgainTomorrow": "Come back tomorrow for more free practice.",
   "learnTitle": "Learn",
@@ -399,7 +399,7 @@
       }
     }
   },
-  "premiumTitle": "Sprelia Premium",
+  "premiumTitle": "Hermione Premium",
   "premiumHeadline": "Practice more, learn faster.",
   "premiumActive": "You have Premium. Thank you!",
   "premiumBenefitTime": "More speaking time every day",

@@ -80,14 +80,15 @@ FilledButton _start(WidgetTester tester) =>
     tester.widget<FilledButton>(find.descendant(of: find.byKey(const ValueKey('prepare-start')), matching: find.byType(FilledButton)));
 
 void main() {
-  test('ad policy: free plan only, never in a conversation or on the paywall', () {
+  test('ad policy: non-subscribers only, never in a conversation', () {
     for (final p in AdPlacement.values) {
       expect(adAllowed(Plan.premium, p), isFalse, reason: 'premium $p');
     }
     expect(adAllowed(Plan.free, AdPlacement.homeBanner), isTrue);
     expect(adAllowed(Plan.free, AdPlacement.afterFeedback), isTrue);
     expect(adAllowed(Plan.free, AdPlacement.conversation), isFalse);
-    expect(adAllowed(Plan.free, AdPlacement.paywall), isFalse);
+    expect(adAllowed(Plan.free, AdPlacement.paywall), isTrue);
+    expect(adAllowed(Plan.free, AdPlacement.bottomBanner), isTrue);
     expect(const UnavailableAdService().available, isFalse, reason: 'no ads are loaded until AdMob is configured');
   });
 
@@ -98,7 +99,7 @@ void main() {
     expect(_start(tester).onPressed, isNull);
     await tester.tap(find.byKey(const ValueKey('prepare-see-premium')));
     await tester.pumpAndSettle();
-    expect(find.text('Sprelia Premium'), findsOneWidget);
+    expect(find.text('Hermione Premium'), findsOneWidget);
     expect(find.textContaining('Test prices, not final'), findsOneWidget);
     expect(find.text('Premium purchases are not available yet.'), findsOneWidget);
     final subscribe = find.descendant(of: find.byKey(const ValueKey('paywall-subscribe')), matching: find.byType(FilledButton));
@@ -128,7 +129,7 @@ void main() {
     expect(find.textContaining("You've used today's free speaking time"), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('conversation-see-premium')));
     await tester.pumpAndSettle();
-    expect(find.text('Sprelia Premium'), findsOneWidget);
+    expect(find.text('Hermione Premium'), findsOneWidget);
   });
 
   testWidgets('profile shows the server plan', (tester) async {

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/sign_in_screen.dart';
 import '../../features/auth/verify_email_screen.dart';
 import '../../features/feedback/feedback_screen.dart';
+import '../../features/guest/guest_lesson_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/learn/learn_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
@@ -13,6 +14,7 @@ import '../../features/practice/category_screen.dart';
 import '../../features/practice/conversation_screen.dart';
 import '../../features/practice/practice_screen.dart';
 import '../../features/practice/prepare_screen.dart';
+import '../../features/premium/entitlement.dart';
 import '../../features/premium/paywall_screen.dart';
 import '../../features/profile/preference_editor_screen.dart';
 import '../../features/profile/profile_screen.dart';
@@ -29,24 +31,30 @@ export 'app_routes.dart';
 /// Pure redirect rule (unit-testable). Returns the location to go to, or null.
 ///
 /// - Session loading or failed → splash (which shows retry on failure).
-/// - Signed out → welcome / sign-in only.
+/// - Signed out (guest) → welcome (the open home), the free sample lesson and sign-in only.
 /// - Signed in with an unverified email/password account → email verification only.
-/// - Signed in, onboarding incomplete → onboarding only.
-/// - Signed in and onboarded → never back to splash/welcome/sign-in/onboarding.
-String? sessionRedirect(AsyncValue<SessionState> session, String location) {
+/// - Signed in without an active subscription → the paywall only. The subscription state is the
+///   server's answer ([entitlement], from `GET /me/subscription`); while it loads → splash, and
+///   an error fails closed (paywall). Pass null to skip this gate.
+/// - Signed in, subscribed, onboarding incomplete → onboarding only.
+/// - Signed in, subscribed and onboarded → never back to splash/welcome/sign-in/onboarding.
+String? sessionRedirect(AsyncValue<SessionState> session, String location, {AsyncValue<bool?>? entitlement}) {
   final value = session.value;
   if (value == null) return location == AppRoutes.splash ? null : AppRoutes.splash;
   if (session.hasError && !session.isLoading) return location == AppRoutes.splash ? null : AppRoutes.splash;
 
   switch (value) {
     case SignedOut():
-      if (location == AppRoutes.welcome || location == AppRoutes.signIn) return null;
+      if (location == AppRoutes.welcome || location == AppRoutes.signIn || location == AppRoutes.guestLesson) return null;
       return AppRoutes.welcome;
     case NeedsEmailVerification():
       return location == AppRoutes.verifyEmail ? null : AppRoutes.verifyEmail;
-    case SignedIn(:final profile) when !profile.onboardingCompleted:
-      return location == AppRoutes.onboarding ? null : AppRoutes.onboarding;
-    case SignedIn():
+    case SignedIn(:final profile):
+      if (entitlement != null) {
+        if (!entitlement.hasValue && !entitlement.hasError) return location == AppRoutes.splash ? null : AppRoutes.splash;
+        if (entitlement.value != true) return location == AppRoutes.premium ? null : AppRoutes.premium;
+      }
+      if (!profile.onboardingCompleted) return location == AppRoutes.onboarding ? null : AppRoutes.onboarding;
       final entry = AppRoutes.publicRoutes.contains(location) ||
           location == AppRoutes.onboarding ||
           location == AppRoutes.verifyEmail;
@@ -65,6 +73,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   final rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
   final refresh = ValueNotifier<int>(0);
   ref.listen(sessionProvider, (_, _) => refresh.value++);
+  ref.listen(entitlementProvider, (_, _) => refresh.value++);
   ref.onDispose(refresh.dispose);
 
   StatefulShellBranch tab(String path, Widget screen, {List<RouteBase> routes = const []}) => StatefulShellBranch(
@@ -75,12 +84,14 @@ final routerProvider = Provider<GoRouter>((ref) {
     navigatorKey: rootKey,
     initialLocation: AppRoutes.splash,
     refreshListenable: refresh,
-    redirect: (_, state) => sessionRedirect(ref.read(sessionProvider), state.matchedLocation),
+    redirect: (_, state) =>
+        sessionRedirect(ref.read(sessionProvider), state.matchedLocation, entitlement: ref.read(entitlementProvider)),
     errorBuilder: (_, _) => const RouteNotFoundScreen(),
     routes: [
       GoRoute(path: AppRoutes.splash, builder: (_, _) => const SplashScreen()),
       GoRoute(path: AppRoutes.welcome, builder: (_, _) => const WelcomeScreen()),
       GoRoute(path: AppRoutes.signIn, builder: (_, _) => const SignInScreen()),
+      GoRoute(path: AppRoutes.guestLesson, builder: (_, _) => const GuestLessonScreen()),
       GoRoute(path: AppRoutes.verifyEmail, builder: (_, _) => const VerifyEmailScreen()),
       GoRoute(path: AppRoutes.onboarding, builder: (_, _) => const OnboardingScreen()),
       StatefulShellRoute.indexedStack(

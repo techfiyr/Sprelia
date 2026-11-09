@@ -221,6 +221,14 @@ abstract final class AppAssets {
     license: 'TBD: commissioned or licensed',
   );
 
+  static const splashWave = AssetEntry(
+    path: 'assets/branding/animations/hermione_wave.gif',
+    status: AssetStatus.available,
+    purpose: 'Looping splash animation: the original Hermione tutor mascot waving and talking (GIF, 240x240, ~80 KB)',
+    license: 'Original work created in this repository for Hermione; no third-party or franchise material',
+    bundled: true,
+  );
+
   /// Every registered asset, for tooling and tests.
   static const all = <AssetEntry>[
     interRegular,
@@ -246,6 +254,7 @@ abstract final class AppAssets {
     welcomeIllustration,
     onboardingIllustration,
     voiceActivity,
+    splashWave,
   ];
 
   /// Approved avatar for a tutor id, or null (use the coded placeholder).

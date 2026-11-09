@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_theme.dart';
 import 'app_brand.dart';
+import 'brand_art.dart';
 
-/// PLACEHOLDER logo ([AppAssets.logoPlaceholder]). The final Sprelia logo
-/// (speech bubble + voice wave, `doc/BRAND.md` §5) has not been designed yet.
-/// This uses a stock Material icon in a brand-colored tile. When
-/// [AppAssets.logoMark] is approved (SVG), add `flutter_svg`, register the file,
-/// and render it here when `AppAssets.logoMark.isUsable`.
+/// The Hermione logo: a speech bubble holding an open book (an original mark drawn in
+/// code, see [HermioneMarkPainter]). Optionally shown with the wordmark.
 class BrandLogo extends StatelessWidget {
   const BrandLogo({super.key, this.size = 64, this.showWordmark = false});
 
@@ -17,17 +15,13 @@ class BrandLogo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mark = Semantics(
-      label: '${AppBrand.name} logo (placeholder)',
+      label: '${AppBrand.name} logo',
       image: true,
-      child: Container(
-        key: const ValueKey('brand-logo-placeholder'),
+      child: SizedBox(
+        key: const ValueKey('brand-logo'),
         width: size,
         height: size,
-        decoration: BoxDecoration(
-          color: context.colors.primary,
-          borderRadius: BorderRadius.circular(size * 0.28),
-        ),
-        child: Icon(Icons.graphic_eq_rounded, color: context.colors.onPrimary, size: size * 0.55),
+        child: const CustomPaint(painter: HermioneMarkPainter()),
       ),
     );
     if (!showWordmark) return mark;
@@ -36,7 +30,14 @@ class BrandLogo extends StatelessWidget {
       children: [
         mark,
         Gap.md,
-        Text(AppBrand.name, style: context.textStyles.headlineSmall?.copyWith(color: context.palette.primaryDark)),
+        Text(
+          AppBrand.name,
+          style: context.textStyles.headlineMedium?.copyWith(
+            color: BrandPalette.plum,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.5,
+          ),
+        ),
       ],
     );
   }
