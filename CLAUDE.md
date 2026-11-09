@@ -31,8 +31,9 @@ silently choosing.
 
 ## Current status
 
-- **Phase 2 (application experience) is complete and closed out**, awaiting owner approval
-  (stacked branches `phase-2-experience` → `asset-library` → `phase-2-closeout`).
+- **Phase 2 (application experience) is complete.** The owner's final decisions are applied on
+  `phase-2-closeout`; Phase 3 waits for owner approval. Stacked branches:
+  `phase-1-foundation` → `phase-2-experience` → `asset-library` → `phase-2-closeout` (do not merge automatically).
 - The roadmap and per-phase records live in `doc/roadmap/` (follow `doc/roadmap/README.md`).
   Open owner decisions are listed in `doc/roadmap/phase_2.md`.
 - Do not start the next phase (or Gemini voice, subscriptions, ads, deployment, or
@@ -53,8 +54,11 @@ silently choosing.
   official documentation and record what you verified.
 - Do not change application identifiers (`com.techfiyr.sprelia`), native app
   labels, signing config or Firebase projects without explicit approval.
-- Firebase project `sprelia` (number 756773147926) is real. Use it only as the owner
-  directs; local work runs against the emulators (`demo-sprelia`).
+- Firebase project `sprelia` (number 756773147926) is **PRODUCTION** (owner decision,
+  2026-11-09). Never use it, or its credentials, for local development or automated
+  tests (the config refuses it outside `APP_ENV=production`). Never change production
+  settings or deploy without an approved plan. Local work and tests use the emulators
+  (`demo-sprelia`). See `doc/FIREBASE_SETUP.md`.
 - **Explicit approval is required** before: destructive operations (deleting files
   or data, force pushes, history rewrites), creating/modifying Firebase or Google
   Cloud resources, any deployment, editing protected files, or adding paid services.

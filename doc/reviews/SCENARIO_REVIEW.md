@@ -3,8 +3,8 @@
 **Date:** 2026-11-09 · **Scope:** the 22 scenarios in
 `backend/src/modules/catalog/practice.catalog.ts`, checked against APP_FLOW §5, §7 and §8,
 `tutors.catalog.ts` and `recommendation.ts`.
-**Status:** review only. **No content was changed.** Each finding that needs a product
-decision is listed in §4 for the owner.
+**Status:** review completed. The owner's decisions (2026-11-09) were applied in §5. §1–§4
+are kept unchanged as the original review record.
 
 The catalogue content (descriptions, objectives, vocabulary, durations) was drafted by
 engineering in Phase 2 and has not yet been approved by a learning or content owner.
@@ -103,3 +103,75 @@ person; no scenario is marked premium without a premium plan.
 | D6 (F7/F8) | Content owner review and level-specific objectives and vocabulary | assign a reviewer |
 | D7 (F10) | Which scenarios become Premium? | product/pricing decision (Phase 9) |
 | D8 (F11) | Spelling standard (British, American or international) | brand decision |
+
+## 5. Resolution (owner decisions, 2026-11-09)
+
+| Review item | Owner decision | Implemented |
+|---|---|---|
+| D1 / F1 Study abroad tutor | Not Emma; use Sofia if she supports the category | Sofia doesn't support Academic, so **Alex** (A2–C1, Academic) |
+| D2 / F2 Networking tutor | Alex only if his config explicitly supports Social | `social` added to Alex's `categoryIds`; Networking stays with Alex |
+| D3 / F3 C1 in onboarding | Offer A1, A2, B1, B2, C1 | Added to the backend schema and the app ("Advanced (C1)") |
+| D4 / F4 A1 Professional and Academic | Add A1 scenarios | `talking-about-work` (A1–A2) and `classroom-basics` (A1–A2), both with Emma. Emma now supports Professional and Academic for beginner content. |
+| D4 / F5 B2 Travel | Expand | `trip-planning` (B1–B2), `changing-plans` (B1–B2), `local-culture` (B2, premium) |
+| F9 Recommendation reach | Every appropriate scenario can be recommended | Rotation among all eligible scenarios (seed = uid + local date), closest-level fallback. A test proves every free scenario is reachable. |
+| D7 / F10 Premium | About five Premium scenarios, keeping useful free coverage | presentations, client-communication, academic-discussions, local-culture, social-events |
+| (new) | Enforce tutor level and category compatibility on the backend | `compatibility.ts`; the API refuses to start on violations; `compatibleTutorIds` in the API; the app offers only compatible tutors |
+| D5 / F6 Durations | 5, 10 and 15 minutes | 8-minute estimates became 10; daily targets 5/10/15 (20 removed) |
+| D6 / F7 / F8 Content review | Human review before publishing | `reviewStatus`; production publishes only `approved` (reviewer + date). All 27 are **draft**. |
+| D8 / F11 Spelling | American English; keep the model flexible for British | en-US text (store, the check, checkout, across from, enroll, housing, coworker, favorite, summarize, practice). `?locale=en-GB` overlay hook. |
+
+### Catalogue after the decisions: 27 scenarios (22 free, 5 premium), all draft
+
+| Category | Scenarios (✦ = premium) |
+|---|---|
+| Everyday (5) | introductions, daily-routines, hobbies, shopping, food-restaurants |
+| Professional (6) | **talking-about-work**, job-interviews, office-conversations, meetings, presentations ✦, client-communication ✦ |
+| Academic (5) | **classroom-basics**, classroom-discussion, study-abroad (now Alex), explaining-ideas, academic-discussions ✦ |
+| Travel (7) | airport, hotel-check-in, asking-directions, travel-problems, **trip-planning**, **changing-plans**, **local-culture** ✦ |
+| Social (4) | making-friends, networking, small-talk, social-events ✦ |
+
+### Coverage by category and level (scenarios available at each level)
+
+All scenarios:
+
+| Category | A1 | A2 | B1 | B2 | C1 |
+|---|---:|---:|---:|---:|---:|
+| Everyday | 5 | 5 | 5 | 2 | 0 |
+| Professional | 1 | 3 | 5 | 5 | 4 |
+| Academic | 1 | 3 | 3 | 4 | 2 |
+| Travel | 3 | 4 | 6 | 4 | 0 |
+| Social | 2 | 3 | 4 | 4 | 1 |
+
+Free plan only:
+
+| Category | A1 | A2 | B1 | B2 | C1 |
+|---|---:|---:|---:|---:|---:|
+| Everyday | 5 | 5 | 5 | 2 | 0 |
+| Professional | 1 | 3 | 3 | 3 | 2 |
+| Academic | 1 | 3 | 3 | 3 | 1 |
+| Travel | 3 | 4 | 6 | 3 | 0 |
+| Social | 2 | 2 | 3 | 3 | 1 |
+
+Every level that a category serves at all still has at least one free scenario (enforced by
+`backend/test/catalog.test.ts`). **Remaining gap:** no C1 scenarios in Everyday or Travel,
+because their tutors (Emma, Sofia) top out at B1/B2. C1 learners with only those goals get the
+closest-level scenario (B2) with Sofia. Closing this needs C1 content plus a C1-capable tutor for
+those categories (future content decision).
+
+### Tutor compatibility (category supported AND tutor range ⊇ scenario range)
+
+All 27 suggested tutors are compatible (`validateCatalog` returns no problems; startup check).
+Compatible tutors per scenario:
+
+| Tutor (range) | Categories | Compatible scenarios |
+|---|---|---|
+| Emma (A1–B1) | everyday, travel, social, professional, academic | introductions, daily-routines, shopping, talking-about-work, classroom-basics, airport, hotel-check-in, asking-directions |
+| Alex (A2–C1) | professional, academic, social | job-interviews, office-conversations, meetings, presentations, client-communication, classroom-discussion, study-abroad, explaining-ideas, academic-discussions, networking, social-events |
+| Sofia (A1–B2) | everyday, travel, social | introductions, daily-routines, hobbies, shopping, food-restaurants, airport, hotel-check-in, asking-directions, travel-problems, trip-planning, changing-plans, local-culture, making-friends, small-talk, social-events |
+
+### Still open
+- Human content review of all 27 scenarios (none approved). **Production would publish an empty
+  catalogue until scenarios are approved.**
+- C1 coverage for Everyday and Travel (see above).
+- Premium gating is in the UI and recommendation; server-side entitlement checks at session
+  creation come with Phase 6 (sessions) and Phase 9 (RevenueCat).

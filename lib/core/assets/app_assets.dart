@@ -181,21 +181,21 @@ abstract final class AppAssets {
     license: 'n/a (rendered in code)',
   );
 
-  /// Candidate images found in the repo (added 2026-11-09). Provenance and licence
-  /// are UNKNOWN, there is no embedded metadata, and the two images use different
-  /// visual styles. NOT bundled and NOT used until the owner confirms the licence
-  /// and approves a consistent style.
+  /// Candidate images found in the repo (added 2026-11-09). Licence audit 2026-11-09:
+  /// usage rights NOT established. The files carry no provenance (bare JFIF, metadata
+  /// stripped by re-encoding), and their styles are inconsistent. Owner decision: replace
+  /// unless usage rights are established. NOT bundled, NOT used.
   static const tutorEmmaCandidate = AssetEntry(
     path: 'assets/tutors/img_tutor_emma.jpeg',
     status: AssetStatus.placeholder,
     purpose: 'Unapproved Emma candidate (3D render, baked rounded-square frame)',
-    license: 'UNKNOWN: owner to confirm source and licence',
+    license: 'UNKNOWN: rights not established (audit 2026-11-09); replace unless the owner provides evidence',
   );
   static const tutorSofiaCandidate = AssetEntry(
     path: 'assets/tutors/img_tutor_sofia.jpeg',
     status: AssetStatus.placeholder,
     purpose: 'Unapproved "Sofia" candidate (monochrome 3D render; style differs from Emma)',
-    license: 'UNKNOWN: owner to confirm source and licence',
+    license: 'UNKNOWN: rights not established (audit 2026-11-09); replace unless the owner provides evidence',
   );
 
   // -------------------------------------------------------- Illustrations ----

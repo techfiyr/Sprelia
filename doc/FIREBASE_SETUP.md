@@ -1,82 +1,87 @@
-# Firebase setup (required configuration)
+# Firebase setup and environment strategy
 
-Status (2026-11-09):
-- Firebase project **`sprelia`** exists. Project ID `sprelia`, project number `756773147926`.
-  The number is not the ID; tools and `FIREBASE_PROJECT_ID` take the **ID**.
-- Android app registered: `com.techfiyr.sprelia`
-  (`1:756773147926:android:1bc8ce332ae6b5ccce2c37`). No SHA-1/SHA-256 fingerprints yet.
-- iOS app: not registered. Auth providers, Firestore database, App Check: not verified or not set up.
-- It is the only project, and whether it is dev or prod is undecided. Agents must not change
-  its configuration or deploy to it without explicit owner approval. Local development
-  uses the emulators with `demo-sprelia`.
+## Architecture decision: Firebase environment strategy
 
-The repo contains local scaffolding only: `firebase.json` (emulators), `firestore.rules`
-and `firestore.indexes.json`.
+**Status:** Approved by the project owner · **Date:** 2026-11-09 · Final unless the owner changes it.
 
-## 1. Projects (owner action)
-Create one Firebase project per environment, all in the same region as Cloud Run:
-
-| Environment | Suggested project ID | Purpose |
+| Environment | Firebase project | Used by |
 |---|---|---|
-| (existing) | `sprelia` | role to be decided by the owner (dev or prod) |
-| development | `sprelia-dev` (suggested) | if `sprelia` becomes production |
-| staging | `sprelia-staging` (suggested) | internal testing builds |
+| **Production** | **`sprelia`** (project number `756773147926`) | Production app builds (`APP_ENV=production`) and the production API only |
+| Development | Separate project, **not created yet** (proposed ID `sprelia-dev`; creation needs owner approval of the ID) | Development builds against a real project |
+| Local and automated tests | Firebase Emulator Suite, project `demo-sprelia` | Local development, CI, all automated tests |
 
-Project IDs are permanent. Confirm the brand name before creating them.
-Also enable billing for Cloud Run and Secret Manager, and confirm the Gemini API
-paid tier for learner data.
+Security requirements (binding; see also `.agents/security.md` §1a):
+1. Never use production credentials in local development.
+2. Never run automated tests against production data. All tests use the emulators (`demo-sprelia`).
+3. Never deploy Firestore rules or Firebase configuration to production without explicit approval.
+4. Keep development and production environment variables separate.
+5. Keep production credentials and service-account keys out of git.
+6. Verify the Firebase project ID before every deployment.
+7. Use separate Android and iOS Firebase app configurations for each environment.
 
-## 2. Per project
-1. **Authentication**: enable the Google and Email/Password providers. Turn on email
-   enumeration protection.
-2. **Apps**: Android `com.techfiyr.sprelia` (registered in `sprelia`) and iOS
-   `com.techfiyr.sprelia` (not registered yet). Add debug and release SHA-1/SHA-256 fingerprints for
-   Google Sign-In and Play Integrity.
-3. **Firestore**: create the database in Native mode, choose a location, then deploy the
-   rules from this repo (after emulator tests and approval).
-4. **App Check**: Play Integrity (Android) and App Attest (iOS); debug provider for
-   development. Start in *monitor* mode and enforce after metrics look healthy.
-5. **Cloud Run service account**: grant it only the roles it needs (Firebase Auth admin
-   for token revocation checks, Datastore user for Firestore). Use no key files.
+Enforced in code:
+- The backend `loadConfig` refuses `FIREBASE_PROJECT_ID=sprelia` unless `APP_ENV=production`,
+  and refuses any other project in production (`PRODUCTION_FIREBASE_PROJECT_ID`).
+- The Flutter `AppConfig` applies the same rule to builds (`productionFirebaseProjectId`).
+- Emulator hosts and `demo-*` projects are refused outside development.
+- `npm run test:integration` always runs with `--project demo-sprelia`.
 
-## 3. Flutter wiring
-Done in Phase 2:
+## Current status (verified read-only, 2026-11-09)
+
+| Item | Production `sprelia` | Development project |
+|---|---|---|
+| Project | Exists | **Not created** |
+| Android app `com.techfiyr.sprelia` | Registered (`1:756773147926:android:1bc8ce332ae6b5ccce2c37`) | n/a |
+| Android SHA-1 / SHA-256 fingerprints | **None** | n/a |
+| iOS app `com.techfiyr.sprelia` | **Not registered** | n/a |
+| Email/Password provider | **Not verified** (not configured by the agent) | n/a |
+| Firestore database and rules | **Not verified / not deployed** | n/a |
+| App Check | **Not configured** | n/a |
+
+No production setting, data or credential was created or changed during Phases 1–2.
+
+## Outstanding Firebase work
+
+Phase 3 prepares these as a reviewed plan. Nothing is changed in production until the
+Phase 3 plan and the proposed changes are approved.
+
+**Production (`sprelia`):**
+- [ ] Verify the Android app registration (package `com.techfiyr.sprelia`)
+- [ ] Register the iOS app (bundle `com.techfiyr.sprelia`)
+- [ ] Add Android SHA-1/SHA-256 fingerprints (release signing key and Play App Signing key)
+- [ ] Enable the Email/Password provider (with email enumeration protection)
+- [ ] Create the Firestore database (needs a region decision), then deploy production security rules after emulator tests
+- [ ] Configure App Check (Play Integrity, App Attest), starting in monitor mode
+- [ ] Validate the production configuration and deployment (project ID check before deploy)
+
+**Development / environment separation:**
+- [ ] Create the development project (proposed `sprelia-dev`) and register its Android and iOS apps
+- [ ] Development app configuration (`env/development-firebase.local.json`, gitignored) and a dev Cloud Run service
+- [ ] CI secrets per environment; never share keys between environments
+
+**Owner actions:** choose the Firestore/Cloud Run region, install the `gcloud` CLI, provide the
+release keystore through CI secrets, and link Play Console for Play Integrity. Confirm the
+brand before creating more projects, since project IDs are permanent.
+
+## Flutter wiring (implemented in Phase 2)
 - `firebase_core` and `firebase_auth`. Options come from dart-defines (`env/*.json`) through
-  `AppConfig.firebase`. No `google-services.json` or FlutterFire file is needed or committed.
-- Development: Auth emulator with `demo-sprelia` (`env/development.json`).
-- Dio interceptor: `Authorization: Bearer <ID token>`, with one forced refresh and retry on 401.
+  `AppConfig.firebase`. No `google-services.json` or FlutterFire file is committed.
+- `env/development.json` uses the Auth emulator with `demo-sprelia`.
+- To use the development project once it exists: create a gitignored
+  `env/development-firebase.local.json` with that project's values and **no** emulator host.
+  The production project is refused in development builds.
+- Production builds: `env/production.json` (gitignored, from `env/production.example.json`)
+  with `FIREBASE_PROJECT_ID=sprelia` and the production app's identifiers, supplied by CI.
 
-To run the app against the real `sprelia` project (owner decision; do not commit the file):
-1. In Firebase console → Authentication, enable **Email/Password**.
-2. Create `env/sprelia.local.json` (gitignored by `env/*.local.json`) with `APP_ENV`
-   `development`, your API URL, `FIREBASE_PROJECT_ID=sprelia`, and `FIREBASE_API_KEY`,
-   `FIREBASE_APP_ID` (`1:756773147926:android:1bc8ce332ae6b5ccce2c37`) and
-   `FIREBASE_MESSAGING_SENDER_ID` (`756773147926`) from the Android app's config. Leave out
-   `FIREBASE_AUTH_EMULATOR_HOST`.
-3. Run the backend with `FIREBASE_PROJECT_ID=sprelia` and Application Default Credentials
-   (`gcloud auth application-default login`), no emulator variables.
+## Backend wiring (implemented)
+- `FIREBASE_PROJECT_ID` selects the project whose ID tokens are accepted. It is checked
+  against `APP_ENV` at startup.
+- Credentials: Application Default Credentials (the Cloud Run service account for each
+  environment). No key files. Never use production credentials locally.
+- Local: `firebase emulators:start --only auth,firestore --project demo-sprelia` with
+  `FIREBASE_AUTH_EMULATOR_HOST` and `FIRESTORE_EMULATOR_HOST`.
 
-Phase 4: App Check, Google sign-in (needs SHA fingerprints), Crashlytics and Analytics.
-
-## 4. Backend wiring (done in Phase 1)
-- `FIREBASE_PROJECT_ID` selects the project whose ID tokens are accepted.
-- Credentials: Application Default Credentials (Cloud Run service account; locally
-  `gcloud auth application-default login`).
-- Local without a project: `firebase emulators:start --project demo-sprelia` and
-  `FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099` (development only; staging and
-  production refuse to start with it).
-
-## 5. Security rules roadmap
-Phases 1–2 deny all client access, verified by `backend/test/integration/firestore.rules.test.ts`. Phase 4 adds the owner-scoped rules described in
-`.agents/architecture.md` together with `@firebase/rules-unit-testing` tests run on
-the emulator. A rule change without tests is not mergeable.
-
-## Owner checklist
-- [ ] Confirm brand / project naming
-- [x] Project `sprelia` created, Android app registered
-- [ ] Decide whether `sprelia` is dev or prod; create the remaining environments
-- [ ] Register the iOS app; add SHA fingerprints to the Android app
-- [ ] Choose a region (Firestore + Cloud Run)
-- [ ] Install the `gcloud` CLI locally
-- [ ] Provide release signing keystore (via CI secrets, never in git)
-- [ ] Link Play Console for Play Integrity
+## Security rules roadmap
+Phases 1–2 deny all client access, verified by `backend/test/integration/firestore.rules.test.ts`.
+The owner-scoped rules described in `.agents/architecture.md` are written and tested on the
+emulator first, and deployed to production only with explicit approval.

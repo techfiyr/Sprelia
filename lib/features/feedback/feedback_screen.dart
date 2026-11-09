@@ -9,6 +9,7 @@ import '../../core/routing/app_routes.dart';
 import '../../core/services/api_client.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/widgets.dart';
+import '../../l10n/l10n.dart';
 import 'session_feedback.dart';
 
 /// Polls the backend until post-session analysis is ready.
@@ -54,7 +55,7 @@ class FeedbackScreen extends ConsumerWidget {
         ],
       ),
       body: feedback.when(
-        loading: () => const AppLoadingView(message: 'Analysing your conversation…'),
+        loading: () => AppLoadingView(message: context.l10n.feedbackAnalyzing),
         error: (e, _) => AppErrorState(
           failure: e is TimeoutException
               ? const ServerFailure(statusCode: 0, message: 'Feedback is taking longer than expected. Please try again.')
@@ -140,7 +141,7 @@ class _FeedbackBody extends StatelessWidget {
           ...feedback.fluencyObservations.map((s) => _Bullet(s, icon: Icons.lightbulb_outline)),
         ],
         if (feedback.recommendedPractice.isNotEmpty) ...[
-          _Heading('Practise next'),
+          _Heading(context.l10n.feedbackPracticeNext),
           ...feedback.recommendedPractice.map((s) => _Bullet(s, icon: Icons.arrow_forward)),
         ],
         const SizedBox(height: 24),

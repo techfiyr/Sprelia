@@ -506,9 +506,12 @@ Re-verify against the official documentation before implementation and record th
 
 | Environment | Firebase project | Backend | Flutter config |
 |---|---|---|---|
-| Local | Emulator Suite (`demo-sprelia`) | `npm run dev` | `env/development.json` |
-| Development / staging | `sprelia` (role to be confirmed) or a dedicated project | Cloud Run (staging) | `env/staging.json` |
-| Production | Dedicated project (**Open decision**) | Cloud Run (production) | `env/production.json` |
+| Local and automated tests | Emulator Suite (`demo-sprelia`) | `npm run dev` | `env/development.json` |
+| Development | Separate project (to be created; proposed `sprelia-dev`) | Cloud Run (dev) | `env/development-firebase.local.json` |
+| Production | **`sprelia`** (756773147926), approved by the owner on 2026-11-09 | Cloud Run (production) | `env/production.json` |
+
+Production credentials are never used locally or in automated tests; the config refuses the
+production project outside `APP_ENV=production` (`doc/FIREBASE_SETUP.md`).
 
 - Backend configuration is validated at startup. Secrets come from Secret Manager.
 - Flutter configuration is compiled in, so it never contains secrets.
@@ -585,13 +588,13 @@ The application must remain buildable after every phase.
 | Decision | Owner |
 |---|---|
 | Final product name (trademark, domain and store clearance) | Product owner |
-| Role of Firebase project `sprelia` (development or production); creation of other environments | Product owner |
+| ~~Role of Firebase project `sprelia`~~: **decided** 2026-11-09, production. Creating the development project remains open. | Product owner |
 | Premium daily allowance | Product owner |
 | Transcript retention period | Product owner / legal |
 | Guest mode (recommended: none for the MVP) | Product owner |
 | Rewarded ads granting minutes | Product owner |
 | Age confirmation approach for 18+ | Product owner / legal |
-| Interface languages at launch | Product owner |
+| Interface languages at launch (content: American English decided 2026-11-09) | Product owner |
 | Cloud Run and Firestore region | Engineering + owner |
 
 **End of app development specification.**

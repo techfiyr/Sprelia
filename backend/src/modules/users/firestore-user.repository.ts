@@ -150,9 +150,16 @@ function toProfile(uid: string, d: DocumentData): UserProfile {
   };
 }
 
-/** Re-validates stored data so a corrupted document never reaches clients. */
+/**
+ * Re-validates stored data field by field so a corrupted or outdated value (e.g. a
+ * retired daily goal of 20 minutes) drops only that field, never the whole document.
+ */
 function toPreferences(d: DocumentData): Partial<LearningPreferences> {
-  const { updatedAt: _u, schemaVersion: _s, ...rest } = d;
-  const parsed = LearningPreferences.partial().safeParse(rest);
-  return parsed.success ? parsed.data : {};
+  const out: Record<string, unknown> = {};
+  for (const [key, field] of Object.entries(LearningPreferences.shape)) {
+    if (!(key in d)) continue;
+    const parsed = field.safeParse(d[key]);
+    if (parsed.success) out[key] = parsed.data;
+  }
+  return out as Partial<LearningPreferences>;
 }

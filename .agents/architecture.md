@@ -50,6 +50,23 @@ Cloud Firestore: default-deny rules. Phase 2: NO direct client access; all data 
 | Provider retries | Riverpod automatic retry disabled (`retry: (_, _) => null`). Every error view has a manual retry. | No silent request loops; errors stay visible. |
 | Voice in Phase 2 | Preparation enables "Start" only for tutors with `voiceAvailable` **and** only in development builds (legacy prototype). | Phase 2 excludes live sessions; the prototype must never ship. |
 
+## Owner decisions applied at Phase 2 close-out (2026-11-09)
+
+| Decision | Implementation |
+|---|---|
+| Firebase `sprelia` = PRODUCTION; separate dev project; emulators for tests | `PRODUCTION_FIREBASE_PROJECT_ID` guard in the backend `env.ts` and Flutter `AppConfig`; `doc/FIREBASE_SETUP.md` |
+| Tutor–scenario compatibility enforced on the backend | `modules/catalog/compatibility.ts`: the tutor supports the category AND its range contains the scenario range. `CatalogService` refuses to start on violations and publishes `compatibleTutorIds`. The app offers only compatible tutors. |
+| Study abroad: not Emma; Sofia only if she supports the category | Sofia doesn't support Academic, so **Alex** (A2–C1, Academic) |
+| Networking: Alex only if his config supports Social | `social` explicitly added to Alex's `categoryIds` |
+| Onboarding levels A1–C1 | `C1` added (backend enum, app enum, labels) |
+| A1 Professional and Academic scenarios | `talking-about-work`, `classroom-basics` (Emma; Emma now supports Professional and Academic for beginner content) |
+| More B2 Travel coverage | `trip-planning`, `changing-plans` (free), `local-culture` (premium): 4 B2 Travel scenarios |
+| Every appropriate scenario recommendable | `recommendation.ts` rotates among all eligible scenarios (seed = uid + local date), with a closest-level fallback. Tested: every free scenario is reachable. |
+| About five Premium scenarios | presentations, client-communication, academic-discussions, local-culture, social-events. Never recommended on the free plan; not startable in the app. |
+| Durations 5, 10, 15 | Daily targets 5/10/15 (20 removed); scenario estimates in {5, 10, 15} (validated) |
+| Human review before publishing | `reviewStatus` (`draft` / `approved` + reviewer and date). Production publishes approved scenarios only. All 27 are currently `draft`. |
+| American English; flexible for British | Base content and ARB in en-US (tested). `content-variants.ts` overlays plus `?locale=en-GB` on the API; a future `app_en_GB.arb` for the app. |
+
 ## Repository layout
 
 ```text
@@ -115,7 +132,7 @@ Presentation → Notifier/Controller → Repository → Service/API.
 | PUT | `/api/v1/me/onboarding` | Bearer | Body `{preferences (partial, strict), complete?}`. Merges, then returns `{profile, plan}` (`plan` once completed). Completing with missing fields returns 400 listing them. |
 | GET | `/api/v1/me/dashboard` | Bearer | `200 {dashboard}` from server data only (today, free allowance remaining, streak, weekly totals, recommendation) |
 | GET | `/api/v1/tutors` | Bearer | Public tutor catalogue (no prompts or voices) |
-| GET | `/api/v1/practice/categories` | Bearer | Categories with scenarios (CEFR range, objectives, vocabulary, minutes) |
+| GET | `/api/v1/practice/categories?locale=en-US\|en-GB` | Bearer | Published categories with scenarios (CEFR range, objectives, vocabulary, minutes, premium, `compatibleTutorIds`). Default `en-US`. |
 
 Ownership is structural: no route takes a uid; every read and write uses `request.user.uid`.
 
@@ -180,10 +197,10 @@ tutors/{id}, scenarios/{id}                  signed-in read; backend write only
 appConfig/{id}                               public fields read; backend write only
 ```
 
-Firebase: project **`sprelia`** (number 756773147926) exists with an Android app
-`com.techfiyr.sprelia` (no SHA fingerprints, no iOS app yet). Staging/production
-projects are not created. Local development uses the emulators (`demo-sprelia`).
-See `doc/FIREBASE_SETUP.md`.
+Firebase: **`sprelia`** (number 756773147926) is the **production** project (owner decision
+2026-11-09). It has an Android app `com.techfiyr.sprelia`, no SHA fingerprints and no iOS app.
+The development project is not created yet; local development and tests use the emulators
+(`demo-sprelia`). See `doc/FIREBASE_SETUP.md`.
 
 ## Provider abstraction
 `RealtimeConversationProvider` (Flutter) and the planned `AIProvider` (backend) isolate

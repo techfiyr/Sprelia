@@ -12,6 +12,7 @@ class Scenario {
     required this.estimatedMinutes,
     required this.suggestedTutorId,
     required this.vocabulary,
+    this.compatibleTutorIds = const [],
     this.premium = false,
   });
 
@@ -24,6 +25,11 @@ class Scenario {
   final int estimatedMinutes;
   final String suggestedTutorId;
   final List<String> vocabulary;
+
+  /// Tutors the backend allows for this scenario (category + level compatible).
+  final List<String> compatibleTutorIds;
+
+  /// Premium-only (owner decision 2026-11-09). Not startable on the free plan.
   final bool premium;
 
   String get levels => '$minLevel – $maxLevel';
@@ -40,6 +46,7 @@ class Scenario {
       estimatedMinutes: (j['estimatedMinutes'] as int?) ?? 5,
       suggestedTutorId: j['suggestedTutorId']! as String,
       vocabulary: (j['vocabulary'] as List?)?.cast<String>() ?? const [],
+      compatibleTutorIds: (j['compatibleTutorIds'] as List?)?.cast<String>() ?? const [],
       premium: j['premium'] == true,
     );
   }

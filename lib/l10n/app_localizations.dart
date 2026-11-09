@@ -265,7 +265,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingGoalsTitle.
   ///
   /// In en, this message translates to:
-  /// **'What would you like to practise?'**
+  /// **'What would you like to practice?'**
   String get onboardingGoalsTitle;
 
   /// No description provided for @onboardingGoalsSubtitle.
@@ -406,6 +406,18 @@ abstract class AppLocalizations {
   /// **'I can discuss many topics and speak fairly fluently.'**
   String get levelB2Description;
 
+  /// No description provided for @levelC1.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced'**
+  String get levelC1;
+
+  /// No description provided for @levelC1Description.
+  ///
+  /// In en, this message translates to:
+  /// **'I can express myself fluently on complex topics.'**
+  String get levelC1Description;
+
   /// No description provided for @levelNotSure.
   ///
   /// In en, this message translates to:
@@ -415,13 +427,13 @@ abstract class AppLocalizations {
   /// No description provided for @levelNotSureDescription.
   ///
   /// In en, this message translates to:
-  /// **'No problem. We\'ll start gently and adjust as you practise.'**
+  /// **'No problem. We\'ll start gently and adjust as you practice.'**
   String get levelNotSureDescription;
 
   /// No description provided for @onboardingDailyGoalTitle.
   ///
   /// In en, this message translates to:
-  /// **'How long would you like to practise each day?'**
+  /// **'How long would you like to practice each day?'**
   String get onboardingDailyGoalTitle;
 
   /// No description provided for @onboardingDailyGoalSubtitle.
@@ -453,12 +465,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Steady, noticeable progress'**
   String get dailyGoal15;
-
-  /// No description provided for @dailyGoal20.
-  ///
-  /// In en, this message translates to:
-  /// **'For focused learners'**
-  String get dailyGoal20;
 
   /// No description provided for @onboardingAccentTitle.
   ///
@@ -517,7 +523,7 @@ abstract class AppLocalizations {
   /// No description provided for @planSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Here\'s how we\'ll start. Your plan adapts as you practise.'**
+  /// **'Here\'s how we\'ll start. Your plan adapts as you practice.'**
   String get planSubtitle;
 
   /// No description provided for @planGoals.
@@ -550,11 +556,11 @@ abstract class AppLocalizations {
   /// **'Recommended tutor'**
   String get planRecommendedTutor;
 
-  /// No description provided for @planStartPractising.
+  /// No description provided for @planStartPracticing.
   ///
   /// In en, this message translates to:
-  /// **'Start practising'**
-  String get planStartPractising;
+  /// **'Start practicing'**
+  String get planStartPracticing;
 
   /// No description provided for @homeGreetingMorning.
   ///
@@ -595,7 +601,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Ready to practise your English?'**
+  /// **'Ready to practice your English?'**
   String get homeSubtitle;
 
   /// No description provided for @homeTodayGoal.
@@ -697,7 +703,7 @@ abstract class AppLocalizations {
   /// No description provided for @practiceSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Choose a real-life situation to practise.'**
+  /// **'Choose a real-life situation to practice.'**
   String get practiceSubtitle;
 
   /// No description provided for @practiceFreeConversation.
@@ -757,7 +763,7 @@ abstract class AppLocalizations {
   /// No description provided for @prepareObjectives.
   ///
   /// In en, this message translates to:
-  /// **'What you\'ll practise'**
+  /// **'What you\'ll practice'**
   String get prepareObjectives;
 
   /// No description provided for @prepareVocabulary.
@@ -849,6 +855,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'First language'**
   String get profileNativeLanguage;
+
+  /// No description provided for @practicePremium.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get practicePremium;
+
+  /// No description provided for @preparePremiumNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a Premium scenario. Premium plans are coming soon.'**
+  String get preparePremiumNote;
+
+  /// No description provided for @prepareTutorNotSuited.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} isn\'t set up for this scenario. Choose another tutor.'**
+  String prepareTutorNotSuited(String name);
+
+  /// No description provided for @tutorsForScenario.
+  ///
+  /// In en, this message translates to:
+  /// **'Tutors who can help with this scenario'**
+  String get tutorsForScenario;
+
+  /// No description provided for @feedbackAnalyzing.
+  ///
+  /// In en, this message translates to:
+  /// **'Analyzing your conversation…'**
+  String get feedbackAnalyzing;
+
+  /// No description provided for @feedbackPracticeNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice next'**
+  String get feedbackPracticeNext;
+
+  /// No description provided for @practiceChooseAnotherCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose another category to practice.'**
+  String get practiceChooseAnotherCategory;
 }
 
 class _AppLocalizationsDelegate

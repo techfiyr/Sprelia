@@ -3,7 +3,9 @@ import { AppError, ErrorCode, validationError } from '../../common/errors.js';
 import { validate } from '../../common/validate.js';
 import { authenticate, requireUser } from '../auth/authenticate.js';
 import type { TokenVerifier } from '../auth/token-verifier.js';
+import type { CatalogService } from '../catalog/catalog.service.js';
 import { buildDashboard } from './dashboard.js';
+import { localDate } from './local-date.js';
 import { recommend } from './recommendation.js';
 import { OnboardingIncompleteError, ProfileNotFoundError, type UserProfile, type UserRepository } from './user.repository.js';
 import { CreateProfileBody, SaveOnboardingBody, type LearningPreferences } from './user.schemas.js';
@@ -13,6 +15,7 @@ export interface ProfileRoutesOptions {
   users: UserRepository;
   freeDailySeconds: number;
   now: () => Date;
+  catalog: CatalogService;
 }
 
 const profileNotFound = () =>
@@ -77,7 +80,14 @@ export const profileRoutes: FastifyPluginAsync<ProfileRoutesOptions> = async (ap
         const { profile, preferences } = await users.saveOnboarding(uid, request.body.preferences, request.body.complete);
         return {
           profile: serializeProfile(profile, preferences),
-          plan: profile.onboardingStatus === 'completed' ? recommend(preferences) : null,
+          plan:
+            profile.onboardingStatus === 'completed'
+              ? recommend(preferences, {
+                  categories: opts.catalog.publishedCategories(),
+                  tutors: opts.catalog.tutors,
+                  seed: `${uid}:${localDate(profile.timezone, opts.now())}`,
+                })
+              : null,
         };
       } catch (err) {
         if (err instanceof ProfileNotFoundError) throw profileNotFound();
@@ -96,7 +106,11 @@ export const profileRoutes: FastifyPluginAsync<ProfileRoutesOptions> = async (ap
     const profile = await users.getProfile(uid);
     if (!profile) throw profileNotFound();
     return {
-      dashboard: await buildDashboard(users, profile, { now: opts.now(), freeDailySeconds: opts.freeDailySeconds }),
+      dashboard: await buildDashboard(users, profile, {
+        now: opts.now(),
+        freeDailySeconds: opts.freeDailySeconds,
+        catalog: opts.catalog,
+      }),
     };
   });
 };

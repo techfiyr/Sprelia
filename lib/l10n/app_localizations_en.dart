@@ -103,7 +103,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingNoLanguageMatch => 'No languages match your search.';
 
   @override
-  String get onboardingGoalsTitle => 'What would you like to practise?';
+  String get onboardingGoalsTitle => 'What would you like to practice?';
 
   @override
   String get onboardingGoalsSubtitle => 'Choose all that apply.';
@@ -183,15 +183,22 @@ class AppLocalizationsEn extends AppLocalizations {
       'I can discuss many topics and speak fairly fluently.';
 
   @override
+  String get levelC1 => 'Advanced';
+
+  @override
+  String get levelC1Description =>
+      'I can express myself fluently on complex topics.';
+
+  @override
   String get levelNotSure => 'I\'m not sure';
 
   @override
   String get levelNotSureDescription =>
-      'No problem. We\'ll start gently and adjust as you practise.';
+      'No problem. We\'ll start gently and adjust as you practice.';
 
   @override
   String get onboardingDailyGoalTitle =>
-      'How long would you like to practise each day?';
+      'How long would you like to practice each day?';
 
   @override
   String get onboardingDailyGoalSubtitle =>
@@ -210,9 +217,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dailyGoal15 => 'Steady, noticeable progress';
-
-  @override
-  String get dailyGoal20 => 'For focused learners';
 
   @override
   String get onboardingAccentTitle => 'Which accent would you like to hear?';
@@ -244,7 +248,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get planSubtitle =>
-      'Here\'s how we\'ll start. Your plan adapts as you practise.';
+      'Here\'s how we\'ll start. Your plan adapts as you practice.';
 
   @override
   String get planGoals => 'Your goals';
@@ -262,7 +266,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get planRecommendedTutor => 'Recommended tutor';
 
   @override
-  String get planStartPractising => 'Start practising';
+  String get planStartPracticing => 'Start practicing';
 
   @override
   String get homeGreetingMorning => 'Good morning!';
@@ -289,7 +293,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get homeSubtitle => 'Ready to practise your English?';
+  String get homeSubtitle => 'Ready to practice your English?';
 
   @override
   String get homeTodayGoal => 'Today\'s goal';
@@ -368,7 +372,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get practiceTitle => 'Practice';
 
   @override
-  String get practiceSubtitle => 'Choose a real-life situation to practise.';
+  String get practiceSubtitle => 'Choose a real-life situation to practice.';
 
   @override
   String get practiceFreeConversation => 'Free conversation';
@@ -411,7 +415,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prepareTitle => 'Get ready';
 
   @override
-  String get prepareObjectives => 'What you\'ll practise';
+  String get prepareObjectives => 'What you\'ll practice';
 
   @override
   String get prepareVocabulary => 'Useful words and phrases';
@@ -464,4 +468,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileNativeLanguage => 'First language';
+
+  @override
+  String get practicePremium => 'Premium';
+
+  @override
+  String get preparePremiumNote =>
+      'This is a Premium scenario. Premium plans are coming soon.';
+
+  @override
+  String prepareTutorNotSuited(String name) {
+    return '$name isn\'t set up for this scenario. Choose another tutor.';
+  }
+
+  @override
+  String get tutorsForScenario => 'Tutors who can help with this scenario';
+
+  @override
+  String get feedbackAnalyzing => 'Analyzing your conversation…';
+
+  @override
+  String get feedbackPracticeNext => 'Practice next';
+
+  @override
+  String get practiceChooseAnotherCategory =>
+      'Choose another category to practice.';
 }

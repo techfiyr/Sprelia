@@ -45,7 +45,7 @@
   "onboardingNativeLanguageSubtitle": "We'll use it to make explanations clearer for you.",
   "onboardingSearchLanguages": "Search languages",
   "onboardingNoLanguageMatch": "No languages match your search.",
-  "onboardingGoalsTitle": "What would you like to practise?",
+  "onboardingGoalsTitle": "What would you like to practice?",
   "onboardingGoalsSubtitle": "Choose all that apply.",
   "goalEveryday": "Everyday English",
   "goalEverydayDescription": "Daily conversations and routines",
@@ -69,9 +69,11 @@
   "levelB1Description": "I can handle most daily situations and share opinions.",
   "levelB2": "Upper intermediate",
   "levelB2Description": "I can discuss many topics and speak fairly fluently.",
+  "levelC1": "Advanced",
+  "levelC1Description": "I can express myself fluently on complex topics.",
   "levelNotSure": "I'm not sure",
-  "levelNotSureDescription": "No problem. We'll start gently and adjust as you practise.",
-  "onboardingDailyGoalTitle": "How long would you like to practise each day?",
+  "levelNotSureDescription": "No problem. We'll start gently and adjust as you practice.",
+  "onboardingDailyGoalTitle": "How long would you like to practice each day?",
   "onboardingDailyGoalSubtitle": "A small daily habit makes a big difference.",
   "dailyGoalMinutes": "{minutes} minutes a day",
   "@dailyGoalMinutes": {
@@ -84,7 +86,6 @@
   "dailyGoal5": "A quick daily warm-up",
   "dailyGoal10": "A great everyday habit",
   "dailyGoal15": "Steady, noticeable progress",
-  "dailyGoal20": "For focused learners",
   "onboardingAccentTitle": "Which accent would you like to hear?",
   "onboardingAccentSubtitle": "Every accent is correct English. This only changes how your tutor sounds.",
   "accentAmerican": "American English",
@@ -94,13 +95,13 @@
   "onboardingCreatePlan": "Create my plan",
   "onboardingSaving": "Saving your answers…",
   "planTitle": "Your learning plan is ready",
-  "planSubtitle": "Here's how we'll start. Your plan adapts as you practise.",
+  "planSubtitle": "Here's how we'll start. Your plan adapts as you practice.",
   "planGoals": "Your goals",
   "planLevel": "Starting point",
   "planDailyTarget": "Daily target",
   "planSuggestedPractice": "Suggested practice",
   "planRecommendedTutor": "Recommended tutor",
-  "planStartPractising": "Start practising",
+  "planStartPracticing": "Start practicing",
   "homeGreetingMorning": "Good morning!",
   "homeGreetingAfternoon": "Good afternoon!",
   "homeGreetingEvening": "Good evening!",
@@ -128,7 +129,7 @@
       }
     }
   },
-  "homeSubtitle": "Ready to practise your English?",
+  "homeSubtitle": "Ready to practice your English?",
   "homeTodayGoal": "Today's goal",
   "homeTodayProgress": "{done} of {goal} minutes",
   "@homeTodayProgress": {
@@ -190,7 +191,7 @@
     }
   },
   "practiceTitle": "Practice",
-  "practiceSubtitle": "Choose a real-life situation to practise.",
+  "practiceSubtitle": "Choose a real-life situation to practice.",
   "practiceFreeConversation": "Free conversation",
   "practiceFreeConversationDescription": "Talk about anything with a tutor of your choice.",
   "practiceScenarioCount": "{count, plural, =1{1 scenario} other{{count} scenarios}}",
@@ -221,7 +222,7 @@
   "tutorsVoiceSoon": "Voice coming soon",
   "tutorsRecommended": "Recommended",
   "prepareTitle": "Get ready",
-  "prepareObjectives": "What you'll practise",
+  "prepareObjectives": "What you'll practice",
   "prepareVocabulary": "Useful words and phrases",
   "prepareFreeConversationObjective": "Speak naturally about a topic you choose.",
   "prepareDuration": "Recommended duration",
@@ -250,5 +251,19 @@
   "profileSignOut": "Sign out",
   "profileLearningPreferences": "Learning preferences",
   "profileAccent": "Preferred accent",
-  "profileNativeLanguage": "First language"
+  "profileNativeLanguage": "First language",
+  "practicePremium": "Premium",
+  "preparePremiumNote": "This is a Premium scenario. Premium plans are coming soon.",
+  "prepareTutorNotSuited": "{name} isn't set up for this scenario. Choose another tutor.",
+  "@prepareTutorNotSuited": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "tutorsForScenario": "Tutors who can help with this scenario",
+  "feedbackAnalyzing": "Analyzing your conversation…",
+  "feedbackPracticeNext": "Practice next",
+  "practiceChooseAnotherCategory": "Choose another category to practice."
 }

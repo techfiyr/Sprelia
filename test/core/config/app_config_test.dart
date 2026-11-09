@@ -13,7 +13,7 @@ void main() {
     AppConfig release(String env, String url) => AppConfig.fromValues(
           appEnv: env,
           apiBaseUrl: url,
-          firebaseProjectId: 'sprelia',
+          firebaseProjectId: env == 'production' ? 'sprelia' : 'sprelia-staging',
           firebaseApiKey: 'k',
           firebaseAppId: '1:1:android:1',
           firebaseMessagingSenderId: '1',
@@ -97,6 +97,13 @@ void main() {
 
       test('a project number is not accepted as a project ID', () {
         expect(() => build(project: '756773147926', emulator: ''), throwsA(isA<ConfigException>()));
+      });
+
+      test('the production project is reserved for production builds', () {
+        expect(() => build(env: 'development', project: 'sprelia', emulator: ''), throwsA(isA<ConfigException>()));
+        expect(() => build(env: 'staging', project: 'sprelia', emulator: ''), throwsA(isA<ConfigException>()));
+        expect(() => build(env: 'production', project: 'sprelia-dev', emulator: ''), throwsA(isA<ConfigException>()));
+        expect(build(env: 'development', project: 'sprelia-dev', emulator: '').firebase!.projectId, 'sprelia-dev');
       });
 
       test('a real project works without the emulator in production', () {

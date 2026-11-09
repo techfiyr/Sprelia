@@ -51,11 +51,15 @@ void main() {
     await _tapText(tester, 'Career and interviews');
     await _tapText(tester, 'Speaking confidence');
     await _continue(tester);
-    // 4. Level.
+    // 4. Level (A1–C1 + not sure).
     expect(find.textContaining('not a test'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Advanced (C1)'), 200);
+    expect(find.text('Advanced (C1)'), findsOneWidget);
     await _tapText(tester, 'Intermediate (B1)');
     await _continue(tester);
-    // 5. Daily target.
+    // 5. Daily target: 5, 10 or 15 minutes only.
+    expect(find.text('20 minutes a day'), findsNothing);
+    expect(find.text('15 minutes a day'), findsOneWidget);
     await _tapText(tester, '10 minutes a day');
     await _continue(tester);
     // 6. Accent → save.

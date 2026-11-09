@@ -6,6 +6,7 @@ import { registerErrorHandling } from './common/error-handler.js';
 import type { AppConfig } from './config/env.js';
 import type { TokenVerifier } from './modules/auth/token-verifier.js';
 import { catalogRoutes } from './modules/catalog/catalog.routes.js';
+import { CatalogService } from './modules/catalog/catalog.service.js';
 import { healthRoutes } from './modules/health/health.routes.js';
 import { meRoutes } from './modules/users/me.routes.js';
 import { profileRoutes } from './modules/users/profile.routes.js';
@@ -20,6 +21,8 @@ export interface AppDependencies {
   logger: FastifyBaseLogger;
   verifier: TokenVerifier;
   users: UserRepository;
+  /** Published practice catalogue; defaults to the built-in catalogue for this config. */
+  catalog?: CatalogService;
   /** Injectable clock for deterministic tests. */
   now?: () => Date;
 }
@@ -28,7 +31,14 @@ export interface AppDependencies {
  * Builds the HTTP application without listening, so tests can use `app.inject()`.
  * External services are injected (`verifier`) to keep modules testable.
  */
-export async function buildApp({ config, logger, verifier, users, now = () => new Date() }: AppDependencies): Promise<FastifyInstance> {
+export async function buildApp({
+  config,
+  logger,
+  verifier,
+  users,
+  catalog = new CatalogService({ includeDrafts: config.catalogIncludeDrafts }),
+  now = () => new Date(),
+}: AppDependencies): Promise<FastifyInstance> {
   const app = Fastify({
     loggerInstance: logger,
     bodyLimit: BODY_LIMIT_BYTES,
@@ -60,8 +70,8 @@ export async function buildApp({ config, logger, verifier, users, now = () => ne
     async (api) => {
       await api.register(healthRoutes);
       await api.register(meRoutes, { verifier });
-      await api.register(profileRoutes, { verifier, users, freeDailySeconds: config.freeDailySeconds, now });
-      await api.register(catalogRoutes, { verifier });
+      await api.register(profileRoutes, { verifier, users, freeDailySeconds: config.freeDailySeconds, now, catalog });
+      await api.register(catalogRoutes, { verifier, catalog });
     },
     { prefix: API_PREFIX },
   );

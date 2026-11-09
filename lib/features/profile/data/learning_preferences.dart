@@ -22,6 +22,7 @@ enum EnglishLevel {
   a2('A2'),
   b1('B1'),
   b2('B2'),
+  c1('C1'),
   notSure('not_sure');
 
   const EnglishLevel(this.wire);
@@ -43,7 +44,8 @@ enum AccentPreference {
 }
 
 /// Allowed daily speaking targets in minutes (motivational, not the allowance).
-const dailyGoalOptions = [5, 10, 15, 20];
+/// Owner decision 2026-11-09: 5, 10 and 15 minutes.
+const dailyGoalOptions = [5, 10, 15];
 
 /// Immutable, possibly partial set of preferences.
 class LearningPreferences {

@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:speakdaily/core/auth/auth_repository.dart';
 import 'package:speakdaily/core/config/app_config.dart';
+import 'package:speakdaily/core/routing/app_router.dart';
 import 'package:speakdaily/features/profile/data/profile_models.dart';
 
 import '../helpers/fakes.dart';
@@ -87,7 +91,7 @@ void main() {
       expect(start.onPressed, isNull);
     });
 
-    testWidgets('changing the tutor keeps the scenario', (tester) async {
+    testWidgets('changing the tutor offers only compatible tutors and keeps the scenario', (tester) async {
       await pumpSpreliaApp(tester, backend: _signedIn(), prefs: await freshPrefs());
       await _tab(tester, 'Practice');
       await tester.tap(find.byKey(const ValueKey('category-professional')));
@@ -97,11 +101,39 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('prepare-change-tutor')));
       await tester.pumpAndSettle();
       expect(find.text('Choose your tutor'), findsOneWidget);
-      expect(find.text('Voice coming soon'), findsOneWidget, reason: 'Alex has no voice yet');
-      await tester.tap(find.byKey(const ValueKey('tutor-emma')));
+      expect(find.byKey(const ValueKey('tutor-alex')), findsOneWidget);
+      expect(find.byKey(const ValueKey('tutor-emma')), findsNothing, reason: 'Emma is not compatible with job interviews');
+      await tester.tap(find.byKey(const ValueKey('tutor-alex')));
       await tester.pumpAndSettle();
-      expect(find.text('Emma'), findsOneWidget);
       expect(find.text('Job interviews'), findsOneWidget);
+    });
+
+    testWidgets('premium scenarios are marked and cannot be started on the free plan', (tester) async {
+      await pumpSpreliaApp(tester, backend: _signedIn(), prefs: await freshPrefs());
+      await _tab(tester, 'Practice');
+      await tester.tap(find.byKey(const ValueKey('category-professional')));
+      await tester.pumpAndSettle();
+      expect(find.descendant(of: find.byKey(const ValueKey('scenario-presentations')), matching: find.text('Premium')), findsOneWidget);
+      expect(find.descendant(of: find.byKey(const ValueKey('scenario-job-interviews')), matching: find.text('Premium')), findsNothing);
+      await tester.tap(find.byKey(const ValueKey('scenario-presentations')));
+      await tester.pumpAndSettle();
+      expect(find.text('This is a Premium scenario. Premium plans are coming soon.'), findsOneWidget);
+      final start = tester.widget<FilledButton>(
+        find.descendant(of: find.byKey(const ValueKey('prepare-start')), matching: find.byType(FilledButton)),
+      );
+      expect(start.onPressed, isNull);
+    });
+
+    testWidgets('an incompatible tutor/scenario link cannot be started', (tester) async {
+      await pumpSpreliaApp(tester, backend: _signedIn(), prefs: await freshPrefs());
+      final container = ProviderScope.containerOf(tester.element(find.byType(MaterialApp)));
+      unawaited(container.read(routerProvider).push(AppRoutes.prepare('emma', scenarioId: 'job-interviews')));
+      await tester.pumpAndSettle();
+      expect(find.text("Emma isn't set up for this scenario. Choose another tutor."), findsOneWidget);
+      final start = tester.widget<FilledButton>(
+        find.descendant(of: find.byKey(const ValueKey('prepare-start')), matching: find.byType(FilledButton)),
+      );
+      expect(start.onPressed, isNull);
     });
 
     testWidgets('catalogue errors show a retry', (tester) async {

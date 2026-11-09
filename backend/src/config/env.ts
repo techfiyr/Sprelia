@@ -9,6 +9,13 @@ import { z } from 'zod';
  * - Unsafe combinations are rejected for staging/production (see `superRefine`).
  */
 
+/**
+ * The PRODUCTION Firebase project (owner decision 2026-11-09, final unless the owner
+ * changes it). Local development and automated tests must never use it; production
+ * deployments must use exactly this project.
+ */
+export const PRODUCTION_FIREBASE_PROJECT_ID = 'sprelia';
+
 const booleanString = z
   .enum(['true', 'false'])
   .transform((v) => v === 'true');
@@ -45,6 +52,12 @@ const EnvSchema = z
 
     /** Requests per minute per client IP across /api. */
     RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).max(10_000).default(120),
+
+    /**
+     * Serve scenarios that have not passed human review. Defaults to true outside
+     * production; forced false in production (owner decision: review before publishing).
+     */
+    CATALOG_INCLUDE_DRAFTS: booleanString.optional(),
   })
   .superRefine((env, ctx) => {
     const deployed = env.APP_ENV === 'staging' || env.APP_ENV === 'production';
@@ -60,6 +73,27 @@ const EnvSchema = z
         code: 'custom',
         path: ['FIRESTORE_EMULATOR_HOST'],
         message: 'must not be set in staging/production',
+      });
+    }
+    if (env.APP_ENV === 'production' && env.FIREBASE_PROJECT_ID !== PRODUCTION_FIREBASE_PROJECT_ID) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['FIREBASE_PROJECT_ID'],
+        message: `production must use the production project (${PRODUCTION_FIREBASE_PROJECT_ID})`,
+      });
+    }
+    if (env.APP_ENV !== 'production' && env.FIREBASE_PROJECT_ID === PRODUCTION_FIREBASE_PROJECT_ID) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['FIREBASE_PROJECT_ID'],
+        message: 'the production project must not be used outside APP_ENV=production',
+      });
+    }
+    if (env.APP_ENV === 'production' && env.CATALOG_INCLUDE_DRAFTS === true) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['CATALOG_INCLUDE_DRAFTS'],
+        message: 'unreviewed scenarios cannot be published in production',
       });
     }
     if (deployed && !env.AUTH_CHECK_REVOKED) {
@@ -83,6 +117,7 @@ export interface AppConfig {
   authCheckRevoked: boolean;
   trustProxyHops: number;
   rateLimitPerMinute: number;
+  catalogIncludeDrafts: boolean;
 }
 
 export class ConfigError extends Error {
@@ -113,5 +148,6 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     authCheckRevoked: e.AUTH_CHECK_REVOKED,
     trustProxyHops: e.TRUST_PROXY_HOPS,
     rateLimitPerMinute: e.RATE_LIMIT_PER_MINUTE,
+    catalogIncludeDrafts: e.CATALOG_INCLUDE_DRAFTS ?? e.APP_ENV !== 'production',
   };
 }

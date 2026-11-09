@@ -4,6 +4,10 @@ import 'app_environment.dart';
 
 export 'app_environment.dart';
 
+/// The PRODUCTION Firebase project (owner decision 2026-11-09). Never used by
+/// development or staging builds; production builds must use exactly this project.
+const productionFirebaseProjectId = 'sprelia';
+
 /// Firebase client configuration (public identifiers, not secrets).
 ///
 /// Values come from dart-defines (see `env/README.md`). Real project values live
@@ -127,6 +131,12 @@ class AppConfig {
     // with a letter. This also rejects a project NUMBER pasted by mistake.
     if (!RegExp(r'^[a-z][a-z0-9-]{4,28}[a-z0-9]$').hasMatch(projectId)) {
       throw const ConfigException('FIREBASE_PROJECT_ID must be a Firebase project ID (not the project number).');
+    }
+    if (environment.isProduction && projectId != productionFirebaseProjectId) {
+      throw const ConfigException('Production builds must use the production Firebase project.');
+    }
+    if (!environment.isProduction && projectId == productionFirebaseProjectId) {
+      throw const ConfigException('The production Firebase project must not be used outside production builds.');
     }
     if (authEmulatorHost.isNotEmpty) {
       if (!environment.isDevelopment) {

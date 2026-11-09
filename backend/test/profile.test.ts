@@ -152,7 +152,10 @@ describe('onboarding', () => {
     const body = res.json();
     expect(body.profile.onboarding.status).toBe('completed');
     expect(body.profile.onboarding.completedAt).toEqual(expect.any(String));
-    expect(body.plan).toEqual({ tutorId: 'alex', scenarioId: 'job-interviews', categoryIds: ['professional', 'everyday', 'social'] });
+    expect(body.plan.tutorId).toBe('alex');
+    expect(body.plan.categoryIds).toEqual(['professional', 'everyday', 'social']);
+    // Rotates among free scenarios Alex can teach at B1 in those categories.
+    expect(['job-interviews', 'office-conversations', 'meetings', 'networking']).toContain(body.plan.scenarioId);
   });
 
   it('completes from previously saved partial progress plus the final answers', async () => {
@@ -178,6 +181,7 @@ describe('onboarding', () => {
     ['duplicate goals', { goals: ['career', 'career'] }],
     ['empty goals', { goals: [] }],
     ['unsupported daily goal', { dailyGoalMinutes: 7 }],
+    ['retired 20-minute daily goal', { dailyGoalMinutes: 20 }],
     ['unknown level', { level: 'C2' }],
     ['unsupported interface language', { interfaceLanguage: 'xx' }],
     ['malformed native language', { nativeLanguage: 'Bengali' }],
@@ -194,6 +198,14 @@ describe('onboarding', () => {
     await withProfile();
     const res = await save({ preferences: {}, uid: 'user-456', status: 'completed' });
     expect(res.statusCode).toBe(400);
+  });
+
+  it('accepts C1 as a self-reported level', async () => {
+    await withProfile();
+    const res = await save({ preferences: { ...FULL_PREFS, level: 'C1' }, complete: true });
+    expect(res.statusCode).toBe(200);
+    expect(res.json().profile.onboarding.preferences.level).toBe('C1');
+    expect(res.json().plan.tutorId).toBe('alex');
   });
 
   it('keeps onboarding completed when preferences are edited later', async () => {
@@ -230,14 +242,17 @@ describe('dashboard', () => {
     await app.inject({ method: 'POST', url: '/api/v1/me/profile', headers: auth(), payload: { displayName: 'Rahim', timezone: 'Asia/Dhaka' } });
     const res = await app.inject({ method: 'GET', url: '/api/v1/me/dashboard', headers: auth() });
     expect(res.statusCode).toBe(200);
-    expect(res.json().dashboard).toEqual({
+    const { recommendation, ...rest } = res.json().dashboard;
+    expect(rest).toEqual({
       displayName: 'Rahim',
       plan: 'free',
       dailyGoalMinutes: null,
       today: { date: '2026-11-10', timezone: 'Asia/Dhaka', speakingSeconds: 0, freeAllowanceSeconds: 600, remainingFreeSeconds: 600 },
       progress: { streakDays: 0, weeklySpeakingSeconds: 0, weeklySessions: 0 },
-      recommendation: { tutorId: 'emma', scenarioId: 'introductions', categoryIds: ['everyday'] },
     });
+    expect(recommendation.tutorId).toBe('emma');
+    expect(recommendation.categoryIds).toEqual(['everyday']);
+    expect(['introductions', 'daily-routines', 'shopping']).toContain(recommendation.scenarioId);
   });
 
   it('uses only server-recorded usage and activity', async () => {

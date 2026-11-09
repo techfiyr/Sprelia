@@ -242,4 +242,75 @@ Stop after Phase 2 and wait for my approval.
 6. Merge strategy for the stacked branches into `main`.
 
 ## Approval
-- [ ] Phase 2 approved by owner. *(pending)*
+- [/] Phase 2 **conditionally approved** by the owner (2026-11-09, "Phase 2 Final Decisions and
+  Approval"). Conditions applied below; final confirmation pending before Phase 3.
+
+---
+
+# Final decisions and conditional approval (2026-11-09)
+
+Source: owner documents "Phase 2 Final Decisions and Approval" and "Architecture Decision:
+Firebase Environment Strategy". Where they differ on Firebase, the approved architecture
+decision applies: **`sprelia` is PRODUCTION**.
+
+## Scenario and tutor decisions
+- [x] 1. Study abroad: no longer Emma. Sofia isn't eligible because she doesn't support Academic, so it's assigned to **Alex** (A2–C1, Academic).
+- [x] 2. Networking: `social` added explicitly to Alex's supported categories; compatibility checked.
+- [x] 3. Onboarding levels A1, A2, B1, B2, C1 (+ "not sure"), in the backend and the app.
+- [x] 4. A1 scenarios added: `talking-about-work` (Professional) and `classroom-basics` (Academic), with Emma (now supports Professional and Academic).
+- [x] 5. B2 Travel: `trip-planning`, `changing-plans` (free) and `local-culture` (premium). B2 Travel: 1 → 4 scenarios (3 free).
+- [x] 6. Recommendation: rotates among all eligible scenarios. A test proves every free scenario is reachable.
+- [x] 7. Premium (5): presentations, client-communication, academic-discussions, local-culture, social-events. Free coverage kept for every level each category serves.
+- [x] 8. Backend enforcement: `compatibility.ts` + `CatalogService` (refuses to start on violations; publishes `compatibleTutorIds`). The app offers only compatible tutors and blocks incompatible or premium starts.
+
+## Content decisions
+- [x] Durations 5, 10 and 15: daily targets 5/10/15 (20 removed; stored 20s are dropped per field). Scenario estimates validated to 5/10/15.
+- [x] Human review before publishing: `reviewStatus` with reviewer and date; production publishes only approved scenarios. **All 27 are draft.**
+- [x] American English: catalogue, tutor text and ARB strings converted, with tests in the backend and the app.
+- [x] Flexible for British English: `content-variants.ts` overlay with `?locale=en-GB` on the API; the app is ready for `app_en_GB.arb`.
+
+## Asset decisions
+- [x] Tutor images audited: rights **not established** (provenance stripped by re-encoding; no metadata or C2PA). Status: to be replaced unless the owner provides evidence. Not bundled.
+- [x] Git history **not** rewritten (no legal or security reason identified).
+- [x] Empty-state icons kept for the MVP.
+- [x] `doc/ASSET_LIBRARY.md` updated with sources, licences, status and the audit (§3a).
+
+## Firebase
+- [x] `sprelia` recorded as **PRODUCTION** everywhere (`doc/FIREBASE_SETUP.md`, CLAUDE.md, `.agents/*`, APP_DEVELOPMENT §12/§19).
+- [x] Code guards: the production project is refused outside `APP_ENV=production` (backend + app), and production must use `sprelia`. Tests run only on the emulators.
+- [-] Development Firebase project: **not created**. It needs owner approval of the project ID (proposed `sprelia-dev`) and is Phase 3 preparation.
+- [x] Outstanding production work documented: iOS registration, SHA fingerprints, Email/Password, Firestore + rules, App Check, deployment validation. No production settings changed.
+
+## Documentation
+- [x] APP_DEVELOPMENT.md and BRAND.md remain **awaiting owner review** (headers unchanged in that respect).
+- [x] Updated: `doc/roadmap/README.md`, this file, `doc/ASSET_LIBRARY.md`, `doc/reviews/SCENARIO_REVIEW.md` §5, `doc/FIREBASE_SETUP.md`, APP_FLOW decision notes.
+
+## Changed files (decisions round, branch `phase-2-closeout`)
+- Backend: `src/modules/catalog/{practice.catalog,tutors.catalog,catalog.routes}.ts` (updated),
+  `src/modules/catalog/{compatibility,catalog.service,content-variants}.ts` (new),
+  `src/modules/users/{recommendation,dashboard,profile.routes,user.schemas,firestore-user.repository}.ts`,
+  `src/app.ts`, `src/config/env.ts`, `.env.example`;
+  tests `test/{catalog,learning-logic,profile,config}.test.ts`.
+- App: `lib/core/config/app_config.dart`, `lib/core/assets/app_assets.dart`, `lib/l10n/app_en.arb` (+ generated),
+  `lib/features/{feedback/feedback_screen,onboarding/onboarding_labels,onboarding/steps/plan_step,practice/category_screen,practice/prepare_screen,practice/data/practice_models,profile/data/learning_preferences,tutors/tutors_screen}.dart`;
+  tests `test/{core/config/app_config_test,features/screens_test,features/onboarding/onboarding_test,helpers/fakes,l10n/spelling_test}.dart`.
+- Docs and config: `doc/{APP_DEVELOPMENT,APP_FLOW,ASSET_LIBRARY,FIREBASE_SETUP}.md`,
+  `doc/reviews/SCENARIO_REVIEW.md`, `doc/roadmap/{README,phase_2}.md`, `assets/ATTRIBUTION.md`,
+  `CLAUDE.md`, `.agents/{architecture,security}.md`, `env/{README.md,production.example.json,staging.example.json}`.
+
+## Test results (2026-11-09, after decisions)
+| Check | Result |
+|---|---|
+| `flutter analyze` | No issues |
+| `flutter test` | 111/111 (incl. 11 asset-library tests and the ARB spelling test) |
+| Backend unit | 128/128 (incl. catalogue policy, compatibility, reachability, production-project guard) |
+| Backend emulator integration (Auth + Firestore + rules) | 16/16 |
+| Typecheck / build | Pass / pass |
+| Debug APK | Builds; bundled assets = 4 Inter fonts + OFL licence only |
+| Secret scan | Clean |
+
+## Remaining before Phase 3
+- Owner confirmation of Phase 2 (conditions applied).
+- Content owner review of 27 scenarios (production publishes none until approved).
+- Tutor image replacement, or rights evidence.
+- Development Firebase project ID approval and creation (Phase 3 preparation).

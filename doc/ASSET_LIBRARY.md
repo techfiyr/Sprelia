@@ -1,6 +1,6 @@
 # Sprelia Asset Library
 
-**Status date:** 2026-11-09 (verified at Phase 2 close-out) · **Owner:** product/brand owner (approvals), engineering (registry)
+**Status date:** 2026-11-09 (verified at Phase 2 close-out; licensing audit §3a) · **Owner:** product/brand owner (approvals), engineering (registry)
 
 > Location note: the guidelines name `docs/ASSET_LIBRARY.md`. This repository keeps all
 > specifications in `doc/`, so the library lives at `doc/ASSET_LIBRARY.md`.
@@ -101,8 +101,8 @@ white launch theme. Both are regenerated from the icon sources once approved.
 | `AppAssets.tutorAlex` | `assets/tutors/alex/alex_avatar.webp` | WebP | Alex avatar | planned | TBD; consistent style required |
 | `AppAssets.tutorSofia` | `assets/tutors/sofia/sofia_avatar.webp` | WebP | Sofia avatar | planned | TBD; consistent style required |
 | `AppAssets.tutorAvatarPlaceholder` | `lib/features/tutors/tutor_avatar.dart` | code | Initial letter on a brand tint, labelled "(placeholder)" | placeholder | Rendered in code |
-| `AppAssets.tutorEmmaCandidate` | `assets/tutors/img_tutor_emma.jpeg` | JPEG 1024², 54 KB | Unapproved Emma candidate | placeholder (candidate, **not bundled**) | **UNKNOWN**: owner to confirm |
-| `AppAssets.tutorSofiaCandidate` | `assets/tutors/img_tutor_sofia.jpeg` | JPEG 1024², 62 KB | Unapproved "Sofia" candidate | placeholder (candidate, **not bundled**) | **UNKNOWN**: owner to confirm |
+| `AppAssets.tutorEmmaCandidate` | `assets/tutors/img_tutor_emma.jpeg` | JPEG 1024², 54 KB | Unapproved Emma candidate | placeholder (candidate, **not bundled**, to be replaced) | **Rights not established** (audit §3a) |
+| `AppAssets.tutorSofiaCandidate` | `assets/tutors/img_tutor_sofia.jpeg` | JPEG 1024², 62 KB | Unapproved "Sofia" candidate | placeholder (candidate, **not bundled**, to be replaced) | **Rights not established** (audit §3a) |
 
 **Review of the two candidates (added to the repo on 2026-11-09):**
 - No embedded metadata (author, tool, copyright), so the source and licence are unknown.
@@ -116,6 +116,38 @@ white launch theme. Both are regenerated from the icon sources once approved.
 - Both images were included in commit `7643ba5` (branch `phase-1-foundation`, pushed).
   If the licence turns out to be unsuitable, removing them from git history needs owner
   approval (it rewrites history).
+
+### 3a. Tutor image licensing audit (2026-11-09)
+
+**Owner decisions:** audit the origin and licence of all tutor images; replace them if usage
+rights cannot be established; do not rewrite git history unless there is a genuine legal or
+security reason.
+
+| Check | `img_tutor_emma.jpeg` | `img_tutor_sofia.jpeg` |
+|---|---|---|
+| SHA-256 (first 16) | `6fb12591b9ff4ea9` | `944a213ecf91bcda` |
+| Container | Baseline JFIF 1.01, 1024×1024 RGB | Baseline JFIF 1.01, 1024×1024 RGB |
+| EXIF / XMP (APP1) | none | none |
+| ICC profile (APP2) | none | none |
+| C2PA / JUMBF provenance (APP11) | none | none |
+| IPTC (APP13), comments, trailing data | none | none |
+| Encoder fingerprint | standard libjpeg quality-75 tables, re-optimized Huffman | identical |
+| Tool or vendor strings (AI generators, stock, Adobe, Canva, …) | none found | none found |
+| First git appearance | commit `7643ba5` (added outside the agent's tasks and swept into the Phase 1 commit) | same |
+
+**Result:** usage rights are **not established**. Both files were re-encoded by the same tool,
+which removed any author, generator or licence information. Their origin can't be determined
+from the files or the repository.
+**Status:** to be **replaced** (owner decision) unless the owner provides evidence of commercial
+usage rights (source, licence or terms, author or tool). They stay out of the app bundle,
+enforced by tests.
+**Git history:** not rewritten. No legal claim or security reason has been identified. If the
+owner later confirms the images must not be distributed, remove them with a normal commit, and
+rewrite history only if legal advice requires it.
+
+### Empty-state art (owner decision 2026-11-09)
+The MVP keeps the current Material icons for empty, error and offline states. No empty-state
+illustrations are planned for the MVP.
 
 ### Illustrations and animations
 
@@ -136,7 +168,7 @@ Screens that the specs say should carry illustrations or brand art, and what the
 | Onboarding | DESIGN_SYSTEM §8: portrait onboarding illustration | None (text + selection cards) | `onboardingIllustration` (planned) |
 | Learning plan | n/a | Material celebration icon | none needed |
 | Tutor cards, preparation, conversation | BRAND §6: tutor portraits | Initial-letter placeholder | `tutorEmma` / `tutorAlex` / `tutorSofia` (planned) |
-| Empty and error states | DESIGN_SYSTEM §9 lists illustration subjects, but no per-screen requirement | Material icons | **Open decision:** whether to commission empty-state art |
+| Empty and error states | DESIGN_SYSTEM §9 lists illustration subjects, but no per-screen requirement | Material icons | **Decided:** keep icons for the MVP |
 | Launcher icon / native splash | BRAND §5, DESIGN_SYSTEM §7 | Flutter defaults | `appIcon*` sources (planned) |
 
 ## 4. Specifications for planned assets

@@ -106,7 +106,7 @@ class _PlanStepState extends ConsumerState<PlanStep> {
               padding: const EdgeInsets.all(AppSpacing.lg),
               child: AppButton(
                 key: const ValueKey('plan-start'),
-                label: l10n.planStartPractising,
+                label: l10n.planStartPracticing,
                 isLoading: _starting,
                 onPressed: _start,
               ),
