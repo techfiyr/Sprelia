@@ -5,10 +5,8 @@ import 'package:flutter/material.dart';
 /// Scale: `doc/DESIGN_SYSTEM.md` §4. Weights: `doc/BRAND.md` §4 ("medium and
 /// semibold weights for headings"), which takes precedence for visual identity.
 ///
-/// Font: Inter is the brand typeface. The font files are NOT bundled yet, so
-/// Flutter falls back to the platform sans-serif (Roboto / SF). To enable Inter,
-/// add the OFL-licensed TTFs under `assets/fonts/inter/` and declare the `Inter`
-/// family in `pubspec.yaml`; no code change is needed.
+/// Font: Inter v4.1 (SIL OFL 1.1), bundled in `assets/fonts/inter/` with weights
+/// 400/500/600/700 and declared in `pubspec.yaml`. Never fetched at runtime.
 abstract final class AppTypography {
   static const fontFamily = 'Inter';
 

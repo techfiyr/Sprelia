@@ -9,6 +9,7 @@ import '../tutors/tutor.dart';
 import '../tutors/tutor_avatar.dart';
 import 'conversation_controller.dart';
 import 'conversation_state.dart';
+import 'data/catalog_repository.dart';
 
 class ConversationScreen extends ConsumerStatefulWidget {
   const ConversationScreen({super.key, required this.tutorId});
@@ -41,7 +42,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
     final provider = conversationControllerProvider(widget.tutorId);
     final state = ref.watch(provider);
     final controller = ref.read(provider.notifier);
-    final tutor = tutorById(widget.tutorId);
+    final tutor = ref.watch(tutorByIdProvider(widget.tutorId));
     final text = Theme.of(context).textTheme;
 
     ref.listen(provider, (prev, next) {

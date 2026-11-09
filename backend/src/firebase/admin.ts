@@ -1,5 +1,6 @@
 import { applicationDefault, getApps, initializeApp, type App } from 'firebase-admin/app';
 import { getAuth, type Auth } from 'firebase-admin/auth';
+import { getFirestore, type Firestore } from 'firebase-admin/firestore';
 import type { AppConfig } from '../config/env.js';
 
 /**
@@ -17,9 +18,10 @@ import type { AppConfig } from '../config/env.js';
 export function initFirebaseAdmin(config: AppConfig): App {
   const existing = getApps()[0];
   if (existing) return existing;
+  // firebase-admin reads emulator hosts from process env; config validation has
+  // already guaranteed we are not in staging/production.
+  if (config.firestoreEmulatorHost) process.env.FIRESTORE_EMULATOR_HOST = config.firestoreEmulatorHost;
   if (config.firebaseAuthEmulatorHost) {
-    // firebase-admin reads this from process env; config validation has already
-    // guaranteed we are not in staging/production.
     process.env.FIREBASE_AUTH_EMULATOR_HOST = config.firebaseAuthEmulatorHost;
     return initializeApp({ projectId: config.firebaseProjectId });
   }
@@ -28,4 +30,8 @@ export function initFirebaseAdmin(config: AppConfig): App {
 
 export function firebaseAuth(app: App): Auth {
   return getAuth(app);
+}
+
+export function firestore(app: App): Firestore {
+  return getFirestore(app);
 }

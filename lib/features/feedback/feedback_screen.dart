@@ -115,7 +115,7 @@ class _FeedbackBody extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(c.improved,
                             style: text.bodyMedium?.copyWith(
-                              color: palette.success,
+                              color: palette.successText,
                               fontWeight: FontWeight.w600,
                             )),
                         const SizedBox(height: 8),

@@ -13,7 +13,7 @@ Sprelia API — Node.js/TypeScript, Fastify, Cloud Run          backend/src/main
   │    ephemeral token minted by the backend (Phase 6)
   ├──► Gemini (text): post-session analysis, server only (Phase 8)
   ▼
-Cloud Firestore: default-deny rules; clients read their own data only (Phase 4)
+Cloud Firestore: default-deny rules. Phase 2: NO direct client access; all data via the API.
 ```
 
 ## Implemented decisions (Phase 1)
@@ -32,6 +32,24 @@ Cloud Firestore: default-deny rules; clients read their own data only (Phase 4)
 | Flutter errors | `AppFailure` (user-safe messages), `ErrorReporter` (debug log now, Crashlytics in Phase 4), `AppProviderObserver`, global `FlutterError.onError` / `PlatformDispatcher.onError` | Nothing fails silently, and raw exceptions are never shown to users. |
 | Navigation | GoRouter `StatefulShellRoute` with 5 tabs (Home, Practice, Learn, Progress, Profile). Tutor, prepare, conversation and feedback routes are pushed full-screen. | APP_FLOW §1. |
 
+## Implemented decisions (Phase 2)
+
+| Decision | Choice | Why |
+|---|---|---|
+| Accessibility tokens | Text secondary darkened to `#6A687C`. New `successText`, `warningText` and `errorText` (`#C82D2D`) for text and destructive fills. Base status hues kept for icons. Primary palette unchanged. | WCAG AA (BRAND §12). Enforced by tests. |
+| Typeface | Inter v4.1 (OFL) static TTFs bundled (400/500/600/700) | BRAND §4; no runtime font downloads. |
+| Client auth | Firebase Auth email/password behind `AuthRepository`. Errors are mapped so "wrong password" and "unknown account" look the same. Google sign-in comes once the provider is configured. No guest mode. | APP_FLOW §4; avoids account enumeration. |
+| Firebase client config | Dart-side `FirebaseOptions` from dart-defines (`AppConfig.firebase`). Development uses the Auth emulator with `demo-sprelia`. The emulator and `demo-*` projects are refused outside development. No `google-services.json` in git. | Fails closed; no credentials in the repo. |
+| Session and routing | `sessionProvider` (auth state → `GET /me/profile`, or `POST` to create it with the device IANA time zone) drives `sessionRedirect`: loading or error → splash (with retry); signed out → welcome/sign-in; not onboarded → onboarding; onboarded → app. | Single source of truth for access. The redirect is a pure, unit-tested function. |
+| Onboarding persistence | The draft (step and answers) is saved to `SharedPreferences` per uid after every change. If there is no draft, onboarding resumes from server preferences. Answers are sent once, at the end, with `complete: true`. | Survives app kill (verified on device); no server writes per tap. |
+| Onboarding completion | The server validates completeness on the **merged** stored preferences inside the Firestore transaction. Completed status is sticky. | Clients cannot mark onboarding complete with missing data. |
+| Recommendations | Deterministic server-side rule (`recommendation.ts`): goals → categories; level and goals → tutor; first level-appropriate scenario. | Explainable; one implementation used by both onboarding and the dashboard. |
+| Dashboard | Built only from server-recorded documents (`usage`, `dailyProgress`). Missing means zero. `plan` is always `free` until RevenueCat (Phase 9). | No invented progress (BRAND §7); never trusts the client. |
+| Catalogue | Tutors and practice categories served from reviewed backend code (`modules/catalog`). Display fields only: no prompts, no voice names. | Read-only for clients. Moves to Firestore once an admin workflow exists. |
+| Localization | `gen-l10n` with `lib/l10n/app_en.arb`. New Phase 2 screens use `context.l10n`. Interface language is applied from the saved preference when supported. | Phase 2 §E: architecture ready; only English shipped. |
+| Provider retries | Riverpod automatic retry disabled (`retry: (_, _) => null`). Every error view has a manual retry. | No silent request loops; errors stay visible. |
+| Voice in Phase 2 | Preparation enables "Start" only for tutors with `voiceAvailable` **and** only in development builds (legacy prototype). | Phase 2 excludes live sessions; the prototype must never ship. |
+
 ## Repository layout
 
 ```text
@@ -45,14 +63,27 @@ lib/
   main.dart               bootstrap: config validation, global error handlers, ProviderScope
   app.dart                SpreliaApp (MaterialApp.router), ConfigErrorApp
   core/
+    auth/                 AuthRepository (Firebase / unavailable), authStateProvider
     branding/             AppBrand (name, tagline), BrandLogo (PLACEHOLDER)
-    config/               AppConfig, AppEnvironment, appConfigProvider
+    config/               AppConfig (+ FirebaseClientConfig), AppEnvironment
     errors/               AppFailure, ErrorReporter, AppProviderObserver
-    routing/              AppRoutes, routerProvider, AppShell (bottom nav)
-    services/             apiClientProvider (Dio), realtime/ (Gemini Live prototype)
+    firebase/             initializeFirebase (options from dart-defines, emulator in dev)
+    routing/              AppRoutes, routerProvider, sessionRedirect, AppShell
+    services/             apiClientProvider (Dio + ID token interceptor), realtime/ (prototype)
+    session/              sessionProvider (SignedOut / SignedIn(user, profile))
+    storage/              sharedPreferencesProvider (non-sensitive data only)
     theme/                AppColors, AppPalette, AppTypography, AppSpacing, AppRadius, AppTheme
-    widgets/              AppButton, AppCard, AppTextField, AppLoading*, AppEmptyState, AppErrorState
-  features/<feature>/     screens, widgets, controllers per feature
+    widgets/              AppButton, AppCard, AppTextField, AppSelectionTile, AppLoading*, state views
+  l10n/                   app_en.arb + generated AppLocalizations, context.l10n
+  features/
+    auth/                 SignInScreen (email sign-in / create account / reset)
+    splash/               SplashScreen (loading, error + retry)
+    onboarding/           Welcome, OnboardingScreen + steps/, controller, draft store, labels
+    home/                 dashboard
+    practice/             Practice tab, CategoryScreen, PrepareScreen, data/ (catalogue)
+    tutors/               Tutor model, TutorsScreen, TutorAvatar (PLACEHOLDER)
+    profile/              ProfileScreen, data/ (profile models + repository)
+    learn/, progress/, feedback/   (empty states / prototype feedback)
 backend/
   src/
     main.ts               entry: config → logger → Firebase Admin → app.listen
@@ -60,9 +91,14 @@ backend/
     config/env.ts         Zod-validated environment (production guards)
     common/               errors, error-handler, validate, logger
     firebase/admin.ts     Admin SDK initialization (ADC, emulator in dev only)
-    modules/<module>/     auth, health, users, … (one Fastify plugin per module)
+    modules/
+      auth/               TokenVerifier, FirebaseTokenVerifier, authenticate
+      health/             GET /health
+      users/              /me, /me/profile, /me/onboarding, /me/dashboard; repositories, schemas
+      catalog/            /tutors, /practice/categories (reviewed content)
     server.ts …           LEGACY Express prototype (see below)
-  test/                   Vitest
+  test/                   Vitest unit tests (in-memory repository, fake verifier)
+  test/integration/       Emulator Suite: real tokens + Firestore; firestore.rules tests
 ```
 
 Flutter layering for new features (APP_DEVELOPMENT §5):
@@ -74,6 +110,14 @@ Presentation → Notifier/Controller → Repository → Service/API.
 |---|---|---|---|
 | GET | `/api/v1/health` | none | `200 {"status":"ok"}`, nothing else, `cache-control: no-store` |
 | GET | `/api/v1/me` | Bearer ID token | `200 {uid, email, emailVerified, signInProvider}` (read-only) |
+| GET | `/api/v1/me/profile` | Bearer | `200 {profile}` or `404 PROFILE_NOT_FOUND` |
+| POST | `/api/v1/me/profile` | Bearer | Body `{timezone, displayName?}` (strict). `201 {profile, created:true}`. If the profile exists: `200`, unchanged. uid and email come from the token. |
+| PUT | `/api/v1/me/onboarding` | Bearer | Body `{preferences (partial, strict), complete?}`. Merges, then returns `{profile, plan}` (`plan` once completed). Completing with missing fields returns 400 listing them. |
+| GET | `/api/v1/me/dashboard` | Bearer | `200 {dashboard}` from server data only (today, free allowance remaining, streak, weekly totals, recommendation) |
+| GET | `/api/v1/tutors` | Bearer | Public tutor catalogue (no prompts or voices) |
+| GET | `/api/v1/practice/categories` | Bearer | Categories with scenarios (CEFR range, objectives, vocabulary, minutes) |
+
+Ownership is structural: no route takes a uid; every read and write uses `request.user.uid`.
 
 Error envelope (every non-2xx):
 
@@ -83,7 +127,7 @@ Error envelope (every non-2xx):
 
 Codes: `VALIDATION_ERROR` 400, `BAD_REQUEST` 400, `UNAUTHENTICATED` 401 (no or malformed
 header), `INVALID_TOKEN` 401 (expired, revoked, forged, wrong project, disabled user),
-`NOT_FOUND` 404, `PAYLOAD_TOO_LARGE` 413, `UNSUPPORTED_MEDIA_TYPE` 415, `RATE_LIMITED` 429,
+`NOT_FOUND` 404, `PROFILE_NOT_FOUND` 404, `PAYLOAD_TOO_LARGE` 413, `UNSUPPORTED_MEDIA_TYPE` 415, `RATE_LIMITED` 429,
 `SERVICE_UNAVAILABLE` 503 (token verification could not complete), `INTERNAL` 500.
 
 ## Legacy prototype (still present, to be migrated)
@@ -116,7 +160,15 @@ deletes the prototype and Express. Until then, never deploy the prototype.
   Candidates: `gemini-3.8-flash`, `gemini-3.5-flash-lite`.
 - Model IDs stay in backend env vars, never in Flutter.
 
-## Firebase layout (planned schema, enforced from Phase 4)
+## Firebase layout
+
+Implemented in Phase 2 (written only by the backend):
+`users/{uid}` (profile: uid, email, displayName, timezone, onboardingStatus,
+onboardingCompletedAt, createdAt, updatedAt, schemaVersion) and
+`users/{uid}/preferences/learning`. Read but not yet written: `usage/{date}`
+(`consumedSeconds`) and `dailyProgress/{date}` (`speakingSeconds`, `sessionsCompleted`).
+
+Planned client access (Phase 4+; today every client read and write is denied):
 
 ```text
 users/{uid}                                  owner read; limited validated owner writes

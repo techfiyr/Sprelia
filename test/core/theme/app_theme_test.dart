@@ -16,7 +16,9 @@ void main() {
 
   test('uses the BRAND.md palette', () {
     expect(theme.colorScheme.primary, const Color(0xFF7656D9));
-    expect(theme.colorScheme.error, const Color(0xFFD95757));
+    // Accessible error red (BRAND §12) for text and destructive fills.
+    expect(theme.colorScheme.error, const Color(0xFFC82D2D));
+    expect(AppColors.error, const Color(0xFFD95757)); // decorative brand hue kept
     expect(theme.colorScheme.onSurface, const Color(0xFF20213A));
     expect(theme.scaffoldBackgroundColor, const Color(0xFFFAF9FF));
     expect(theme.brightness, Brightness.light);
@@ -37,16 +39,51 @@ void main() {
     expect(t.bodyMedium!.fontFamily, 'Inter');
   });
 
-  group('WCAG AA contrast (4.5:1) for core text pairs', () {
-    test('primary text on background and surface', () {
-      expect(contrast(AppColors.textPrimary, AppColors.background), greaterThanOrEqualTo(4.5));
-      expect(contrast(AppColors.textPrimary, AppColors.surface), greaterThanOrEqualTo(4.5));
-    });
-    test('button label on primary', () {
+  group('WCAG AA contrast (BRAND §12)', () {
+    const surfaces = {
+      'background': AppColors.background,
+      'surface': AppColors.surface,
+      'primaryLight': AppColors.primaryLight,
+    };
+    const textTokens = {
+      'textPrimary': AppColors.textPrimary,
+      'textSecondary': AppColors.textSecondary,
+      'primaryDark': AppColors.primaryDark,
+      'successText': AppColors.successText,
+      'warningText': AppColors.warningText,
+      'errorText': AppColors.errorText,
+    };
+    for (final t in textTokens.entries) {
+      for (final s in surfaces.entries) {
+        test('${t.key} text on ${s.key} >= 4.5:1', () {
+          expect(contrast(t.value, s.value), greaterThanOrEqualTo(4.5));
+        });
+      }
+    }
+
+    test('white label on primary button >= 4.5:1', () {
       expect(contrast(AppColors.onPrimary, AppColors.primary), greaterThanOrEqualTo(4.5));
     });
-    test('primaryDark on primaryLight (tinted surfaces)', () {
-      expect(contrast(AppColors.primaryDark, AppColors.primaryLight), greaterThanOrEqualTo(4.5));
+
+    test('white label on destructive button >= 4.5:1', () {
+      expect(contrast(AppColors.onPrimary, AppTheme.light().colorScheme.error), greaterThanOrEqualTo(4.5));
+    });
+
+    test('text primary on coral accent >= 4.5:1', () {
+      expect(contrast(AppColors.textPrimary, AppColors.accentCoral), greaterThanOrEqualTo(4.5));
+    });
+
+    test('meaningful non-text colors >= 3:1 on surfaces', () {
+      for (final c in [AppColors.primary, AppColors.success, AppColors.error]) {
+        expect(contrast(c, AppColors.surface), greaterThanOrEqualTo(3));
+      }
+    });
+
+    test('theme text roles use accessible tokens', () {
+      final theme = AppTheme.light();
+      expect(theme.colorScheme.onSurfaceVariant, AppColors.textSecondary);
+      expect(theme.textTheme.bodySmall!.color, AppColors.textSecondary);
+      expect(theme.extension<AppPalette>()!.danger, AppColors.errorText);
     });
   });
 

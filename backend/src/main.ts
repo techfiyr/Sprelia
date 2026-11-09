@@ -1,8 +1,9 @@
 import { buildApp } from './app.js';
 import { createLogger } from './common/logger.js';
 import { ConfigError, loadConfig } from './config/env.js';
-import { firebaseAuth, initFirebaseAdmin } from './firebase/admin.js';
+import { firebaseAuth, firestore, initFirebaseAdmin } from './firebase/admin.js';
 import { FirebaseTokenVerifier } from './modules/auth/firebase-token-verifier.js';
+import { FirestoreUserRepository } from './modules/users/firestore-user.repository.js';
 
 async function main() {
   let config;
@@ -20,7 +21,9 @@ async function main() {
     checkRevoked: config.authCheckRevoked,
   });
 
-  const app = await buildApp({ config, logger, verifier });
+  const users = new FirestoreUserRepository(firestore(firebase));
+
+  const app = await buildApp({ config, logger, verifier, users });
 
   const shutdown = async (signal: string) => {
     logger.info({ signal }, 'shutting down');
@@ -38,6 +41,9 @@ async function main() {
   await app.listen({ port: config.port, host: config.host });
   if (config.firebaseAuthEmulatorHost) {
     logger.warn('Firebase Auth emulator tokens are accepted (development only)');
+  }
+  if (config.firestoreEmulatorHost) {
+    logger.warn('Using the Firestore emulator (development only)');
   }
 }
 

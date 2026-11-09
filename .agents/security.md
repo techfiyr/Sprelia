@@ -41,12 +41,23 @@ task, stop and ask; do not work around it.
   caller and validate the payload explicitly.
 
 ## 4. Firestore rules
-- Default deny. Phase 1 `firestore.rules` denies everything.
+- Default deny. Phase 2 `firestore.rules` still denies **all** client access; the app
+  reaches data only through the authenticated API. `backend/test/integration/firestore.rules.test.ts`
+  proves that owners cannot read or write their own documents directly, cannot grant
+  themselves premium or usage, and cannot touch the catalogue or app config.
 - Users access only `users/{their uid}/**`, and only the fields and operations listed in
   `architecture.md`. Validate field names, types and sizes on every permitted write. No
   broad wildcard writes.
 - Every rule change ships with Emulator Suite tests (`@firebase/rules-unit-testing`).
   Never weaken a rule to fix an error.
+
+### User-owned API data (Phase 2)
+- No route accepts a uid. Profile, onboarding and dashboard always use `request.user.uid`.
+- Profile creation is create-if-absent in a transaction and never overwrites. Email comes from
+  the token, never from the body.
+- Onboarding completion is validated on the merged, stored preferences inside the transaction.
+- Dashboard values come only from server-written documents. Client query or header values are ignored.
+- The catalogue exposes display fields only: no prompts, voice names or opening instructions.
 
 ## 5. Input validation and API hygiene
 - Validate every request with Zod through `validate({ body, query, params })`. Use
@@ -66,6 +77,15 @@ task, stop and ask; do not work around it.
 - Analytics and Crashlytics never receive transcripts, audio, email or tokens.
 
 ## 7. Flutter client
+- Firebase client identifiers are public, but real-project values still live only in
+  gitignored env files and CI. `demo-*` projects and the emulator are refused outside development.
+- Auth errors never reveal whether an account exists. Password reset always shows the same confirmation.
+- `SharedPreferences` holds only non-sensitive data (the onboarding draft, per uid). Never
+  store tokens, credentials, transcripts or personal data there. Firebase Auth manages its own session.
+- Debug builds allow cleartext HTTP only to `10.0.2.2`, `localhost` and `127.0.0.1`
+  (`android/app/src/debug/res/xml/network_security_config.xml`). This replaced the blanket
+  `usesCleartextTraffic="true"`. Release builds keep the platform default (cleartext blocked).
+- The legacy voice prototype can only be started from development builds.
 - Show users only `AppFailure.message`, never `'$e'`, `toString()` of exceptions or raw
   server bodies. Report the original error through `ErrorReporter`.
 - The client is untrusted. It may display limits (e.g. the free minutes) but never enforce

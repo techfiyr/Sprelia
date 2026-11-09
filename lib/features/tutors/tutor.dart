@@ -1,63 +1,74 @@
 /// Brand tone used for a tutor's placeholder avatar. Resolved to theme colors
 /// in `TutorAvatar`; models never hold raw colors.
-enum TutorTone { primary, primaryDark, accent }
+enum TutorTone {
+  primary,
+  primaryDark,
+  accent;
 
-/// Client-side tutor metadata for display (APP_FLOW §7). Prompts and voice configuration
-/// live on the backend (`backend/src/tutors.ts`) and are never sent to the app.
+  static TutorTone fromWire(Object? v) => switch (v) {
+        'primaryDark' => TutorTone.primaryDark,
+        'accent' => TutorTone.accent,
+        _ => TutorTone.primary,
+      };
+}
+
+/// Public tutor metadata from `GET /api/v1/tutors` (APP_FLOW §7). Prompts and
+/// voice configuration live only on the backend and are never sent to the app.
 class Tutor {
   const Tutor({
     required this.id,
     required this.name,
     required this.title,
     required this.personality,
-    required this.levels,
-    required this.focus,
+    required this.description,
+    required this.minLevel,
+    required this.maxLevel,
+    required this.categoryIds,
     required this.tone,
-    this.available = true,
+    this.voiceAvailable = false,
   });
 
   final String id;
   final String name;
   final String title;
-  final String personality;
-  final String levels;
-  final String focus;
+  final List<String> personality;
+  final String description;
+  final String minLevel;
+  final String maxLevel;
+  final List<String> categoryIds;
   final TutorTone tone;
 
-  /// Prototype phase: only Emma is enabled.
-  final bool available;
+  /// Voice conversations exist for this tutor (prototype: Emma only).
+  final bool voiceAvailable;
+
+  String get levels => '$minLevel – $maxLevel';
+
+  factory Tutor.fromJson(Map<String, Object?> j) {
+    final levels = (j['levels']! as Map).cast<String, Object?>();
+    return Tutor(
+      id: j['id']! as String,
+      name: j['name']! as String,
+      title: j['title']! as String,
+      personality: (j['personality'] as List?)?.cast<String>() ?? const [],
+      description: (j['description'] as String?) ?? '',
+      minLevel: levels['min']! as String,
+      maxLevel: levels['max']! as String,
+      categoryIds: (j['categoryIds'] as List?)?.cast<String>() ?? const [],
+      tone: TutorTone.fromWire(j['tone']),
+      voiceAvailable: j['voiceAvailable'] == true,
+    );
+  }
+
+  /// Shown while the catalogue loads or if a tutor id is unknown.
+  factory Tutor.placeholder(String id) => Tutor(
+        id: id,
+        name: id.isEmpty ? 'Tutor' : '${id[0].toUpperCase()}${id.substring(1)}',
+        title: '',
+        personality: const [],
+        description: '',
+        minLevel: 'A1',
+        maxLevel: 'B2',
+        categoryIds: const [],
+        tone: TutorTone.primary,
+      );
 }
-
-const tutors = <Tutor>[
-  Tutor(
-    id: 'emma',
-    name: 'Emma',
-    title: 'Friendly English Coach',
-    personality: 'Patient and encouraging',
-    levels: 'A1 – B1',
-    focus: 'Everyday communication',
-    tone: TutorTone.primary,
-  ),
-  Tutor(
-    id: 'alex',
-    name: 'Alex',
-    title: 'Professional Communication Coach',
-    personality: 'Professional, structured and helpful',
-    levels: 'A2 – C1',
-    focus: 'Interviews, meetings, presentations',
-    tone: TutorTone.primaryDark,
-    available: false,
-  ),
-  Tutor(
-    id: 'sofia',
-    name: 'Sofia',
-    title: 'Everyday Conversation Partner',
-    personality: 'Natural, expressive and friendly',
-    levels: 'A1 – B2',
-    focus: 'Everyday, social and travel situations',
-    tone: TutorTone.accent,
-    available: false,
-  ),
-];
-
-Tutor tutorById(String id) => tutors.firstWhere((t) => t.id == id, orElse: () => tutors.first);

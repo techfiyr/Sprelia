@@ -1,0 +1,467 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for English (`en`).
+class AppLocalizationsEn extends AppLocalizations {
+  AppLocalizationsEn([String locale = 'en']) : super(locale);
+
+  @override
+  String get actionContinue => 'Continue';
+
+  @override
+  String get actionBack => 'Back';
+
+  @override
+  String get actionTryAgain => 'Try again';
+
+  @override
+  String stepProgress(int current, int total) {
+    return 'Step $current of $total';
+  }
+
+  @override
+  String get welcomeContinueWithEmail => 'Continue with Email';
+
+  @override
+  String get welcomeSignInUnavailable =>
+      'Sign-in isn\'t set up in this build yet.';
+
+  @override
+  String get authSignInTitle => 'Welcome back';
+
+  @override
+  String get authSignInSubtitle => 'Sign in to continue your practice.';
+
+  @override
+  String get authCreateTitle => 'Create your account';
+
+  @override
+  String get authCreateSubtitle => 'It only takes a minute.';
+
+  @override
+  String get authEmailLabel => 'Email';
+
+  @override
+  String get authPasswordLabel => 'Password';
+
+  @override
+  String get authSignInAction => 'Sign in';
+
+  @override
+  String get authCreateAction => 'Create account';
+
+  @override
+  String get authSwitchToCreate => 'New here? Create an account';
+
+  @override
+  String get authSwitchToSignIn => 'Already have an account? Sign in';
+
+  @override
+  String get authForgotPassword => 'Forgot password?';
+
+  @override
+  String authResetSent(String email) {
+    return 'If an account exists for $email, we\'ve sent a link to reset your password.';
+  }
+
+  @override
+  String get authEmailInvalid => 'Please enter a valid email address.';
+
+  @override
+  String get authPasswordTooShort => 'Use at least 8 characters.';
+
+  @override
+  String get splashLoading => 'Getting things ready…';
+
+  @override
+  String get onboardingInterfaceLanguageTitle =>
+      'Which language should the app use?';
+
+  @override
+  String get onboardingInterfaceLanguageSubtitle =>
+      'You can change this later in your profile.';
+
+  @override
+  String get onboardingMoreLanguagesSoon =>
+      'More app languages are coming soon.';
+
+  @override
+  String get onboardingNativeLanguageTitle => 'What\'s your first language?';
+
+  @override
+  String get onboardingNativeLanguageSubtitle =>
+      'We\'ll use it to make explanations clearer for you.';
+
+  @override
+  String get onboardingSearchLanguages => 'Search languages';
+
+  @override
+  String get onboardingNoLanguageMatch => 'No languages match your search.';
+
+  @override
+  String get onboardingGoalsTitle => 'What would you like to practise?';
+
+  @override
+  String get onboardingGoalsSubtitle => 'Choose all that apply.';
+
+  @override
+  String get goalEveryday => 'Everyday English';
+
+  @override
+  String get goalEverydayDescription => 'Daily conversations and routines';
+
+  @override
+  String get goalCareer => 'Career and interviews';
+
+  @override
+  String get goalCareerDescription =>
+      'Job interviews and talking about your work';
+
+  @override
+  String get goalBusiness => 'Business communication';
+
+  @override
+  String get goalBusinessDescription => 'Meetings, presentations and clients';
+
+  @override
+  String get goalTravelSocial => 'Travel and social life';
+
+  @override
+  String get goalTravelSocialDescription =>
+      'Trips, new places and making friends';
+
+  @override
+  String get goalAcademic => 'Academic English';
+
+  @override
+  String get goalAcademicDescription =>
+      'Class discussions and explaining ideas';
+
+  @override
+  String get goalConfidence => 'Speaking confidence';
+
+  @override
+  String get goalConfidenceDescription => 'Feel relaxed when you speak';
+
+  @override
+  String get onboardingLevelTitle =>
+      'How would you describe your English today?';
+
+  @override
+  String get onboardingLevelSubtitle =>
+      'This is a starting point, not a test. You can change it anytime.';
+
+  @override
+  String get levelA1 => 'Beginner';
+
+  @override
+  String get levelA1Description => 'I can use simple words and phrases.';
+
+  @override
+  String get levelA2 => 'Elementary';
+
+  @override
+  String get levelA2Description =>
+      'I can talk about familiar, everyday topics.';
+
+  @override
+  String get levelB1 => 'Intermediate';
+
+  @override
+  String get levelB1Description =>
+      'I can handle most daily situations and share opinions.';
+
+  @override
+  String get levelB2 => 'Upper intermediate';
+
+  @override
+  String get levelB2Description =>
+      'I can discuss many topics and speak fairly fluently.';
+
+  @override
+  String get levelNotSure => 'I\'m not sure';
+
+  @override
+  String get levelNotSureDescription =>
+      'No problem. We\'ll start gently and adjust as you practise.';
+
+  @override
+  String get onboardingDailyGoalTitle =>
+      'How long would you like to practise each day?';
+
+  @override
+  String get onboardingDailyGoalSubtitle =>
+      'A small daily habit makes a big difference.';
+
+  @override
+  String dailyGoalMinutes(int minutes) {
+    return '$minutes minutes a day';
+  }
+
+  @override
+  String get dailyGoal5 => 'A quick daily warm-up';
+
+  @override
+  String get dailyGoal10 => 'A great everyday habit';
+
+  @override
+  String get dailyGoal15 => 'Steady, noticeable progress';
+
+  @override
+  String get dailyGoal20 => 'For focused learners';
+
+  @override
+  String get onboardingAccentTitle => 'Which accent would you like to hear?';
+
+  @override
+  String get onboardingAccentSubtitle =>
+      'Every accent is correct English. This only changes how your tutor sounds.';
+
+  @override
+  String get accentAmerican => 'American English';
+
+  @override
+  String get accentBritish => 'British English';
+
+  @override
+  String get accentAustralian => 'Australian English';
+
+  @override
+  String get accentInternational => 'International / no preference';
+
+  @override
+  String get onboardingCreatePlan => 'Create my plan';
+
+  @override
+  String get onboardingSaving => 'Saving your answers…';
+
+  @override
+  String get planTitle => 'Your learning plan is ready';
+
+  @override
+  String get planSubtitle =>
+      'Here\'s how we\'ll start. Your plan adapts as you practise.';
+
+  @override
+  String get planGoals => 'Your goals';
+
+  @override
+  String get planLevel => 'Starting point';
+
+  @override
+  String get planDailyTarget => 'Daily target';
+
+  @override
+  String get planSuggestedPractice => 'Suggested practice';
+
+  @override
+  String get planRecommendedTutor => 'Recommended tutor';
+
+  @override
+  String get planStartPractising => 'Start practising';
+
+  @override
+  String get homeGreetingMorning => 'Good morning!';
+
+  @override
+  String get homeGreetingAfternoon => 'Good afternoon!';
+
+  @override
+  String get homeGreetingEvening => 'Good evening!';
+
+  @override
+  String homeGreetingMorningName(String name) {
+    return 'Good morning, $name!';
+  }
+
+  @override
+  String homeGreetingAfternoonName(String name) {
+    return 'Good afternoon, $name!';
+  }
+
+  @override
+  String homeGreetingEveningName(String name) {
+    return 'Good evening, $name!';
+  }
+
+  @override
+  String get homeSubtitle => 'Ready to practise your English?';
+
+  @override
+  String get homeTodayGoal => 'Today\'s goal';
+
+  @override
+  String homeTodayProgress(int done, int goal) {
+    return '$done of $goal minutes';
+  }
+
+  @override
+  String homeTodayMinutes(int minutes) {
+    return '$minutes minutes today';
+  }
+
+  @override
+  String homeFreeTimeLeft(int minutes) {
+    return '$minutes min of free speaking time left today';
+  }
+
+  @override
+  String get homeStartSpeaking => 'Start Speaking';
+
+  @override
+  String get homeRecommended => 'Recommended for you';
+
+  @override
+  String get homeReview => 'Review';
+
+  @override
+  String get homeMistakeVault => 'Mistake Vault';
+
+  @override
+  String get homeMistakeVaultEmpty =>
+      'Your corrections will appear here after practice.';
+
+  @override
+  String get homeVocabulary => 'Vocabulary';
+
+  @override
+  String get homeVocabularyEmpty =>
+      'Useful new words will appear here after practice.';
+
+  @override
+  String get homeYourProgress => 'Your progress';
+
+  @override
+  String homeStreak(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count-day streak',
+      one: '1-day streak',
+      zero: 'No streak yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String homeWeeklyMinutes(int minutes) {
+    return '$minutes min this week';
+  }
+
+  @override
+  String homeWeeklySessions(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sessions this week',
+      one: '1 session this week',
+      zero: 'No sessions this week',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get practiceTitle => 'Practice';
+
+  @override
+  String get practiceSubtitle => 'Choose a real-life situation to practise.';
+
+  @override
+  String get practiceFreeConversation => 'Free conversation';
+
+  @override
+  String get practiceFreeConversationDescription =>
+      'Talk about anything with a tutor of your choice.';
+
+  @override
+  String practiceScenarioCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count scenarios',
+      one: '1 scenario',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String practiceAboutMinutes(int minutes) {
+    return 'About $minutes min';
+  }
+
+  @override
+  String practiceLevels(String range) {
+    return 'Levels $range';
+  }
+
+  @override
+  String get tutorsTitle => 'Choose your tutor';
+
+  @override
+  String get tutorsVoiceSoon => 'Voice coming soon';
+
+  @override
+  String get tutorsRecommended => 'Recommended';
+
+  @override
+  String get prepareTitle => 'Get ready';
+
+  @override
+  String get prepareObjectives => 'What you\'ll practise';
+
+  @override
+  String get prepareVocabulary => 'Useful words and phrases';
+
+  @override
+  String get prepareFreeConversationObjective =>
+      'Speak naturally about a topic you choose.';
+
+  @override
+  String get prepareDuration => 'Recommended duration';
+
+  @override
+  String get prepareFreeTime => 'Free speaking time left today';
+
+  @override
+  String prepareMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get prepareChangeTutor => 'Change tutor';
+
+  @override
+  String get prepareStart => 'Start conversation';
+
+  @override
+  String prepareVoiceComingSoon(String name) {
+    return 'Voice practice with $name is coming soon.';
+  }
+
+  @override
+  String get prepareMicrophoneNote =>
+      'When you start, we\'ll ask to use your microphone so you can talk with your tutor.';
+
+  @override
+  String get preparePrivacyNote =>
+      'Your voice is streamed to our AI provider to power the conversation. We save the text transcript to create your feedback. Raw audio is not stored.';
+
+  @override
+  String get profileTitle => 'Profile';
+
+  @override
+  String get profileSignOut => 'Sign out';
+
+  @override
+  String get profileLearningPreferences => 'Learning preferences';
+
+  @override
+  String get profileAccent => 'Preferred accent';
+
+  @override
+  String get profileNativeLanguage => 'First language';
+}

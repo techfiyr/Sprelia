@@ -17,14 +17,20 @@
   `context.textStyles`, `AppSpacing`, `Gap` and `AppRadius`. A dark theme must be addable
   by providing a second `ThemeData` and `AppPalette` only.
 - **Components**: `lib/core/widgets/widgets.dart`. Extend these rather than duplicating.
-- **Assets**: final logo, tutor portraits and Inter font files do not exist yet.
-  `BrandLogo` and `TutorAvatar` are labelled placeholders. Never ship generated or
-  invented brand assets.
+- **Assets**: the final logo and tutor portraits do not exist yet. `BrandLogo` and
+  `TutorAvatar` are labelled placeholders. Never ship generated or invented brand assets.
+  Inter is bundled in `assets/fonts/inter/` (OFL).
 - **Errors**: global handlers in `main.dart`, `AppProviderObserver` for provider
   failures, `AppErrorState` for display. Never render raw exceptions.
 - **Audio**: mic input is PCM16 mono 16 kHz (`record`); output is PCM16 mono 24 kHz
   (`flutter_pcm_sound`). Ask for microphone permission only when the user starts their
   first conversation.
-- **Strings**: still inline (English). Phase 2 moves them to ARB files (gen-l10n). Write new
-  strings so they are easy to extract: no string concatenation for sentences.
+- **Strings**: user-facing text goes in `lib/l10n/app_en.arb` and is read with `context.l10n`
+  (generated `AppLocalizations`). Phase 1 screens (learn, progress, feedback, conversation) still
+  have inline English to migrate. Never build sentences by concatenation; use ARB placeholders and plurals.
+- **Session and access**: never navigate based on auth state inside widgets. `sessionRedirect`
+  in `app_router.dart` is the single rule; refresh the session with
+  `ref.read(sessionProvider.notifier).reload()`.
+- **Data access**: screens read repositories through providers (`profileRepositoryProvider`,
+  `catalogRepositoryProvider`, `authRepositoryProvider`) so tests can override them with fakes.
 - Run `flutter analyze` and `flutter test` before finishing a change.

@@ -2,56 +2,103 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/auth/sign_in_screen.dart';
 import '../../features/feedback/feedback_screen.dart';
 import '../../features/home/home_screen.dart';
 import '../../features/learn/learn_screen.dart';
+import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/onboarding/welcome_screen.dart';
+import '../../features/practice/category_screen.dart';
 import '../../features/practice/conversation_screen.dart';
 import '../../features/practice/practice_screen.dart';
 import '../../features/practice/prepare_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/progress/progress_screen.dart';
+import '../../features/splash/splash_screen.dart';
 import '../../features/tutors/tutors_screen.dart';
+import '../session/session_controller.dart';
 import '../widgets/widgets.dart';
 import 'app_routes.dart';
 import 'app_shell.dart';
 
 export 'app_routes.dart';
 
+/// Pure redirect rule (unit-testable). Returns the location to go to, or null.
+///
+/// - Session loading or failed → splash (which shows retry on failure).
+/// - Signed out → welcome / sign-in only.
+/// - Signed in, onboarding incomplete → onboarding only.
+/// - Signed in and onboarded → never back to splash/welcome/sign-in/onboarding.
+String? sessionRedirect(AsyncValue<SessionState> session, String location) {
+  final value = session.value;
+  if (value == null) return location == AppRoutes.splash ? null : AppRoutes.splash;
+  if (session.hasError && !session.isLoading) return location == AppRoutes.splash ? null : AppRoutes.splash;
+
+  switch (value) {
+    case SignedOut():
+      if (location == AppRoutes.welcome || location == AppRoutes.signIn) return null;
+      return AppRoutes.welcome;
+    case SignedIn(:final profile) when !profile.onboardingCompleted:
+      return location == AppRoutes.onboarding ? null : AppRoutes.onboarding;
+    case SignedIn():
+      final entry = AppRoutes.publicRoutes.contains(location) || location == AppRoutes.onboarding;
+      return entry ? AppRoutes.home : null;
+  }
+}
+
 /// Application router.
 ///
 /// - Tabs live in a [StatefulShellRoute]; focused flows (tutor selection,
 ///   preparation, live conversation, feedback) are pushed full-screen above it.
-/// - Unknown locations render [RouteNotFoundScreen] instead of crashing.
-/// - Auth/onboarding redirects are added in Phase 4 (Firebase Auth). Until
-///   then every route is reachable, matching the prototype.
+/// - Access is driven by [sessionRedirect]; the router re-evaluates whenever
+///   the session changes.
+/// - Unknown locations render [RouteNotFoundScreen].
 final routerProvider = Provider<GoRouter>((ref) {
   final rootKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+  final refresh = ValueNotifier<int>(0);
+  ref.listen(sessionProvider, (_, _) => refresh.value++);
+  ref.onDispose(refresh.dispose);
 
-  StatefulShellBranch tab(String path, Widget screen) => StatefulShellBranch(
-        routes: [GoRoute(path: path, builder: (_, _) => screen)],
+  StatefulShellBranch tab(String path, Widget screen, {List<RouteBase> routes = const []}) => StatefulShellBranch(
+        routes: [GoRoute(path: path, builder: (_, _) => screen, routes: routes)],
       );
 
   final router = GoRouter(
     navigatorKey: rootKey,
-    initialLocation: AppRoutes.welcome,
+    initialLocation: AppRoutes.splash,
+    refreshListenable: refresh,
+    redirect: (_, state) => sessionRedirect(ref.read(sessionProvider), state.matchedLocation),
     errorBuilder: (_, _) => const RouteNotFoundScreen(),
     routes: [
+      GoRoute(path: AppRoutes.splash, builder: (_, _) => const SplashScreen()),
       GoRoute(path: AppRoutes.welcome, builder: (_, _) => const WelcomeScreen()),
+      GoRoute(path: AppRoutes.signIn, builder: (_, _) => const SignInScreen()),
+      GoRoute(path: AppRoutes.onboarding, builder: (_, _) => const OnboardingScreen()),
       StatefulShellRoute.indexedStack(
         builder: (_, _, shell) => AppShell(navigationShell: shell),
         branches: [
           tab(AppRoutes.home, const HomeScreen()),
-          tab(AppRoutes.practice, const PracticeScreen()),
+          tab(AppRoutes.practice, const PracticeScreen(), routes: [
+            GoRoute(
+              path: 'category/:categoryId',
+              builder: (_, s) => CategoryScreen(categoryId: s.pathParameters['categoryId']!),
+            ),
+          ]),
           tab(AppRoutes.learn, const LearnScreen()),
           tab(AppRoutes.progress, const ProgressScreen()),
           tab(AppRoutes.profile, const ProfileScreen()),
         ],
       ),
-      GoRoute(path: AppRoutes.tutors, builder: (_, _) => const TutorsScreen()),
+      GoRoute(
+        path: AppRoutes.tutors,
+        builder: (_, s) => TutorsScreen(scenarioId: s.uri.queryParameters['scenario']),
+      ),
       GoRoute(
         path: AppRoutes.preparePattern,
-        builder: (_, s) => PrepareScreen(tutorId: s.pathParameters['tutorId']!),
+        builder: (_, s) => PrepareScreen(
+          tutorId: s.pathParameters['tutorId']!,
+          scenarioId: s.uri.queryParameters['scenario'],
+        ),
       ),
       GoRoute(
         path: AppRoutes.conversationPattern,

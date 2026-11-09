@@ -414,4 +414,178 @@ Model IDs must be configurable in backend environment variables.
 Before implementation:
 - Verify the exact Live API model ID.
 - Verify current API availability.
-- Verify supported audio
+- Verify supported audio formats and sample rates.
+- Verify session duration limits, reconnection and session resumption behaviour.
+- Verify the supported client authentication mechanism (ephemeral tokens).
+- Verify current pricing, rate limits and quotas.
+
+> **Sections 9 (continued) to 19** were drafted on 2026-11-09 by engineering from the
+> approved decisions in §2, `APP_FLOW.md` and the verified provider documentation.
+> They are pending owner review. Where a decision is still open it is marked
+> **Open decision**.
+
+## Verified Gemini Live facts (2026-11-09)
+
+Re-verify against the official documentation before implementation and record the date.
+
+| Topic | Verified fact |
+|---|---|
+| Default Live model | `gemini-3.8-live` (GA since 2026-09-15). `gemini-3.1-flash-live-preview` is legacy. |
+| Superseded | `gemini-2.5-flash-native-audio-preview-09-2025` (used by the prototype) |
+| Text analysis models | `gemini-3.8-flash` or `gemini-3.5-flash-lite`. `gemini-2.5-flash` is deprecated and reroutes from 2026-12-01. |
+| Audio input | Raw PCM16, little-endian, 16 kHz mono |
+| Audio output | Raw PCM16, little-endian, 24 kHz mono |
+| Connection lifetime | About 10 minutes, announced by a `GoAway` message. Audio-only sessions last 15 minutes without context compression. |
+| Session resumption | Supported. Handles are valid for 2 hours after the session ends. |
+| Client authentication | Ephemeral tokens (preview, Live API only, `v1beta`), passed as the `access_token` query parameter or `Authorization: Token <token>` |
+| Token defaults | `uses: 1`, 1 minute to start a session, 30 minutes total |
+
+## Realtime transport decision
+
+- The mobile app connects **directly** to the Live API WebSocket using a short-lived,
+  single-use ephemeral token minted by the backend for one conversation.
+- The token locks the model, system instructions, voice and transcription settings
+  (`liveConnectConstraints`), so a modified client cannot change persona or model.
+- The token's expiry bounds the session to the server-reserved allowance.
+- Proxying audio through the backend was rejected for the MVP because it adds latency
+  and Cloud Run cost. Reconsider only if server-side transcripts become mandatory.
+- Ephemeral tokens can be extracted from a mobile app. They limit, but do not
+  eliminate, abuse. Quotas are therefore always enforced on the server.
+
+## Post-session analysis
+
+- Runs on the backend only, after the conversation ends.
+- Uses structured JSON output validated with Zod before storage.
+- Corrections include a confidence value. Low-confidence items, which may be speech
+  recognition artefacts, are discarded. Never fabricate corrections.
+- No pronunciation scoring until a validated assessment system exists.
+- Transcripts are treated as untrusted data, never as instructions, in analysis prompts.
+
+## AI cost controls
+
+- Per-user daily allowance enforced server-side (§10).
+- One active realtime session per user.
+- Session expiry and reconciliation even when the app closes unexpectedly.
+- Per-uid rate limits on session creation and analysis.
+- Usage and cost metrics per model, with budget alerts in Google Cloud.
+
+# 10. Usage and Quota Accounting
+
+- Free plan: 10 minutes of AI speaking per **local calendar day**. Premium uses a higher
+  limit stored in server configuration (**Open decision**: premium allowance).
+- The day boundary uses the timezone stored on the user profile by the server.
+  Timezone changes are rate-limited to prevent quota farming.
+- Session start reserves the remaining allowance atomically in a Firestore transaction
+  (`users/{uid}/usage/{YYYY-MM-DD}` plus an append-only ledger).
+- Session end bills server-measured time, capped at the reservation. `end` is idempotent.
+- Unfinished sessions are reconciled when their token expires.
+- Clients may display remaining time but can never write or report authoritative usage.
+
+# 11. Subscriptions and Advertising
+
+## RevenueCat
+- The RevenueCat app user ID equals the Firebase uid.
+- Entitlements are written only by the backend after a RevenueCat webhook (authenticated
+  with a shared secret) and a server-side REST verification. They are stored in
+  `users/{uid}/subscription/current`.
+- Never unlock premium because the client reports a successful purchase.
+- Test prices: $5.99 monthly and $39.99 annual (APP_FLOW §16). Not final.
+
+## Google AdMob
+- Free plan only. Never during an active conversation and never before a paywall decision.
+- If rewarded ads grant extra minutes (**Open decision**), the grant requires AdMob
+  server-side verification callbacks; client reports are never trusted.
+
+# 12. Environments and Configuration
+
+| Environment | Firebase project | Backend | Flutter config |
+|---|---|---|---|
+| Local | Emulator Suite (`demo-sprelia`) | `npm run dev` | `env/development.json` |
+| Development / staging | `sprelia` (role to be confirmed) or a dedicated project | Cloud Run (staging) | `env/staging.json` |
+| Production | Dedicated project (**Open decision**) | Cloud Run (production) | `env/production.json` |
+
+- Backend configuration is validated at startup. Secrets come from Secret Manager.
+- Flutter configuration is compiled in, so it never contains secrets.
+- Emulator usage is refused outside development, in both the backend and the app.
+- Production deployment always requires explicit owner approval.
+
+# 13. Security Requirements
+
+The binding, detailed rules are in `.agents/security.md`. In summary:
+- Firebase ID token verification on every protected endpoint. Identity only from the token.
+- App Check on supported resources as an additional layer.
+- Default-deny Firestore rules, tested on the Emulator Suite.
+- Server-authoritative usage, entitlements and learning analysis.
+- Zod validation on every request and strict schemas on writes.
+- No secrets in the app, in git or in logs.
+
+# 14. Privacy and Data Retention
+
+- Raw voice recordings are **not stored** by default.
+- Transcripts are stored only as needed for feedback and the Mistake Vault, subject to a
+  published retention period (**Open decision**: retention length).
+- Analytics and crash reports never contain transcripts, audio or personal data.
+- Account deletion removes or anonymizes all user data (Firestore, Auth, RevenueCat
+  customer) according to the published policy.
+- Gemini API usage must be on a billing-enabled tier with appropriate data-use terms;
+  disclose AI processing in the privacy policy.
+- Initial audience: adults 18+ (**Open decision**: how age is confirmed).
+
+# 15. Testing Strategy
+
+| Layer | Tooling | Required coverage |
+|---|---|---|
+| Flutter unit | `flutter_test` | Config, models, controllers, error mapping |
+| Flutter widget | `flutter_test` | Components, navigation, onboarding persistence, state views |
+| Flutter integration | `integration_test` | Critical journeys on a device or emulator (from Phase 10) |
+| Backend unit | Vitest + `fastify.inject` | Every route: unauthenticated, invalid token, invalid input, success, ownership |
+| Backend integration | Vitest + Firebase Emulator Suite | Real token verification and Firestore repositories |
+| Security rules | `@firebase/rules-unit-testing` on the emulator | Every allow and deny path |
+
+Tests never use real credentials or call production services.
+
+# 16. Observability and Error Handling
+
+- Backend: structured JSON logs (Cloud Logging format), request IDs, no bodies or tokens.
+- App: Crashlytics for crashes and non-fatal errors, including audio and realtime failures.
+  Users see friendly messages only.
+- Alerts: error rate, latency, AI cost and quota anomalies.
+
+# 17. CI/CD and Deployment
+
+- GitHub Actions (or Codemagic for mobile builds): analyze, test, typecheck and build on
+  every pull request.
+- Cloud Run deploys from CI using workload identity federation, with no service-account keys.
+- Mobile release signing keys are stored only in CI secrets.
+- Production deploys and store releases require explicit owner approval.
+
+# 18. Delivery Phases
+
+1. Project foundation and development guardrails.
+2. Flutter application experience: onboarding, home, tutors, practice discovery.
+3. Backend foundation: remaining modules and the AI provider abstraction.
+4. Firebase Authentication, App Check, Firestore rules and secure API communication.
+5. Onboarding and profile management (complete).
+6. Gemini real-time speaking integration.
+7. Speaking session management and daily quotas.
+8. AI feedback, vocabulary and Mistake Vault.
+9. RevenueCat subscriptions and AdMob.
+10. Testing, security review and production readiness.
+
+The application must remain buildable after every phase.
+
+# 19. Open Decisions
+
+| Decision | Owner |
+|---|---|
+| Final product name (trademark, domain and store clearance) | Product owner |
+| Role of Firebase project `sprelia` (development or production); creation of other environments | Product owner |
+| Premium daily allowance | Product owner |
+| Transcript retention period | Product owner / legal |
+| Guest mode (recommended: none for the MVP) | Product owner |
+| Rewarded ads granting minutes | Product owner |
+| Age confirmation approach for 18+ | Product owner / legal |
+| Interface languages at launch | Product owner |
+| Cloud Run and Firestore region | Engineering + owner |
+
+**End of app development specification.**
