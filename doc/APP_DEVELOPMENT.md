@@ -83,7 +83,7 @@ Use maintained, compatible package versions. Verify package compatibility before
 - TypeScript.
 - NestJS or modular Fastify architecture.
 - Firebase Admin SDK.
-- ~~Cloud Run~~ **Netlify Functions** (owner hosting decision 2026-11-09; free plan, default function region; Firestore stays in Singapore; see `doc/DEPLOYMENT_NETLIFY.md`).
+- ~~Cloud Run~~ **Netlify Functions** (owner hosting decision 2026-11-09; free plan, default function region (US East); Firestore in `us-east5`; see `doc/DEPLOYMENT_NETLIFY.md`).
 - Cloud Firestore.
 - Google Cloud Secret Manager.
 - Gemini API.
@@ -600,6 +600,6 @@ The application must remain buildable after every phase.
 | Rewarded ads granting minutes | Product owner |
 | Age confirmation approach for 18+ | Product owner / legal |
 | Interface languages at launch (content: American English decided 2026-11-09) | Product owner |
-| ~~Cloud Run region~~ **Decided 2026-11-09:** hosting on Netlify Functions (free plan, default region, US East); Firestore in `asia-southeast1`, so API requests cross regions | Owner |
+| ~~Cloud Run region~~ **Decided 2026-11-09:** hosting on Netlify Functions (free plan, default region, US East); Firestore in `us-east5` (Columbus, Ohio; recreated by the owner, replacing `asia-southeast1`) | Owner |
 
 **End of app development specification.**

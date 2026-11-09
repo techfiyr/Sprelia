@@ -41,7 +41,7 @@ flutter run --dart-define-from-file=env/development-firebase.local.json
 ## Hosting (Netlify)
 `netlify.toml` publishes the API as a Netlify Function (`/api/*`, free plan, default region) and the
 website (landing page and **draft** policy pages) from `backend/netlify/public`. Firestore is in
-Singapore, so API requests cross regions. The Firebase key is set only as a Netlify secret by the
+`us-east5` (Ohio), next to the function. The Firebase key is set only as a Netlify secret by the
 owner: `doc/DEPLOYMENT_NETLIFY.md`.
 
 ## Checks

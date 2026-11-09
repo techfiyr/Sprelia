@@ -5,8 +5,8 @@
  *   same as on any other host. With a custom `path`, the default /.netlify/functions/api URL
  *   is not exposed (Netlify docs: build/functions/configuration).
  * - Runs on the Netlify free plan in Netlify's default function region (owner decision
- *   2026-11-09; no region is set). Firestore stays in asia-southeast1 (Singapore), so every
- *   API request crosses regions (added latency on Firestore and Auth calls).
+ *   2026-11-09; no region is set: US East, Ohio). Firestore is in us-east5 (Columbus, Ohio),
+ *   in the same area.
  * - Synchronous functions have a 60-second limit and a 6 MB buffered payload limit.
  * - Configuration comes from Netlify environment variables (see doc/DEPLOYMENT_NETLIFY.md).
  *   Firebase credential: the FIREBASE_SERVICE_ACCOUNT_JSON Netlify environment secret (owner

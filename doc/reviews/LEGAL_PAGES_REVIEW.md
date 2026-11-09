@@ -32,7 +32,7 @@ They are **drafts, not legal advice**, marked "Draft for review", `noindex`, and
 
 ## Stated as facts (from approved or implemented decisions)
 Adults 18+; email/password (verified) and Google sign-in; data categories actually stored by the
-API; Firestore in Singapore (`asia-southeast1`); Gemini as AI provider; raw voice not stored by
+API; Firestore in the United States (`us-east5`, Ohio); Gemini as AI provider; raw voice not stored by
 default; no transcripts/audio in analytics or crash reports; 10 free minutes per local day; ads
 never during a conversation; Premium via the app store; in-app account deletion with re-sign-in;
 Netlify hosting; feedback after the conversation; no pronunciation scoring; self-reported levels.

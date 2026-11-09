@@ -17,9 +17,9 @@ shipped as node modules), and first-party-only security headers for the site.
 
 ## Platform facts (Netlify docs, verified 2026-11-09)
 - Function region: **none set**, so Netlify's default region is used (documented as US East,
-  Ohio). Firestore remains in `asia-southeast1` (Singapore), so **every API request crosses
-  regions**: Firebase Auth and Firestore calls from the function add latency (typically a few
-  hundred ms per request). Choosing a function region requires a paid plan and is not used.
+  Ohio). Firestore is in **`us-east5` (Columbus, Ohio)**, so the function and the database are in
+  the same US East area; no cross-region penalty is expected. Choosing a function region requires a
+  paid plan and is not used.
 - Synchronous functions: **60-second** execution limit; **6 MB** buffered request/response payload.
 - A custom `path` means the function is only reachable at that path (not `/.netlify/functions/api`).
 - Client IP: `context.ip`. The adapter uses only this and ignores caller-supplied forwarding

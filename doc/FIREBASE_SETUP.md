@@ -44,18 +44,19 @@ Enforced in code:
 |---|---|
 | Project `sprelia` | Exists, accessible |
 | Android app `com.techfiyr.sprelia` | Registered (`1:756773147926:android:1bc8ce332ae6b5ccce2c37`). The owner-provided client config was verified locally (project and package match) and used for the gitignored `env/development-firebase.local.json` |
+| Live Firestore canary (owner-permitted, 2026-11-09) | **Passed**: one random document in the test-only `__connectivity_canary` collection was written, read back and deleted (absence verified) with the service-account key. No user collections were read or listed |
 | Android SHA-1 / SHA-256 | **None** |
 | iOS app | **Not registered** |
 | Google provider | **Not enabled** (the Android config has no OAuth clients) |
 | Email/Password provider, enumeration protection, email templates | **Not verifiable from the CLI**; owner to check |
-| Firestore database | **Created by the owner**: `(default)`, Native mode, Standard edition, **`asia-southeast1` (Singapore)** (read-only check, 2026-11-09). Delete protection and point-in-time recovery are **off**. The rules currently active were set in the Console at creation and are **not verified**; the repo's deny-all `firestore.rules` is **not deployed** |
+| Firestore database | **Created by the owner**: `(default)`, Native mode, Standard edition, **`us-east5` (Columbus, Ohio)** (recreated by the owner; replaces an earlier `asia-southeast1` database; read-only check, 2026-11-09). Delete protection and point-in-time recovery are **off**. The rules currently active were set in the Console at creation and are **not verified**; the repo's deny-all `firestore.rules` is **not deployed** |
 | App Check | **Not verifiable from the CLI**; assume not configured |
 | Release signing | **None** (release builds are debug-signed and must not be distributed) |
 
 ## Backend deployment status
 **No backend is deployed.** Hosting decision (owner, 2026-11-09): **Netlify Functions** on the free
-plan in Netlify's default function region (US East). Firestore stays in Singapore, so API requests
-cross regions. See `doc/DEPLOYMENT_NETLIFY.md`.
+plan in Netlify's default function region (US East, Ohio), next to Firestore (`us-east5`). See
+`doc/DEPLOYMENT_NETLIFY.md`.
 On Netlify (no Google Cloud workload identity) the API authenticates with the
 `FIREBASE_SERVICE_ACCOUNT_JSON` environment secret (owner authorized 2026-11-09; set by the owner).
 
@@ -86,7 +87,7 @@ must run locally (below).
 - Enable Email/Password (with email enumeration protection) and Google; send the Web and iOS
   OAuth client IDs.
 - Register the iOS app; add the debug and, later, release and Play App Signing SHA fingerprints.
-- Firestore: created in `asia-southeast1` (done). Check the rules shown in the Console: if it was created in
+- Firestore: created in `us-east5` (done). Check the rules shown in the Console: if it was created in
   test mode, all clients can read and write until the date shown. Approve deploying the repo's deny-all
   `firestore.rules`. Consider enabling delete protection and point-in-time recovery.
 - App Check: **deferred** (owner, 2026-11-09). Later: Play Integrity (Play Console link), debug tokens for test devices.

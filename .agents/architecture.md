@@ -212,7 +212,7 @@ Gemini specifics. Add vendors as new implementations; never add vendor checks in
 
 ## Hosting (owner decision 2026-11-09)
 Netlify, not Cloud Run. One deploy publishes the API (Netlify Function `api` at `/api/*`, free plan,
-default region; Firestore is in Singapore, so requests cross regions) and the static website (`backend/netlify/public`). `src/runtime.ts` wires the real
+default region, US East; Firestore is in `us-east5`, same area) and the static website (`backend/netlify/public`). `src/runtime.ts` wires the real
 dependencies for both `main.ts` (long-running server) and the function, so routes and behavior are
 identical. `src/serverless/netlify.ts` bridges Netlify's Request/Response to `app.inject()`.
 Rate limits are in memory and therefore per function instance. See `doc/DEPLOYMENT_NETLIFY.md`.
