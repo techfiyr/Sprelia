@@ -8,9 +8,10 @@
   <meta name="color-scheme" content="light">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/site.css">
+  <script src="/assets/stage.js"></script>
   <script type="module" src="/assets/consent.js"></script>
 </head>
-<body>
+<body class="stage">
   <a class="skip-link" href="#main">Skip to main content</a>
   <header class="site-header">
     <div class="container">
@@ -27,86 +28,101 @@
       </nav>
     </div>
   </header>
-  <main id="main" tabindex="-1" class="landing">
-    <div class="container">
-      <section class="hero" aria-labelledby="hero-title">
-        <div>
-          <p class="badge">In development: not yet available</p>
-          <h1 id="hero-title">Learn English with <span>Hermione</span></h1>
-          <p class="tagline">Learn smarter. Speak with confidence.</p>
-          <p class="lead">Chat out loud with a friendly AI English coach every day. Get gentle, useful feedback after each conversation, and watch your confidence grow. Hermione is being built for Android first, with iOS planned later.</p>
-          <div class="cta-row">
-            <span class="pill">Coming soon to Android</span>
-            <a class="pill pill-soft" href="#how-it-works">See how it works</a>
+  <main id="main" tabindex="-1">
+    <section class="stage-hero" aria-labelledby="hero-title">
+      <div class="container stage-grid">
+        <div class="stage-copy">
+          <p class="status"><span class="dot" aria-hidden="true"></span>In development: not yet available</p>
+          <h1 id="hero-title">
+            <span class="line l1"><span class="w">Learn</span> <span class="w">English</span></span>
+            <span class="line l2"><span class="w">with</span> <span class="w">Hermione</span></span>
+          </h1>
+          <p class="line l3 sub"><span class="w">Learn</span> <span class="w">smarter.</span> <span class="w">Speak</span> <span class="w">with</span> <span class="w">confidence.</span></p>
+          <p class="lede">Talk out loud with a friendly AI English coach every day. Hermione listens, keeps the conversation going, and shows you what to polish afterwards. Android first, iOS planned later.</p>
+          <div class="actions">
+            <a class="btn-sun" href="#try">Try a free lesson line</a>
+            <span class="soon">The Android app is coming soon</span>
           </div>
         </div>
-        <div class="hero-art">
+        <div class="singer">
+          <span class="bubble-sing" aria-hidden="true"><i></i><i></i><i></i></span>
           <img src="/assets/mascot.svg" alt="Hermione's friendly tutor mascot: a smiling teacher with glasses holding an open book" width="400" height="400">
-          <span class="bubble bubble-1" aria-hidden="true">Hello! Ready to chat?</span>
-          <span class="bubble bubble-2" aria-hidden="true">Great job!</span>
         </div>
-      </section>
+      </div>
+      <div class="caption-bar" aria-hidden="true"><span>Hello! Ready to chat?</span></div>
+    </section>
 
-      <section aria-labelledby="features-title">
-        <h2 id="features-title" class="section-title">How Hermione helps you practice</h2>
-        <p class="section-sub">Short, friendly sessions that fit into your day.</p>
-        <div class="feature-grid">
-          <article class="feature"><div class="icon" aria-hidden="true">💬</div><h3>Real conversations</h3><p>Speak out loud with an AI tutor in real time, at a pace that suits you.</p></article>
-          <article class="feature"><div class="icon" aria-hidden="true">🧭</div><h3>Practical scenarios</h3><p>Everyday life, work, study, travel and social situations, from beginner (A1) to advanced (C1) levels.</p></article>
-          <article class="feature"><div class="icon" aria-hidden="true">✨</div><h3>Feedback after you speak</h3><p>Your tutor keeps the conversation natural. Corrections and suggestions come after the session, not in the middle of it.</p></article>
-          <article class="feature"><div class="icon" aria-hidden="true">🔥</div><h3>Track your progress</h3><p>Set a daily practice target of 5, 10 or 15 minutes and keep a streak going.</p></article>
-        </div>
-      </section>
+    <section id="try" class="stage-try" aria-labelledby="try-title">
+      <div class="container">
+        <h2 id="try-title">Say it. Watch it light up.</h2>
+        <p class="sec-lede">A preview of how practice lines look in the app. Tap a line to replay it. In the real lesson you say each one out loud.</p>
+        <p id="stage-status" class="sr-only" role="status" aria-live="polite"></p>
+        <ul class="practice">
+          <li><button type="button" class="practice-line" data-sing><span class="line"><span class="w">Hi,</span> <span class="w">I'm</span> <span class="w">Alex.</span> <span class="w">Nice</span> <span class="w">to</span> <span class="w">meet</span> <span class="w">you!</span></span></button></li>
+          <li><button type="button" class="practice-line" data-sing><span class="line"><span class="w">Where</span> <span class="w">are</span> <span class="w">you</span> <span class="w">from?</span></span></button></li>
+          <li><button type="button" class="practice-line" data-sing><span class="line"><span class="w">I'd</span> <span class="w">like</span> <span class="w">a</span> <span class="w">table</span> <span class="w">for</span> <span class="w">two,</span> <span class="w">please.</span></span></button></li>
+        </ul>
+      </div>
+    </section>
 
-      <section aria-labelledby="progress-title">
-        <h2 id="progress-title" class="section-title">Watch your confidence grow</h2>
-        <p class="section-sub">An illustration of the progress you will see in the app. The numbers are examples, not real results.</p>
-        <div class="progress-panel">
-          <div>
-            <h3>Confidence builder (example)</h3>
-            <div class="meter"><div class="meter-label"><span>Speaking</span><span>Week 4</span></div><div class="meter-track"><span class="meter-fill fill-90"></span></div></div>
-            <div class="meter"><div class="meter-label"><span>Vocabulary</span><span>Week 4</span></div><div class="meter-track"><span class="meter-fill fill-70"></span></div></div>
-            <div class="meter"><div class="meter-label"><span>Fluency</span><span>Week 4</span></div><div class="meter-track"><span class="meter-fill fill-45"></span></div></div>
-          </div>
-          <div>
-            <h3>Daily streak (example)</h3>
-            <div class="streak" aria-label="Example: practised on five of the last seven days"><span class="done">M</span><span class="done">T</span><span class="done">W</span><span>T</span><span class="done">F</span><span class="done">S</span><span>S</span></div>
-            <h3>Words you are collecting (example)</h3>
-            <ul class="words"><li>appointment</li><li>itinerary</li><li class="new">reservation</li><li>reliable</li><li class="new">negotiate</li></ul>
-            <p class="note">Your Mistake Vault keeps the phrases you want to remember.</p>
-          </div>
-        </div>
-      </section>
-
-      <section id="how-it-works" aria-labelledby="how-title">
-        <h2 id="how-title" class="section-title">How it works</h2>
-        <ol class="steps">
-          <li><h3>Pick a tutor</h3><p>Choose a friendly AI coach and a scenario that matches your day.</p></li>
-          <li><h3>Start talking</h3><p>Have a relaxed voice conversation. No pressure, no interruptions.</p></li>
-          <li><h3>Learn from feedback</h3><p>Review what went well and what to practise next, then try again tomorrow.</p></li>
+    <section class="lesson" aria-labelledby="lesson-title">
+      <div class="container">
+        <h2 id="lesson-title">A lesson takes about two minutes</h2>
+        <ol class="setlist">
+          <li><span class="act">Meet</span><p>Say hello to your tutor and see what you will practise today.</p></li>
+          <li><span class="act">Say it</span><p>Read a short phrase out loud, with a big smile.</p></li>
+          <li><span class="act">Choose</span><p>Pick the natural reply. A wrong answer is fine: try again.</p></li>
+          <li><span class="act">Build</span><p>Put the words in order to make your own sentence.</p></li>
         </ol>
-      </section>
+      </div>
+    </section>
 
-      <section aria-labelledby="tutors-title">
-        <h2 id="tutors-title" class="section-title">Meet the tutors</h2>
-        <ul class="tutors feature-grid">
-          <li class="tutor-card"><h3>Emma</h3><p>Friendly English coach for beginners and everyday practice.</p></li>
-          <li class="tutor-card"><h3>Alex</h3><p>Professional communication coach for interviews, meetings and presentations.</p></li>
-          <li class="tutor-card"><h3>Sofia</h3><p>Everyday conversation partner for travel, social life and small talk.</p></li>
+    <section class="paper feedback" aria-labelledby="fb-title">
+      <div class="container feedback-grid">
+        <div>
+          <h2 id="fb-title">Feedback after you speak, never in the middle</h2>
+          <p class="sec-lede dark">Your tutor keeps the conversation natural. When it ends you get corrections and phrases to remember, saved in your Mistake Vault.</p>
+        </div>
+        <figure class="transcript">
+          <figcaption>Example feedback (illustration, not a real learner)</figcaption>
+          <p class="said"><span class="who">You said</span> I go to market yesterday.</p>
+          <p class="better"><span class="who">Try</span> I <mark>went</mark> to <mark>the</mark> market yesterday.</p>
+          <p class="why">Use the past tense for finished actions: go becomes went.</p>
+        </figure>
+      </div>
+    </section>
+
+    <section class="tutors-band" aria-labelledby="tutors-title">
+      <div class="container">
+        <h2 id="tutors-title">Pick your tutor</h2>
+        <ul class="tutors">
+          <li><span class="tname">Emma</span><span class="trole">Friendly coach for beginners and everyday practice.</span></li>
+          <li><span class="tname">Alex</span><span class="trole">Interviews, meetings and presentations.</span></li>
+          <li><span class="tname">Sofia</span><span class="trole">Travel, social life and small talk.</span></li>
         </ul>
         <p class="fine">All tutors are AI. They are not real people. See the <a href="/ai-disclaimer/">AI disclaimer</a>.</p>
-      </section>
+      </div>
+    </section>
 
-      <section aria-labelledby="plans-title">
-        <h2 id="plans-title" class="section-title">Free and Premium</h2>
-        <p class="fine">The free plan includes 10 minutes of AI speaking practice per day, measured by your local calendar day. A Premium subscription with more practice time, advanced scenarios and no ads is planned. Prices are not final.</p>
-      </section>
+    <section class="paper plans" aria-labelledby="plans-title">
+      <div class="container plans-grid">
+        <div>
+          <h2 id="plans-title">Start free, subscribe to keep going</h2>
+          <p>Try one sample lesson with no account. Create an account and subscribe to unlock every lesson, tutor and conversation. Prices are not final and subscriptions are not available yet. Set a daily target of 5, 10 or 15 minutes and keep your streak going.</p>
+        </div>
+        <div>
+          <h2 id="privacy-title">Your privacy</h2>
+          <p>Hermione is for adults (18+). Voice recordings are not stored by default, and you can delete your account and learning data from the app. Read the draft <a href="/privacy/">Privacy Policy</a>.</p>
+        </div>
+      </div>
+    </section>
 
-      <section aria-labelledby="privacy-title">
-        <h2 id="privacy-title" class="section-title">Your privacy</h2>
-        <p class="fine">Hermione is for adults (18+). Voice recordings are not stored by default, and you can delete your account and learning data from the app. Read the draft <a href="/privacy/">Privacy Policy</a>.</p>
-      </section>
-    </div>
+    <section class="finale" aria-labelledby="close-title">
+      <div class="container">
+        <h2 id="close-title" class="line"><span class="w">Ready</span> <span class="w">when</span> <span class="w">you</span> <span class="w">are.</span></h2>
+        <p class="soon big">Hermione for Android is in development. Check back soon.</p>
+      </div>
+    </section>
   </main>
   <footer class="site-footer">
     <div class="container">

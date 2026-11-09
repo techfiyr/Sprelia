@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-09T00:00:00Z",
+  "title": "Design System: Hermione Marketing Site (Sing-along stage)",
+  "extensions": {
+    "colorMeta": {
+      "stage": { "role": "primary", "displayName": "Stage Violet", "canonical": "#3b1fa8", "tonalRamp": ["#0f0830", "#1a0d4d", "#25106b", "#3b1fa8", "#5033c9", "#7a64dc", "#bfb1f5", "#ece7fc"] },
+      "lit-sun": { "role": "primary", "displayName": "Lit Sun", "canonical": "#ffd166", "tonalRamp": ["#4d3500", "#805800", "#b88400", "#e8ac1a", "#ffd166", "#ffdd8c", "#ffe9b3", "#fff6e0"] },
+      "bubble-coral": { "role": "secondary", "displayName": "Bubble Coral", "canonical": "#ff7a6b", "tonalRamp": ["#4a1610", "#7a2a20", "#b04436", "#d9604f", "#ff7a6b", "#ff9a8d", "#ffc0b8", "#ffe6e2"] },
+      "stage-deep": { "role": "neutral", "displayName": "Pit Violet", "canonical": "#25106b", "tonalRamp": ["#0b0526", "#150a45", "#25106b", "#3b1fa8", "#5b45c0", "#8a7bd6", "#bfb1f5", "#ece7fc"] },
+      "paper": { "role": "neutral", "displayName": "Paper Lavender", "canonical": "#f4f0ff", "tonalRamp": ["#2a1650", "#4a3d73", "#6b5f94", "#9a90bd", "#c4bde0", "#dcd6f0", "#ebe7f8", "#f4f0ff"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Lyric Display", "purpose": "Hero lyric lines, set heavy and rounded. System rounded stack; self-hosted OFL rounded face (for example Fredoka) is the recommended follow-up." },
+      "headline": { "displayName": "Section Title", "purpose": "Band headings on stage and paper." },
+      "title": { "displayName": "Practice Line", "purpose": "Practice lines, act labels, tutor names." },
+      "body": { "displayName": "Body", "purpose": "Ledes and paragraphs at 34 to 38rem measure." },
+      "label": { "displayName": "Label", "purpose": "Captions and small chips." }
+    },
+    "shadows": [
+      { "name": "button-lift", "value": "0 10px 22px rgba(0,0,0,0.28)", "purpose": "Under the yellow primary pill." },
+      { "name": "card-soft", "value": "0 12px 28px rgba(37,16,107,0.14)", "purpose": "Transcript card on paper." }
+    ],
+    "motion": [
+      { "name": "ease-out-sing", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Word light-up and button/row movement." },
+      { "name": "word-light", "value": "0.42s, stagger 0.26s per word; lines start at 0 / 0.7s / 1.7s", "purpose": "Colour from unlit to lit with a 0.06em rise. Reduced motion: all lit, no animation." },
+      { "name": "bob", "value": "3.2s ease-in-out infinite, 0.6rem", "purpose": "Mascot idle float." }
+    ],
+    "breakpoints": [
+      { "name": "stage-grid", "value": "56rem" },
+      { "name": "two-column", "value": "52rem" },
+      { "name": "setlist", "value": "48rem" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Sun Button",
+      "kind": "button",
+      "refersTo": "button-sun",
+      "description": "The single primary action: yellow pill.",
+      "html": "<a class=\"ds-btn-sun\" href=\"#\">Try a free lesson line</a>",
+      "css": ".ds-btn-sun { display: inline-block; background: #ffd166; color: #2a1650; font-weight: 800; font-size: 1.1rem; padding: 0.9rem 1.6rem; border-radius: 999px; text-decoration: none; min-height: 48px; box-shadow: 0 10px 22px rgba(0,0,0,0.28); transition: transform 0.2s cubic-bezier(0.22,1,0.36,1); } .ds-btn-sun:hover { transform: translateY(-2px); } .ds-btn-sun:active { transform: translateY(2px); } .ds-btn-sun:focus-visible { outline: 3px solid #ffd166; outline-offset: 3px; }"
+    },
+    {
+      "name": "Practice Line",
+      "kind": "custom",
+      "refersTo": "practice-line",
+      "description": "Tap-to-replay lyric row with lit words.",
+      "html": "<button type=\"button\" class=\"ds-practice\"><span>Where</span> <span>are</span> <span>you</span> <span>from?</span></button>",
+      "css": ".ds-practice { all: unset; box-sizing: border-box; display: block; width: 100%; cursor: pointer; font-family: ui-rounded, 'Arial Rounded MT Bold', Nunito, 'Trebuchet MS', system-ui, sans-serif; font-weight: 800; font-size: 2rem; line-height: 1.12; letter-spacing: -0.015em; padding: 1rem 1.25rem; border-radius: 1.25rem; background: #25106b; color: #ffd166; transition: transform 0.2s cubic-bezier(0.22,1,0.36,1); } .ds-practice:hover { transform: translateX(0.4rem); } .ds-practice:focus-visible { outline: 3px solid #ffd166; outline-offset: 3px; }"
+    },
+    {
+      "name": "Caption Bar",
+      "kind": "custom",
+      "refersTo": "caption-bar-chip",
+      "description": "Subtitle-style chip on a pit-violet band.",
+      "html": "<div class=\"ds-caption-bar\"><span>Hello! Ready to chat?</span></div>",
+      "css": ".ds-caption-bar { background: #25106b; padding: 0.9rem 1.25rem; text-align: center; } .ds-caption-bar span { display: inline-block; background: rgba(0,0,0,0.55); color: #fff; font-weight: 700; padding: 0.25rem 0.8rem; border-radius: 6px; }"
+    },
+    {
+      "name": "Setlist Row",
+      "kind": "custom",
+      "description": "Ruled row with a yellow act label and a plain description.",
+      "html": "<div class=\"ds-row\"><span class=\"ds-act\">Say it</span><p>Read a short phrase out loud, with a big smile.</p></div>",
+      "css": ".ds-row { display: grid; gap: 0.25rem 2rem; grid-template-columns: 16rem 1fr; align-items: baseline; padding-block: 1.25rem; border-top: 2px solid rgba(255,255,255,0.18); background: #3b1fa8; color: #f1ecff; } .ds-act { font-family: ui-rounded, 'Arial Rounded MT Bold', Nunito, system-ui, sans-serif; font-weight: 800; font-size: 2.4rem; line-height: 1; color: #ffd166; } .ds-row p { margin: 0; font-size: 1.1rem; max-width: 34rem; }"
+    },
+    {
+      "name": "Transcript Card",
+      "kind": "card",
+      "refersTo": "transcript-card",
+      "description": "Feedback example on a paper band.",
+      "html": "<figure class=\"ds-transcript\"><p class=\"ds-said\">I go to market yesterday.</p><p>I <mark>went</mark> to <mark>the</mark> market yesterday.</p></figure>",
+      "css": ".ds-transcript { margin: 0; background: #fff; color: #2a1650; border-radius: 1.25rem; padding: 1.5rem; font-size: 1.15rem; box-shadow: 0 12px 28px rgba(37,16,107,0.14); } .ds-transcript p { margin: 0 0 0.75rem; } .ds-said { text-decoration: line-through; text-decoration-color: #c4402f; text-decoration-thickness: 2px; color: #4a3d73; } .ds-transcript mark { background: #ffd166; color: #2a1650; border-radius: 4px; padding: 0 0.2em; font-weight: 800; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Sing-along Stage",
+    "overview": "A lyric-video stage. Saturated violet is the ground, deeper ink-violet is the pit, and words are lit sun-yellow as if voiced. The page proves speaking by making it visible: the hero lines sing in word by word on load, later lines sing as they scroll into view, and any practice line replays on tap or Enter. The mascot is the small \"singer\" at stage right, kept in its own colours.\n\nDensity is generous: huge lyric lines, wide bands, one action. Reading-heavy content drops to a quiet pale-lavender \"paper\" band so the stage never carries small print. The mood is warm and low-pressure for adults, not nightlife.\n\nConstraints: first-party only, no inline scripts or styles, no network fonts. Content is fully visible and lit without JavaScript. Under reduced motion every word is lit and nothing animates.",
+    "keyCharacteristics": [
+      "Violet bands alternate stage, lift, and deep; paper bands interrupt for reading.",
+      "Sun yellow is reserved for lit words, act labels, the one primary action, links on stage, and focus rings.",
+      "Display voice is a heavy rounded system stack at weight 800, tight tracking.",
+      "Pills for controls, large rounded rows for practice lines, subtitle-bar chips for captions.",
+      "Depth is tonal; shadows are soft and rare."
+    ],
+    "rules": [
+      { "name": "The One Lit Colour Rule", "body": "Yellow means voiced or actionable: a lit word, the primary action, an act label, or focus. Never decorative fill.", "section": "colors" },
+      { "name": "The Quiet Paper Rule", "body": "Paragraphs longer than two lines on the page live on paper bands in dark ink, not on violet.", "section": "colors" },
+      { "name": "The Lyric Line Rule", "body": "Display type is set as lines made of word spans so each word can light independently; headlines never wrap inside a word.", "section": "typography" },
+      { "name": "The Tonal Bands Rule", "body": "Separate sections by background step, not by borders or shadows.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do render every lyric as `.line` with `.w` word spans; lit is the default state and the JS-enhanced unlit state is the exception.",
+      "Do keep all words lit and static under `prefers-reduced-motion`.",
+      "Do keep scripts and styles first-party and external; no inline script or style.",
+      "Do put small print, legal, and pricing prose on paper bands.",
+      "Do set one yellow primary action per view."
+    ],
+    "donts": [
+      "Don't use yellow for decoration or for body text on paper (it fails contrast there).",
+      "Don't put long paragraphs on the violet stage.",
+      "Don't add network fonts, analytics, or third-party embeds.",
+      "Don't apply this system to the policy pages or the Flutter app without an explicit decision; they use separate palettes."
+    ]
+  }
+}
