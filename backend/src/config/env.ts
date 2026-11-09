@@ -3,8 +3,8 @@ import { z } from 'zod';
 /**
  * Environment-based configuration for the API server.
  *
- * - All values come from process env (Cloud Run env vars / Secret Manager mounts in
- *   deployed environments, `backend/.env` locally). Nothing secret is hardcoded.
+ * - All values come from process env (Netlify environment variables when deployed,
+ *   `backend/.env` locally). Nothing secret is hardcoded.
  * - Parsing fails fast at startup with a list of invalid keys (never their values).
  * - Unsafe combinations are rejected for staging/production (see `superRefine`).
  */
@@ -21,6 +21,54 @@ import { z } from 'zod';
 export const FIREBASE_PROJECT_ID = 'sprelia';
 
 export const APP_CHECK_MODES = ['off', 'monitor', 'enforce'] as const;
+
+/**
+ * Service-account credential parsed from the FIREBASE_SERVICE_ACCOUNT_JSON secret (hosts without
+ * Google Cloud workload identity, e.g. Netlify; owner hosting decision 2026-11-09).
+ * `privateKey` is NON-ENUMERABLE so JSON serialization and structured logging never include it.
+ */
+export interface FirebaseServiceAccount {
+  readonly projectId: string;
+  readonly clientEmail: string;
+  readonly privateKey: string;
+}
+
+const MAX_SERVICE_ACCOUNT_JSON_LENGTH = 16 * 1024;
+const SERVICE_ACCOUNT_EMAIL = /^[a-z0-9][a-z0-9-]{4,61}@[a-z][a-z0-9-]{4,28}[a-z0-9]\.iam\.gserviceaccount\.com$/;
+
+/**
+ * Strictly validates a service-account JSON document. Never returns or echoes any part of the
+ * input in errors (JSON.parse messages can quote the input, so they are discarded).
+ */
+export function parseServiceAccountJson(
+  raw: string,
+  expectedProjectId: string,
+): { ok: true; value: FirebaseServiceAccount } | { ok: false; reason: string } {
+  if (raw.length > MAX_SERVICE_ACCOUNT_JSON_LENGTH) return { ok: false, reason: 'is too large to be a service account key' };
+  let doc: unknown;
+  try {
+    doc = JSON.parse(raw);
+  } catch {
+    return { ok: false, reason: 'must be the service account key file content as one valid JSON value' };
+  }
+  if (typeof doc !== 'object' || doc === null || Array.isArray(doc)) return { ok: false, reason: 'must be a JSON object' };
+  const d = doc as Record<string, unknown>;
+  if (d.type !== 'service_account') return { ok: false, reason: 'must be a service account key (type service_account)' };
+  if (d.project_id !== expectedProjectId) return { ok: false, reason: 'belongs to a different project than FIREBASE_PROJECT_ID' };
+  if (typeof d.client_email !== 'string' || !SERVICE_ACCOUNT_EMAIL.test(d.client_email)) {
+    return { ok: false, reason: 'has a missing or invalid client_email' };
+  }
+  if (!d.client_email.endsWith(`@${expectedProjectId}.iam.gserviceaccount.com`)) {
+    return { ok: false, reason: 'client_email belongs to a different project' };
+  }
+  const key = d.private_key;
+  if (typeof key !== 'string' || !key.includes('-----BEGIN PRIVATE KEY-----') || !key.includes('-----END PRIVATE KEY-----')) {
+    return { ok: false, reason: 'has a missing or malformed private_key' };
+  }
+  const value = { projectId: expectedProjectId, clientEmail: d.client_email } as FirebaseServiceAccount;
+  Object.defineProperty(value, 'privateKey', { value: key, enumerable: false, writable: false });
+  return { ok: true, value: Object.freeze(value) };
+}
 export type AppCheckMode = (typeof APP_CHECK_MODES)[number];
 
 const booleanString = z
@@ -54,7 +102,7 @@ const EnvSchema = z
     /** Also reject tokens revoked via revokeRefreshTokens (one extra Auth API call). */
     AUTH_CHECK_REVOKED: booleanString.default(true),
 
-    /** Number of proxy hops to trust for client IP (Cloud Run = 1). */
+    /** Number of proxy hops to trust for client IP (Netlify: must be 0; the adapter uses context.ip). */
     TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(0),
 
     /** Requests per minute per client IP across /api. */
@@ -75,6 +123,15 @@ const EnvSchema = z
 
     /** Email/password accounts must verify their email before using /me resources. */
     REQUIRE_EMAIL_VERIFICATION: booleanString.default(true),
+
+    /**
+     * SECRET (optional). The full service-account key JSON, for hosts without Google Cloud
+     * workload identity (Netlify; owner authorized as a Netlify environment secret).
+     * When unset, Application Default Credentials are used (local
+     * `gcloud auth application-default login`, or the attached service account on Google Cloud).
+     * Never logged; validation errors never include its content.
+     */
+    FIREBASE_SERVICE_ACCOUNT_JSON: z.string().min(1).optional(),
 
     /** Sensitive operations (account deletion) need a sign-in at most this many seconds ago. */
     RECENT_AUTH_MAX_AGE_SECONDS: z.coerce.number().int().min(60).max(3600).default(300),
@@ -121,6 +178,18 @@ const EnvSchema = z
     if (env.APP_ENV === 'production' && env.APP_CHECK_MODE !== undefined && env.APP_CHECK_MODE !== 'enforce') {
       ctx.addIssue({ code: 'custom', path: ['APP_CHECK_MODE'], message: 'must be enforce in production' });
     }
+    if (env.FIREBASE_SERVICE_ACCOUNT_JSON !== undefined) {
+      if (env.APP_ENV === 'test' || demo || env.FIREBASE_AUTH_EMULATOR_HOST || env.FIRESTORE_EMULATOR_HOST) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['FIREBASE_SERVICE_ACCOUNT_JSON'],
+          message: 'must not be set with the emulators, demo projects or APP_ENV=test',
+        });
+      } else {
+        const parsed = parseServiceAccountJson(env.FIREBASE_SERVICE_ACCOUNT_JSON, project);
+        if (!parsed.ok) ctx.addIssue({ code: 'custom', path: ['FIREBASE_SERVICE_ACCOUNT_JSON'], message: parsed.reason });
+      }
+    }
     if (deployed && !env.REQUIRE_EMAIL_VERIFICATION) {
       ctx.addIssue({ code: 'custom', path: ['REQUIRE_EMAIL_VERIFICATION'], message: 'must be true in staging/production' });
     }
@@ -156,6 +225,8 @@ export interface AppConfig {
   appCheckMode: AppCheckMode;
   requireEmailVerification: boolean;
   recentAuthMaxAgeSeconds: number;
+  /** Set only when FIREBASE_SERVICE_ACCOUNT_JSON is provided (its private key is non-enumerable). */
+  firebaseServiceAccount?: FirebaseServiceAccount;
 }
 
 export class ConfigError extends Error {
@@ -190,5 +261,14 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     appCheckMode: e.APP_CHECK_MODE ?? (e.APP_ENV === 'production' ? 'enforce' : e.APP_ENV === 'staging' ? 'monitor' : 'off'),
     requireEmailVerification: e.REQUIRE_EMAIL_VERIFICATION,
     recentAuthMaxAgeSeconds: e.RECENT_AUTH_MAX_AGE_SECONDS,
+    firebaseServiceAccount: serviceAccount(e.FIREBASE_SERVICE_ACCOUNT_JSON, e.FIREBASE_PROJECT_ID),
   };
+}
+
+function serviceAccount(raw: string | undefined, projectId: string): FirebaseServiceAccount | undefined {
+  if (raw === undefined) return undefined;
+  const parsed = parseServiceAccountJson(raw, projectId);
+  // Already validated in the schema; this cannot fail here.
+  if (!parsed.ok) throw new ConfigError([`FIREBASE_SERVICE_ACCOUNT_JSON: ${parsed.reason}`]);
+  return parsed.value;
 }

@@ -51,7 +51,7 @@ export async function buildApp({
   const app = Fastify({
     loggerInstance: logger,
     bodyLimit: BODY_LIMIT_BYTES,
-    // Trust only the first N proxy hops (Cloud Run front end = 1) for client IPs.
+    // Trust only the first N proxy hops for client IPs (Netlify: 0; the adapter sets the client IP).
     trustProxy: config.trustProxyHops > 0 ? (_address: string, hop: number) => hop < config.trustProxyHops : false,
     // Accept a caller-supplied request ID only if it is short and safe to log.
     requestIdHeader: false,

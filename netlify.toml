@@ -1,0 +1,28 @@
+# Netlify configuration for the Sprelia API (owner hosting decision 2026-11-09).
+# See doc/DEPLOYMENT_NETLIFY.md. No secrets here: set them as Netlify environment variables.
+
+[build]
+  # The API lives in backend/. All paths below are relative to this base directory.
+  base = "backend"
+  # Fail the deploy on type errors. Functions themselves are bundled by Netlify (esbuild).
+  command = "npm run typecheck"
+  # IMPORTANT: publish ONLY this static folder. Without it Netlify would publish the base
+  # directory (source code and any local .env files) as a static site.
+  publish = "netlify/public"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+  # Shipped as regular node_modules instead of being bundled (they load files at runtime).
+  external_node_modules = ["firebase-admin", "@google-cloud/firestore", "google-gax"]
+
+# Static site (landing page and policy drafts). First-party only: no third-party scripts,
+# styles, fonts, analytics or trackers. The API sets its own headers (helmet).
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    X-Frame-Options = "DENY"

@@ -20,6 +20,14 @@ export const REDACT_PATHS = [
   '*.idToken',
   '*.password',
   '*.apiKey',
+  'privateKey',
+  '*.privateKey',
+  'private_key',
+  '*.private_key',
+  'firebaseServiceAccount',
+  '*.firebaseServiceAccount',
+  'FIREBASE_SERVICE_ACCOUNT_JSON',
+  '*.FIREBASE_SERVICE_ACCOUNT_JSON',
 ];
 
 const SEVERITY: Record<string, string> = {

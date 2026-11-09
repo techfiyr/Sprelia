@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch --env-file=.env src/main.ts",
+    "dev:sprelia": "tsx watch --env-file=.env.sprelia.local src/main.ts",
     "dev:prototype": "tsx watch --env-file=.env src/server.ts",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/main.js",

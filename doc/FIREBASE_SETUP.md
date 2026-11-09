@@ -19,8 +19,10 @@ Security requirements (binding; see also `.agents/security.md` §1a):
 2. Manual checks on `sprelia` use clearly identified test accounts and test data only. Never run
    destructive scripts or tests against real user data.
 3. Never deploy Firestore rules or change Firebase settings without explicit owner approval.
-4. No service-account key files anywhere. Local backend access uses personal Application Default
-   Credentials (`gcloud auth application-default login`). Keys and CI secrets stay out of git.
+4. No service-account key files in the repo or on disk in the project. Local backend access uses
+   personal Application Default Credentials (`gcloud auth application-default login`). Exception
+   authorized by the owner (2026-11-09): on Netlify, a key stored only as the
+   `FIREBASE_SERVICE_ACCOUNT_JSON` environment secret.
 5. Verify the project ID before every deployment.
 6. Separate Android and iOS Firebase app configurations (one app per platform in `sprelia`).
 7. Development-only mechanisms (emulator hosts, App Check debug providers, the legacy prototype's
@@ -46,16 +48,48 @@ Enforced in code:
 | iOS app | **Not registered** |
 | Google provider | **Not enabled** (the Android config has no OAuth clients) |
 | Email/Password provider, enumeration protection, email templates | **Not verifiable from the CLI**; owner to check |
-| Firestore database | **Does not exist**; rules not deployed |
+| Firestore database | **Created by the owner**: `(default)`, Native mode, Standard edition, **`asia-southeast1` (Singapore)** (read-only check, 2026-11-09). Delete protection and point-in-time recovery are **off**. The rules currently active were set in the Console at creation and are **not verified**; the repo's deny-all `firestore.rules` is **not deployed** |
 | App Check | **Not verifiable from the CLI**; assume not configured |
 | Release signing | **None** (release builds are debug-signed and must not be distributed) |
+
+## Backend deployment status
+**No backend is deployed.** Hosting decision (owner, 2026-11-09): **Netlify Functions** on the free
+plan in Netlify's default function region (US East). Firestore stays in Singapore, so API requests
+cross regions. See `doc/DEPLOYMENT_NETLIFY.md`.
+On Netlify (no Google Cloud workload identity) the API authenticates with the
+`FIREBASE_SERVICE_ACCOUNT_JSON` environment secret (owner authorized 2026-11-09; set by the owner).
+
+Firebase client configuration alone is **not enough** for sign-in or learning data: after Firebase
+Auth signs the user in, the app calls the Sprelia API (`/api/v1/me/profile`, `/me/onboarding`,
+`/me/dashboard`, catalogue, `DELETE /me`), which verifies the ID token and reads/writes Firestore
+with the Admin SDK. Clients have no direct Firestore access. Until the API is deployed, a backend
+must run locally (below).
+
+## Run the Android app against `sprelia` (development, test accounts only)
+1. One-time (owner): enable Email/Password in Firebase Auth; install the `gcloud` CLI and run
+   `gcloud auth application-default login` with an account that has access to `sprelia`
+   (the backend needs Application Default Credentials for Firestore and revocation checks;
+   never use key files). If your shell exports an unrelated `GOOGLE_CLOUD_PROJECT`, unset it
+   for the backend.
+2. Backend: `cd backend && npm run dev:sprelia` (gitignored `backend/.env.sprelia.local`:
+   project `sprelia`, no emulators, `APP_CHECK_MODE=off`).
+3. App (Android emulator): `flutter run --dart-define-from-file=env/development-firebase.local.json`
+   (gitignored; built from the owner's Android config file; `APP_CHECK_ENABLED=false`;
+   `API_BASE_URL=http://10.0.2.2:8080`). On a physical device run `adb reverse tcp:8080 tcp:8080`
+   and set `API_BASE_URL` to `http://localhost:8080` in the local file (cleartext is allowed
+   only to local hosts in debug builds).
+4. Emulator mode is unchanged: `firebase emulators:start --only auth,firestore --project
+   demo-sprelia`, `npm run dev` with `backend/.env` from `.env.example`, and
+   `flutter run --dart-define-from-file=env/development.json`.
 
 ## Owner actions (see `doc/roadmap/phase_3.md` §2 for the full list)
 - Enable Email/Password (with email enumeration protection) and Google; send the Web and iOS
   OAuth client IDs.
 - Register the iOS app; add the debug and, later, release and Play App Signing SHA fingerprints.
-- Choose the Firestore region, create the database, approve deploying `firestore.rules`.
-- App Check: Play Integrity (Play Console link), App Attest (Apple Team ID), debug tokens for test devices.
+- Firestore: created in `asia-southeast1` (done). Check the rules shown in the Console: if it was created in
+  test mode, all clients can read and write until the date shown. Approve deploying the repo's deny-all
+  `firestore.rules`. Consider enabling delete protection and point-in-time recovery.
+- App Check: **deferred** (owner, 2026-11-09). Later: Play Integrity (Play Console link), debug tokens for test devices.
 - Install `gcloud` for local Application Default Credentials.
 - Confirm the account deletion and data retention policy (release blocker; see below).
 
@@ -73,7 +107,7 @@ Enforced in code:
 
 ## Backend wiring
 - `FIREBASE_PROJECT_ID` selects the project whose ID tokens are accepted (checked at startup).
-- Credentials: Application Default Credentials (the Cloud Run service account when deployed). No key files.
+- Credentials: Application Default Credentials locally (no key files). On Netlify: the `FIREBASE_SERVICE_ACCOUNT_JSON` secret (see `doc/DEPLOYMENT_NETLIFY.md`).
 - Local with emulators: `firebase emulators:start --only auth,firestore --project demo-sprelia`
   with `FIREBASE_AUTH_EMULATOR_HOST` and `FIRESTORE_EMULATOR_HOST`.
 - `APP_CHECK_MODE` (`off` / `monitor` / `enforce`), `REQUIRE_EMAIL_VERIFICATION`,

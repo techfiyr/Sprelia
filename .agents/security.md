@@ -9,9 +9,9 @@ task, stop and ask; do not work around it.
   logs, tests, fixtures, screenshots or git.
 - Flutter `env/*.json` values are compiled into the binary and are public. They may hold
   only non-secret configuration such as `APP_ENV` and `API_BASE_URL`.
-- The backend uses Application Default Credentials (the Cloud Run service account;
-  locally, `gcloud auth application-default login`). Never create, download or commit
-  service-account key files.
+- The backend uses Application Default Credentials (locally, `gcloud auth
+  application-default login`). Never create, download or commit service-account key files.
+  On Netlify (no workload identity) the owner authorized a key as a Netlify secret; see below.
 - `.gitignore` blocks `.env*` (except `.env.example`), keys, keystores, Firebase app
   configs and FlutterFire options. Never loosen it. `.env.example` holds placeholders only.
 - Agents must never invent or fill in credentials. If one is needed, document the
@@ -140,3 +140,16 @@ Supersedes the earlier "separate development project" rule.
 - [ ] No client-trusted usage, entitlement or duration values.
 - [ ] Firestore rules unchanged, or changed with emulator tests and approval.
 - [ ] Tests cover the unauthenticated, invalid-token and invalid-input paths.
+
+## Netlify hosting (owner decision 2026-11-09)
+- **Owner-authorized exception (2026-11-09):** on Netlify only, the API reads a service-account key
+  from the `FIREBASE_SERVICE_ACCOUNT_JSON` environment secret (marked secret, Functions scope),
+  entered by the owner in the Netlify UI. It is strictly validated (project and email must match
+  `FIREBASE_PROJECT_ID`), never logged (redacted; private key non-enumerable), never echoed in
+  errors, and refused with emulators/`APP_ENV=test`. Agents never read, print, type or upload key
+  content. Never commit a key or put it in `netlify.toml`/app files. Rotate to a dedicated
+  least-privilege key later.
+- Client IP comes only from Netlify `context.ip`; `TRUST_PROXY_HOPS` must be 0 (enforced).
+- In-memory rate limits are per function instance, not global protection.
+- The static site loads first-party resources only (CSP in `netlify.toml`); no analytics or
+  third-party scripts; optional categories require opt-in (`assets/consent.js`).

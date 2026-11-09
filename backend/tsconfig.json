@@ -11,5 +11,5 @@
     "types": ["node"],
     "noEmit": true
   },
-  "include": ["src", "test", "vitest.config.ts", "vitest.integration.config.ts"]
+  "include": ["src", "test", "netlify/functions", "vitest.config.ts", "vitest.integration.config.ts"]
 }

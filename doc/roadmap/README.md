@@ -93,4 +93,6 @@ to avoid breaking existing references.
 | 2026-11-09 | Human review required before publishing scenarios (production serves approved only) | Owner content decision |
 | 2026-11-09 | American English for the initial release; British via overlays and ARB later | Owner content decision |
 | 2026-11-09 | Tutor images: rights not established → replace; no history rewrite; keep empty-state icons | Owner asset decisions; `doc/ASSET_LIBRARY.md` §3a |
+| 2026-11-09 | **Hosting: Netlify** (API as Netlify Function on the free plan, default region; website from `backend/netlify/public`); supersedes Cloud Run. Firebase credential: service-account key as Netlify secret (owner authorized) | Owner; `doc/DEPLOYMENT_NETLIFY.md` |
+| 2026-11-09 | Public landing page and draft Privacy, Terms, AI disclaimer, Content policy and Cookies pages; first-party consent manager, no tracking | Owner; `doc/reviews/LEGAL_PAGES_REVIEW.md` |
 | 2026-11-09 | ~~Stacked PRs~~ superseded: everything merged to `main`; **work directly on `main`** from Phase 3 | Owner git decision |

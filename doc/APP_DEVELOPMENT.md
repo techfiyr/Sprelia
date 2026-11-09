@@ -83,7 +83,7 @@ Use maintained, compatible package versions. Verify package compatibility before
 - TypeScript.
 - NestJS or modular Fastify architecture.
 - Firebase Admin SDK.
-- Cloud Run.
+- ~~Cloud Run~~ **Netlify Functions** (owner hosting decision 2026-11-09; free plan, default function region; Firestore stays in Singapore; see `doc/DEPLOYMENT_NETLIFY.md`).
 - Cloud Firestore.
 - Google Cloud Secret Manager.
 - Gemini API.
@@ -454,7 +454,7 @@ Re-verify against the official documentation before implementation and record th
   (`liveConnectConstraints`), so a modified client cannot change persona or model.
 - The token's expiry bounds the session to the server-reserved allowance.
 - Proxying audio through the backend was rejected for the MVP because it adds latency
-  and Cloud Run cost. Reconsider only if server-side transcripts become mandatory.
+  and hosting cost. Reconsider only if server-side transcripts become mandatory.
 - Ephemeral tokens can be extracted from a mobile app. They limit, but do not
   eliminate, abuse. Quotas are therefore always enforced on the server.
 
@@ -508,7 +508,7 @@ Re-verify against the official documentation before implementation and record th
 |---|---|---|---|
 | Local and automated tests | Emulator Suite (`demo-sprelia`) | `npm run dev` | `env/development.json` |
 | Development (pre-launch) | **`sprelia`** (756773147926), test accounts only | local `npm run dev` | `env/development-firebase.local.json` |
-| Staging / production | **`sprelia`** | Cloud Run | `env/staging.json`, `env/production.json` |
+| Staging / production | **`sprelia`** | Netlify Functions (default region) | `env/staging.json`, `env/production.json` |
 
 Owner architecture decision (2026-11-09): **one Firebase project, `sprelia`**, for development,
 integration testing where appropriate, and eventual production. It supersedes the separate
@@ -516,7 +516,7 @@ integration testing where appropriate, and eventual production. It supersedes th
 project with `APP_ENV=test`). No public release until the readiness checklist in
 `doc/roadmap/phase_3.md` §5 passes (`doc/FIREBASE_SETUP.md`).
 
-- Backend configuration is validated at startup. Secrets come from Secret Manager.
+- Backend configuration is validated at startup. Locally, credentials come from Application Default Credentials. On Netlify, secrets come from environment variables marked secret; including the service-account key `FIREBASE_SERVICE_ACCOUNT_JSON` (owner authorized 2026-11-09).
 - Flutter configuration is compiled in, so it never contains secrets.
 - Emulator usage is refused outside development, in both the backend and the app.
 - Production deployment always requires explicit owner approval.
@@ -565,9 +565,11 @@ Tests never use real credentials or call production services.
 
 # 17. CI/CD and Deployment
 
+> **Owner hosting decision (2026-11-09):** Netlify (API as a Netlify Function, website as static files). Where this section mentions Cloud Run or workload identity, `doc/DEPLOYMENT_NETLIFY.md` applies instead.
+
 - GitHub Actions (or Codemagic for mobile builds): analyze, test, typecheck and build on
   every pull request.
-- Cloud Run deploys from CI using workload identity federation, with no service-account keys.
+- ~~Cloud Run deploys from CI using workload identity federation~~ Netlify deploys from the connected Git repository after owner approval (`doc/DEPLOYMENT_NETLIFY.md`).
 - Mobile release signing keys are stored only in CI secrets.
 - Production deploys and store releases require explicit owner approval.
 
@@ -598,6 +600,6 @@ The application must remain buildable after every phase.
 | Rewarded ads granting minutes | Product owner |
 | Age confirmation approach for 18+ | Product owner / legal |
 | Interface languages at launch (content: American English decided 2026-11-09) | Product owner |
-| Cloud Run and Firestore region | Engineering + owner |
+| ~~Cloud Run region~~ **Decided 2026-11-09:** hosting on Netlify Functions (free plan, default region, US East); Firestore in `asia-southeast1`, so API requests cross regions | Owner |
 
 **End of app development specification.**

@@ -25,7 +25,9 @@ values are placeholders that only the emulator accepts; they are not credentials
 
 `staging.json`, `production.json` and `*.local.json` are gitignored. Create them from the
 `*.example.json` files. Development against the shared project uses
-`env/development-firebase.local.json` (gitignored; `flutter run --dart-define-from-file=env/development-firebase.local.json`).
+`env/development-firebase.local.json` (gitignored; `flutter run --dart-define-from-file=env/development-firebase.local.json`),
+Android only for now, with `APP_CHECK_ENABLED=false` (App Check deferred). It needs a backend:
+none is deployed yet, so run `npm run dev:sprelia` locally (see `doc/FIREBASE_SETUP.md`).
 See `doc/FIREBASE_SETUP.md` for the environment strategy (single project `sprelia`, emulators for tests).
 
 **Everything here is compiled into the app binary and can be extracted. Never put

@@ -31,11 +31,17 @@ silently choosing.
 
 ## Current status
 
-- **Phase 2 (application experience) is complete.** The owner's final decisions are applied on
-  `phase-2-closeout`; Phase 3 waits for owner approval. Stacked branches:
-  `phase-1-foundation` → `phase-2-experience` → `asset-library` → `phase-2-closeout` (do not merge automatically).
+- **Phases 1 and 2 are complete and merged to `main`.** Phase 3 (Firebase integration and
+  account management) is code complete and verified locally (commit `1db48eb`, pushed), but
+  blocked on owner-only Firebase, signing and policy items; see `doc/roadmap/phase_3.md`.
+- **Work directly on `main`** (owner decision, 2026-11-09). Do not create feature or phase
+  branches unless the owner asks. Commit and push only when asked; never force-push.
+- **Hosting: Netlify** (owner decision, 2026-11-09): free plan, default function region; API as a
+  Netlify Function, website and policy drafts from `backend/netlify/public`. The Firebase key is
+  authorized only as the `FIREBASE_SERVICE_ACCOUNT_JSON` Netlify secret, entered by the owner;
+  agents never read or upload it. See `doc/DEPLOYMENT_NETLIFY.md`.
 - The roadmap and per-phase records live in `doc/roadmap/` (follow `doc/roadmap/README.md`).
-  Open owner decisions are listed in `doc/roadmap/phase_2.md`.
+  Open owner decisions are listed in the current phase record.
 - Do not start the next phase (or Gemini voice, subscriptions, ads, deployment, or
   configuring the real `sprelia` Firebase project) without approval.
 

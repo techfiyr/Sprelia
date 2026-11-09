@@ -42,7 +42,7 @@ REST call for them was blocked by the local permission policy, so those items ar
 | OAuth clients in the Android config | `oauth_client: []`, so **Google sign-in is not enabled** (enabling it creates a web OAuth client) | Missing |
 | Auth: Email/Password | Not verifiable from the CLI | Owner to check |
 | Auth: email enumeration protection, templates, authorized domains | Not verifiable from the CLI | Owner to check |
-| Firestore database | **No database exists**, so no rules are deployed | Missing |
+| Firestore database | **Created by the owner after the audit**: `(default)`, Native, Standard, `asia-southeast1` (Singapore). Active rules not verified; repo rules not deployed | Created |
 | Firestore rules (repo) | `firestore.rules`: default deny for all clients; tested on the emulator | Ready, not deployed |
 | App Check | Not verifiable from the CLI. Play Integrity needs a Play Console link; App Attest needs an Apple Team ID | Assume not configured |
 | Config files in the repo | None committed (correct): no `google-services.json`, `GoogleService-Info.plist`, `lib/firebase_options*.dart` or `.firebaserc`; all gitignored | OK |
@@ -83,7 +83,7 @@ validation, and a uid always taken from the verified token.
 |---|---|---|
 | D1 | Email verification enforcement | Password accounts must verify before onboarding or using the app (verification screen with resend, refresh and sign out). The backend also rejects unverified **password** accounts on `/me/*` writes and the dashboard. Google accounts arrive verified |
 | D2 | Account deletion policy (APP_FLOW §17: "according to the published retention policy") | **Immediate hard delete** of `users/{uid}` and all subcollections, then the Auth user. No grace period for the MVP. Requires a sign-in within the last 5 minutes. **Implemented as the recommendation; NOT confirmed by the owner.** The published retention policy is a **release blocker** |
-| D3 | Firestore region | Owner choice. Pick it close to the main audience and the future Cloud Run region (for example, `asia-south1` for South Asia) |
+| D3 | Firestore region | **Decided by the owner: `asia-southeast1` (Singapore).** API hosting: Netlify Functions, free plan, default region (owner decision 2026-11-09); requests cross regions |
 | D4 | Client Firestore access | **Keep default deny** (API-only architecture). Ownership is enforced by the backend. Owner-read rules are added only when the app needs a direct read |
 | D5 | App Check rollout | Backend mode `off` / `monitor` / `enforce`. Development: monitor. Enforce before public release only |
 | D6 | FlutterFire configuration | **Keep the dart-define approach** (no generated files, iOS values added). Alternative: `flutterfire configure` with all outputs gitignored (needs the CLI installed) |

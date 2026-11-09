@@ -1,7 +1,7 @@
 import type { FastifyPluginAsync } from 'fastify';
 
 /**
- * Liveness check for Cloud Run and uptime monitors. Public, unauthenticated and
+ * Liveness check for the hosting platform and uptime monitors. Public, unauthenticated and
  * deliberately minimal: no version, environment, hostnames, dependencies or timings.
  */
 export const healthRoutes: FastifyPluginAsync = async (app) => {

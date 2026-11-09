@@ -6,7 +6,7 @@
 Flutter app (Riverpod · GoRouter · Dio)
   │ HTTPS  Authorization: Bearer <Firebase ID token>   (+ X-Firebase-AppCheck, Phase 3)
   ▼
-Sprelia API — Node.js/TypeScript, Fastify, Cloud Run          backend/src/main.ts
+Sprelia API — Node.js/TypeScript, Fastify, Netlify Functions (default region)  backend/src/main.ts, backend/netlify/functions/api.mts
   │ Firebase Admin SDK: verifies ID tokens; writes trusted Firestore data
   │ Owns: identity, entitlements, usage/quota, AI session authorization, learning data
   ├──► Gemini Live API: app connects directly with a short-lived, constrained
@@ -23,7 +23,7 @@ Cloud Firestore: default-deny rules. Phase 2: NO direct client access; all data 
 | Brand | **Sprelia**, purple palette (`doc/BRAND.md`). Kept configurable in `lib/core/branding/app_brand.dart`. | Approved direction; the name is provisional. |
 | App identity | Android `applicationId`/namespace and iOS bundle ID **`com.techfiyr.sprelia`**. Visible name "Sprelia". Dart package stays `speakdaily`. | Owner decision (2026-11-09): matches the Android app registered in Firebase project `sprelia`. Overrides `doc/roadmap/phase_2.md` §B ("keep existing IDs"). |
 | Design tokens | Colors and weights from BRAND.md. Type scale, spacing names and components from DESIGN_SYSTEM.md. 4 px grid. | Resolves the conflict between the two documents. DESIGN_SYSTEM's teal palette is superseded. |
-| Backend framework | **Fastify 5** (not Express) | APP_DEVELOPMENT §3 allows "NestJS or modular Fastify". Encapsulated plugins map to modules. Built-in pino structured logging. `inject()` testing without opening a port. Lower overhead on Cloud Run. Less ceremony than NestJS for a small team. |
+| Backend framework | **Fastify 5** (not Express) | APP_DEVELOPMENT §3 allows "NestJS or modular Fastify". Encapsulated plugins map to modules. Built-in pino structured logging. `inject()` testing without opening a port. Low overhead on serverless hosting (Netlify Functions). Less ceremony than NestJS for a small team. |
 | Validation | Zod via the `validate()` preHandler (`backend/src/common/validate.ts`) | One schema library across the backend, with typed parsed output. |
 | Logging | pino JSON with Cloud Logging fields (`severity`, `message`) and request IDs. Auth headers and tokens are redacted. Bodies are never logged. | Structured, safe by default. |
 | API versioning | Path prefix `/api/v1` | Simple, cache-friendly, explicit. |
@@ -209,3 +209,10 @@ projects (`env.ts`, `AppConfig`).
 ## Provider abstraction
 `RealtimeConversationProvider` (Flutter) and the planned `AIProvider` (backend) isolate
 Gemini specifics. Add vendors as new implementations; never add vendor checks in UI.
+
+## Hosting (owner decision 2026-11-09)
+Netlify, not Cloud Run. One deploy publishes the API (Netlify Function `api` at `/api/*`, free plan,
+default region; Firestore is in Singapore, so requests cross regions) and the static website (`backend/netlify/public`). `src/runtime.ts` wires the real
+dependencies for both `main.ts` (long-running server) and the function, so routes and behavior are
+identical. `src/serverless/netlify.ts` bridges Netlify's Request/Response to `app.inject()`.
+Rate limits are in memory and therefore per function instance. See `doc/DEPLOYMENT_NETLIFY.md`.

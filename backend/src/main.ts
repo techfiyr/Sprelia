@@ -1,11 +1,7 @@
-import { buildApp } from './app.js';
 import { createLogger } from './common/logger.js';
 import { ConfigError, loadConfig } from './config/env.js';
-import { firebaseAppCheck, firebaseAuth, firestore, initFirebaseAdmin } from './firebase/admin.js';
-import { FirebaseIdentityAdmin } from './modules/account/identity-admin.js';
-import { FirebaseAppCheckVerifier } from './modules/app-check/app-check.js';
-import { FirebaseTokenVerifier } from './modules/auth/firebase-token-verifier.js';
-import { FirestoreUserRepository } from './modules/users/firestore-user.repository.js';
+import { credentialSource } from './firebase/admin.js';
+import { createRuntimeApp } from './runtime.js';
 
 async function main() {
   let config;
@@ -18,17 +14,8 @@ async function main() {
   }
 
   const logger = createLogger(config);
-  const firebase = initFirebaseAdmin(config);
-  const verifier = new FirebaseTokenVerifier(firebaseAuth(firebase), {
-    checkRevoked: config.authCheckRevoked,
-  });
-
-  const users = new FirestoreUserRepository(firestore(firebase));
-
-  const identity = new FirebaseIdentityAdmin(firebaseAuth(firebase));
-  const appCheck = config.appCheckMode === 'off' ? undefined : new FirebaseAppCheckVerifier(firebaseAppCheck(firebase));
-
-  const app = await buildApp({ config, logger, verifier, users, identity, appCheck });
+  const app = await createRuntimeApp(config, logger);
+  logger.info({ credential: credentialSource(config).kind }, 'firebase admin credential source');
 
   const shutdown = async (signal: string) => {
     logger.info({ signal }, 'shutting down');

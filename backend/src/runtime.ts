@@ -1,0 +1,25 @@
+import type { FastifyBaseLogger, FastifyInstance } from 'fastify';
+import { buildApp } from './app.js';
+import type { AppConfig } from './config/env.js';
+import { firebaseAppCheck, firebaseAuth, firestore, initFirebaseAdmin } from './firebase/admin.js';
+import { FirebaseIdentityAdmin } from './modules/account/identity-admin.js';
+import { FirebaseAppCheckVerifier } from './modules/app-check/app-check.js';
+import { FirebaseTokenVerifier } from './modules/auth/firebase-token-verifier.js';
+import { FirestoreUserRepository } from './modules/users/firestore-user.repository.js';
+
+/**
+ * Wires the real (Firebase-backed) dependencies into the HTTP app. Shared by the long-running
+ * server (`main.ts`) and the Netlify Functions entry point, so routes and behavior are identical.
+ */
+export async function createRuntimeApp(config: AppConfig, logger: FastifyBaseLogger): Promise<FastifyInstance> {
+  const firebase = initFirebaseAdmin(config);
+  const auth = firebaseAuth(firebase);
+  return buildApp({
+    config,
+    logger,
+    verifier: new FirebaseTokenVerifier(auth, { checkRevoked: config.authCheckRevoked }),
+    users: new FirestoreUserRepository(firestore(firebase)),
+    identity: new FirebaseIdentityAdmin(auth),
+    appCheck: config.appCheckMode === 'off' ? undefined : new FirebaseAppCheckVerifier(firebaseAppCheck(firebase)),
+  });
+}

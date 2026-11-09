@@ -162,7 +162,7 @@ Flutter 36/36; backend 46/46; typecheck clean; debug APK built.
 | `APP_DEVELOPMENT.md` / `BRAND.md` truncated | Completed in Phase 2; pending owner review |
 | Inter not bundled | Fixed in Phase 2 |
 | Voice prototype on Express, superseded model IDs, v1alpha tokens | Open, Phase 6 |
-| `TRUST_PROXY_HOPS=1` required on Cloud Run | Open (deployment) |
+| ~~`TRUST_PROXY_HOPS=1` required on Cloud Run~~ | Superseded 2026-11-09: hosting is Netlify; `TRUST_PROXY_HOPS=0` there (client IP from `context.ip`, enforced) |
 | Release builds signed with debug key | Open, Phase 10 |
 | 4 moderate transitive npm advisories (firebase-admin) | Open, no non-breaking fix |
 | Unapproved tutor images (`assets/tutors/img_tutor_*.jpeg`) were swept into commit `7643ba5` | Open: licence unknown, not bundled; removing them from history needs owner approval |
