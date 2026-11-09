@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../core/widgets/widgets.dart';
+
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -8,7 +10,11 @@ class ProfileScreen extends StatelessWidget {
     // TODO(profile): preferences, subscription, privacy controls, delete account, sign out.
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
-      body: const Center(child: Text('Profile and settings are coming soon.')),
+      body: const AppEmptyState(
+        icon: Icons.person_outline,
+        title: 'Profile and settings',
+        message: 'Profile and settings are coming soon.',
+      ),
     );
   }
 }

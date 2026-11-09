@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/routing/app_routes.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/widgets/widgets.dart';
 import 'tutor.dart';
 import 'tutor_avatar.dart';
 
@@ -10,23 +12,19 @@ class TutorsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
+    final text = context.textStyles;
     return Scaffold(
       appBar: AppBar(title: const Text('Choose your tutor')),
       body: ListView.separated(
-        padding: const EdgeInsets.all(16),
+        padding: AppSpacing.screenPadding,
         itemCount: tutors.length,
-        separatorBuilder: (_, _) => const SizedBox(height: 12),
+        separatorBuilder: (_, _) => Gap.md,
         itemBuilder: (context, i) {
           final t = tutors[i];
           return Opacity(
             opacity: t.available ? 1 : 0.55,
-            child: Card(
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                onTap: t.available ? () => context.push('/prepare/${t.id}') : null,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
+            child: AppCard(
+                  onTap: t.available ? () => context.push(AppRoutes.prepare(t.id)) : null,
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -36,25 +34,22 @@ class TutorsScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('${t.name} · ${t.title}',
-                                style: text.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+                            Text('${t.name} · ${t.title}', style: text.titleSmall),
                             const SizedBox(height: 4),
                             Text(t.personality, style: text.bodyMedium),
                             const SizedBox(height: 2),
                             Text('${t.focus} · ${t.levels}',
-                                style: text.bodySmall?.copyWith(color: AppColors.inkMuted)),
+                                style: text.bodySmall),
                             if (!t.available) ...[
                               const SizedBox(height: 6),
                               Text('Coming soon',
-                                  style: text.labelSmall?.copyWith(color: AppColors.inkMuted)),
+                                  style: text.labelSmall),
                             ],
                           ],
                         ),
                       ),
                     ],
                   ),
-                ),
-              ),
             ),
           );
         },

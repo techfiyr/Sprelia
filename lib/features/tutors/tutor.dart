@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
+/// Brand tone used for a tutor's placeholder avatar. Resolved to theme colors
+/// in `TutorAvatar`; models never hold raw colors.
+enum TutorTone { primary, primaryDark, accent }
 
-/// Client-side tutor metadata for display. Prompts and voice configuration
+/// Client-side tutor metadata for display (APP_FLOW §7). Prompts and voice configuration
 /// live on the backend (`backend/src/tutors.ts`) and are never sent to the app.
 class Tutor {
   const Tutor({
@@ -10,7 +12,7 @@ class Tutor {
     required this.personality,
     required this.levels,
     required this.focus,
-    required this.color,
+    required this.tone,
     this.available = true,
   });
 
@@ -20,7 +22,7 @@ class Tutor {
   final String personality;
   final String levels;
   final String focus;
-  final Color color;
+  final TutorTone tone;
 
   /// Prototype phase: only Emma is enabled.
   final bool available;
@@ -34,26 +36,26 @@ const tutors = <Tutor>[
     personality: 'Patient and encouraging',
     levels: 'A1 – B1',
     focus: 'Everyday communication',
-    color: Color(0xFF3B5BDB),
+    tone: TutorTone.primary,
   ),
   Tutor(
     id: 'alex',
     name: 'Alex',
     title: 'Professional Communication Coach',
-    personality: 'Direct, constructive feedback',
-    levels: 'B1 – B2',
+    personality: 'Professional, structured and helpful',
+    levels: 'A2 – C1',
     focus: 'Interviews, meetings, presentations',
-    color: Color(0xFF0F766E),
+    tone: TutorTone.primaryDark,
     available: false,
   ),
   Tutor(
     id: 'sofia',
     name: 'Sofia',
-    title: 'Natural Conversation Partner',
-    personality: 'Expressive and relaxed',
-    levels: 'A2 – B2',
-    focus: 'Social and travel situations',
-    color: Color(0xFFC2410C),
+    title: 'Everyday Conversation Partner',
+    personality: 'Natural, expressive and friendly',
+    levels: 'A1 – B2',
+    focus: 'Everyday, social and travel situations',
+    tone: TutorTone.accent,
     available: false,
   ),
 ];

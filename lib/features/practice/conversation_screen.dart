@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/routing/app_routes.dart';
 import '../../core/services/realtime/realtime_provider.dart';
 import '../../core/theme/app_theme.dart';
 import '../tutors/tutor.dart';
@@ -47,7 +48,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
       if (prev?.status != ConversationStatus.ended && next.status == ConversationStatus.ended) {
         final id = next.conversationId;
         if (id != null) {
-          context.pushReplacement('/feedback/$id');
+          context.pushReplacement(AppRoutes.feedback(id));
         } else {
           context.pop();
         }
@@ -91,7 +92,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Text('Response latency ≈ ${state.lastResponseLatencyMs} ms',
-                      style: text.labelSmall?.copyWith(color: AppColors.inkMuted)),
+                      style: text.labelSmall),
                 ),
               _Controls(state: state, controller: controller),
             ],
@@ -115,7 +116,7 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.wifi_off_rounded, size: 40, color: AppColors.danger),
+              Icon(Icons.wifi_off_rounded, size: 40, color: context.colors.error),
               const SizedBox(height: 12),
               Text(state.error ?? 'Something went wrong.', textAlign: TextAlign.center),
               const SizedBox(height: 16),
@@ -155,6 +156,7 @@ class _Bubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isLearner = line.speaker == Speaker.learner;
+    final colors = context.colors;
     return Align(
       alignment: isLearner ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -162,13 +164,16 @@ class _Bubble extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.78),
         decoration: BoxDecoration(
-          color: isLearner ? AppColors.primary : AppColors.surface,
-          border: isLearner ? null : Border.all(color: AppColors.border),
+          color: isLearner ? colors.primary : colors.surface,
+          border: isLearner ? null : Border.all(color: context.palette.border),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Text(
           line.text,
-          style: TextStyle(color: isLearner ? Colors.white : AppColors.ink, height: 1.35),
+          style: context.textStyles.bodyMedium?.copyWith(
+            color: isLearner ? colors.onPrimary : colors.onSurface,
+            height: 1.35,
+          ),
         ),
       ),
     );
@@ -194,7 +199,7 @@ class _TimerBar extends StatelessWidget {
               Text(_fmt(state.elapsedSeconds)),
               const Spacer(),
               Text('${_fmt(state.remainingSeconds)} left',
-                  style: const TextStyle(color: AppColors.inkMuted)),
+                  style: TextStyle(color: context.palette.textSecondary)),
             ],
           ),
           const SizedBox(height: 6),
@@ -202,7 +207,6 @@ class _TimerBar extends StatelessWidget {
             value: progress.clamp(0, 1),
             minHeight: 4,
             borderRadius: BorderRadius.circular(2),
-            backgroundColor: AppColors.border,
           ),
         ],
       ),
@@ -217,11 +221,12 @@ class _ConnectionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final (label, color) = switch (status) {
-      ConversationStatus.live => ('Live', AppColors.success),
-      ConversationStatus.connecting => ('Connecting', AppColors.warning),
-      ConversationStatus.failed => ('Offline', AppColors.danger),
-      _ => ('Ended', AppColors.inkMuted),
+      ConversationStatus.live => ('Live', palette.success),
+      ConversationStatus.connecting => ('Connecting', palette.warning),
+      ConversationStatus.failed => ('Offline', palette.danger),
+      _ => ('Ended', palette.textSecondary),
     };
     return Row(
       children: [
@@ -257,7 +262,10 @@ class _Controls extends StatelessWidget {
           IconButton.filled(
             iconSize: 28,
             padding: const EdgeInsets.all(16),
-            style: IconButton.styleFrom(backgroundColor: AppColors.danger),
+            style: IconButton.styleFrom(
+              backgroundColor: context.colors.error,
+              foregroundColor: context.colors.onError,
+            ),
             onPressed: (live || state.status == ConversationStatus.connecting)
                 ? () => controller.end()
                 : (state.status == ConversationStatus.failed ? () => context.pop() : null),
