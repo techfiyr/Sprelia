@@ -31,7 +31,19 @@ class PrepareScreen extends ConsumerWidget {
     final match = scenarioId == null ? null : ref.watch(scenarioByIdProvider(scenarioId!));
     final scenario = match?.$2;
     final remaining = ref.watch(dashboardProvider).value?.remainingFreeSeconds;
-    final canStart = tutor.voiceAvailable && ref.watch(appConfigProvider).voicePrototypeEnabled;
+    // Tutor/scenario compatibility is decided by the backend (compatibleTutorIds).
+    final tutorSuited = scenario == null || scenario.compatibleTutorIds.contains(tutor.id);
+    // Phase 2 has no entitlements: everyone is on the free plan.
+    final premiumLocked = scenario?.premium ?? false;
+    final canStart = tutor.voiceAvailable &&
+        tutorSuited &&
+        !premiumLocked &&
+        ref.watch(appConfigProvider).voicePrototypeEnabled;
+    final blockedReason = !tutorSuited
+        ? l10n.prepareTutorNotSuited(tutor.name)
+        : premiumLocked
+            ? l10n.preparePremiumNote
+            : l10n.prepareVoiceComingSoon(tutor.name);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.prepareTitle)),
@@ -118,7 +130,7 @@ class PrepareScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   if (!canStart) ...[
-                    Text(l10n.prepareVoiceComingSoon(tutor.name), textAlign: TextAlign.center, style: text.bodyMedium),
+                    Text(blockedReason, textAlign: TextAlign.center, style: text.bodyMedium),
                     Gap.md,
                   ],
                   AppButton(

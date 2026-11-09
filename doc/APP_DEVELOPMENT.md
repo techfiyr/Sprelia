@@ -4,7 +4,13 @@
 **Date:** November 2026  
 **Product:** SpeakDaily — AI English Speaking & Communication Coach  
 **Platforms:** Android first, iOS-ready  
-**Development approach:** Flutter + Firebase + Node.js + Gemini API
+**Development approach:** Flutter + Firebase + Node.js + Gemini API  
+**Completeness:** complete (§1–§19, verified 2026-11-09; no truncated sections)  
+**Review status:** §1 to the start of §9 are the owner's original text. §9 (continued) to §19
+were drafted by engineering on 2026-11-09 and are **pending owner review**.  
+**Name note:** the product's provisional name is now **Sprelia** (owner decision,
+`doc/roadmap/phase_2.md` §B; BRAND.md §1, §13). "SpeakDaily" in this document refers to the
+same product. The app ID is `com.techfiyr.sprelia`.
 
 ---
 
@@ -31,7 +37,7 @@ These decisions are already approved and must not be changed without explicit au
 
 | Area | Decision |
 |---|---|
-| Product name | SpeakDaily |
+| Product name | SpeakDaily, now provisionally **Sprelia** (owner decision, roadmap phase 2 §B; pending clearance) |
 | Target market | Global |
 | Initial audience | Adults, 18+ |
 | Mobile framework | Flutter |
@@ -500,9 +506,12 @@ Re-verify against the official documentation before implementation and record th
 
 | Environment | Firebase project | Backend | Flutter config |
 |---|---|---|---|
-| Local | Emulator Suite (`demo-sprelia`) | `npm run dev` | `env/development.json` |
-| Development / staging | `sprelia` (role to be confirmed) or a dedicated project | Cloud Run (staging) | `env/staging.json` |
-| Production | Dedicated project (**Open decision**) | Cloud Run (production) | `env/production.json` |
+| Local and automated tests | Emulator Suite (`demo-sprelia`) | `npm run dev` | `env/development.json` |
+| Development | Separate project (to be created; proposed `sprelia-dev`) | Cloud Run (dev) | `env/development-firebase.local.json` |
+| Production | **`sprelia`** (756773147926), approved by the owner on 2026-11-09 | Cloud Run (production) | `env/production.json` |
+
+Production credentials are never used locally or in automated tests; the config refuses the
+production project outside `APP_ENV=production` (`doc/FIREBASE_SETUP.md`).
 
 - Backend configuration is validated at startup. Secrets come from Secret Manager.
 - Flutter configuration is compiled in, so it never contains secrets.
@@ -579,13 +588,13 @@ The application must remain buildable after every phase.
 | Decision | Owner |
 |---|---|
 | Final product name (trademark, domain and store clearance) | Product owner |
-| Role of Firebase project `sprelia` (development or production); creation of other environments | Product owner |
+| ~~Role of Firebase project `sprelia`~~: **decided** 2026-11-09, production. Creating the development project remains open. | Product owner |
 | Premium daily allowance | Product owner |
 | Transcript retention period | Product owner / legal |
 | Guest mode (recommended: none for the MVP) | Product owner |
 | Rewarded ads granting minutes | Product owner |
 | Age confirmation approach for 18+ | Product owner / legal |
-| Interface languages at launch | Product owner |
+| Interface languages at launch (content: American English decided 2026-11-09) | Product owner |
 | Cloud Run and Firestore region | Engineering + owner |
 
 **End of app development specification.**

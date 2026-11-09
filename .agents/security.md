@@ -17,6 +17,16 @@ task, stop and ask; do not work around it.
 - Agents must never invent or fill in credentials. If one is needed, document the
   requirement and ask.
 
+## 1a. Environment separation (owner decision 2026-11-09)
+- Firebase project `sprelia` is **production**. Development uses a separate project (to be
+  created) or the Emulator Suite. Automated tests always use the emulators (`demo-sprelia`).
+- Never use production credentials locally. Never run tests against production data.
+  Keep development and production env vars, app configs (Android/iOS) and CI secrets separate.
+- Code guards: the backend `loadConfig` and the Flutter `AppConfig` refuse the production
+  project outside production, and refuse any other project in production.
+- Verify the project ID before every deployment. Never deploy rules or config to production
+  without explicit approval.
+
 ## 2. Authentication and authorization (backend)
 - Every protected route uses `authenticate(verifier)`. The caller's uid comes **only**
   from the verified token (`request.user`). Ignore uids in bodies, queries or headers.
@@ -58,6 +68,11 @@ task, stop and ask; do not work around it.
 - Onboarding completion is validated on the merged, stored preferences inside the transaction.
 - Dashboard values come only from server-written documents. Client query or header values are ignored.
 - The catalogue exposes display fields only: no prompts, voice names or opening instructions.
+- Catalogue integrity: the API refuses to start if a suggested tutor does not support the
+  scenario's category or level range. Production serves only human-reviewed scenarios
+  (`CATALOG_INCLUDE_DRAFTS` cannot be true in production).
+- Premium scenarios are never recommended without a server-verified entitlement (none exist
+  until Phase 9). Session creation (Phase 6) must re-check premium and tutor compatibility on the server.
 
 ## 5. Input validation and API hygiene
 - Validate every request with Zod through `validate({ body, query, params })`. Use

@@ -2,10 +2,10 @@ import { z } from 'zod';
 
 /** Learning goals (APP_FLOW §5, screen 3). */
 export const LEARNING_GOALS = ['everyday', 'career', 'business', 'travel_social', 'academic', 'confidence'] as const;
-/** Self-reported level (APP_FLOW §5, screen 4). Not a formal CEFR assessment. */
-export const ENGLISH_LEVELS = ['A1', 'A2', 'B1', 'B2', 'not_sure'] as const;
-/** Motivational daily target in minutes (APP_FLOW §5, screen 5). Not the free allowance. */
-export const DAILY_GOAL_MINUTES = [5, 10, 15, 20] as const;
+/** Self-reported level (APP_FLOW §5, screen 4; C1 added by owner decision 2026-11-09). Not a formal CEFR assessment. */
+export const ENGLISH_LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'not_sure'] as const;
+/** Motivational daily target in minutes (owner decision 2026-11-09: 5, 10, 15). Not the free allowance. */
+export const DAILY_GOAL_MINUTES = [5, 10, 15] as const;
 /** Accent preference (APP_FLOW §5, screen 6). Preferences, not correctness. */
 export const ACCENTS = ['american', 'british', 'australian', 'international'] as const;
 /** Interface languages the app currently ships. Extend together with the app's ARB files. */
@@ -56,7 +56,7 @@ export const LearningPreferences = z
       .max(LEARNING_GOALS.length)
       .refine((g) => new Set(g).size === g.length, 'must not contain duplicates'),
     level: z.enum(ENGLISH_LEVELS),
-    dailyGoalMinutes: z.union([z.literal(5), z.literal(10), z.literal(15), z.literal(20)]),
+    dailyGoalMinutes: z.union([z.literal(5), z.literal(10), z.literal(15)]),
     accent: z.enum(ACCENTS),
   })
   .strict();

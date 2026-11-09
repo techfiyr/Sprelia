@@ -149,6 +149,8 @@ Options:
 - B2 — Upper intermediate.
 - Not sure.
 
+> **Owner decision (2026-11-09):** C1 — Advanced is also offered (A1, A2, B1, B2, C1, Not sure).
+
 Optional placement assessment can be offered later.
 
 Do not claim a formal CEFR assessment from an unvalidated short conversation.
@@ -160,6 +162,9 @@ Options:
 - 10 minutes.
 - 15 minutes.
 - 20 minutes.
+
+> **Owner decision (2026-11-09):** the options are 5, 10 and 15 minutes. 20 minutes was removed.
+> Scenario duration estimates use the same 5, 10 and 15 minute values.
 
 This is the learner's motivational goal, not the free usage allowance.
 
@@ -306,6 +311,11 @@ Categories:
 - Networking.
 - Small talk.
 - Social events.
+
+> **Owner decisions (2026-11-09):** A1 scenarios added to Professional and Academic; B2 Travel
+> expanded; about five Premium scenarios; suggested tutors must be compatible (category and level,
+> enforced by the backend); scenarios need human review before publishing; American English for
+> the initial release. See `doc/reviews/SCENARIO_REVIEW.md` §5.
 
 Each scenario should include:
 - Title.

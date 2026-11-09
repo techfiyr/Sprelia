@@ -30,6 +30,7 @@ extension PreferenceLabels on BuildContext {
         EnglishLevel.a2 => '${l10n.levelA2} (A2)',
         EnglishLevel.b1 => '${l10n.levelB1} (B1)',
         EnglishLevel.b2 => '${l10n.levelB2} (B2)',
+        EnglishLevel.c1 => '${l10n.levelC1} (C1)',
         EnglishLevel.notSure => l10n.levelNotSure,
       };
 
@@ -38,6 +39,7 @@ extension PreferenceLabels on BuildContext {
         EnglishLevel.a2 => l10n.levelA2Description,
         EnglishLevel.b1 => l10n.levelB1Description,
         EnglishLevel.b2 => l10n.levelB2Description,
+        EnglishLevel.c1 => l10n.levelC1Description,
         EnglishLevel.notSure => l10n.levelNotSureDescription,
       };
 
@@ -51,8 +53,7 @@ extension PreferenceLabels on BuildContext {
   String dailyGoalHint(int minutes) => switch (minutes) {
         5 => l10n.dailyGoal5,
         10 => l10n.dailyGoal10,
-        15 => l10n.dailyGoal15,
-        _ => l10n.dailyGoal20,
+        _ => l10n.dailyGoal15,
       };
 
   String languageName(String? code) {

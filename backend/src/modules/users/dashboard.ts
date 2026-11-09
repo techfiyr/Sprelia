@@ -1,5 +1,6 @@
 import type { DailyActivity, UserProfile, UserRepository } from './user.repository.js';
 import { addDays, lastLocalDates } from './local-date.js';
+import type { CatalogService } from '../catalog/catalog.service.js';
 import { recommend, type Recommendation } from './recommendation.js';
 
 export const STREAK_LOOKBACK_DAYS = 60;
@@ -43,7 +44,7 @@ export function computeStreak(today: string, activity: Map<string, DailyActivity
 export async function buildDashboard(
   users: UserRepository,
   profile: UserProfile,
-  options: { now: Date; freeDailySeconds: number },
+  options: { now: Date; freeDailySeconds: number; catalog: CatalogService },
 ): Promise<Dashboard> {
   const dates = lastLocalDates(profile.timezone, options.now, STREAK_LOOKBACK_DAYS);
   const today = dates[0]!;
@@ -71,6 +72,11 @@ export async function buildDashboard(
       weeklySpeakingSeconds: week.reduce((n, d) => n + (activity.get(d)?.speakingSeconds ?? 0), 0),
       weeklySessions: week.reduce((n, d) => n + (activity.get(d)?.sessionsCompleted ?? 0), 0),
     },
-    recommendation: recommend(prefs),
+    // Free plan: premium scenarios are not recommended (Phase 2 has no entitlements).
+    recommendation: recommend(prefs, {
+      categories: options.catalog.publishedCategories(),
+      tutors: options.catalog.tutors,
+      seed: `${profile.uid}:${today}`,
+    }),
   };
 }

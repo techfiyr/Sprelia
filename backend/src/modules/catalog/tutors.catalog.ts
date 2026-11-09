@@ -31,7 +31,8 @@ export const TUTORS: readonly PublicTutor[] = [
     personality: ['Warm', 'Patient', 'Encouraging'],
     description: 'A patient coach who helps you feel relaxed and confident while you speak.',
     levels: { min: 'A1', max: 'B1' },
-    categoryIds: ['everyday', 'travel', 'social'],
+    // professional/academic added 2026-11-09: beginner (A1–A2) work and classroom scenarios.
+    categoryIds: ['everyday', 'travel', 'social', 'professional', 'academic'],
     tone: 'primary',
     voiceAvailable: true,
     voiceSampleAvailable: false,
@@ -41,9 +42,10 @@ export const TUTORS: readonly PublicTutor[] = [
     name: 'Alex',
     title: 'Professional Communication Coach',
     personality: ['Professional', 'Structured', 'Helpful'],
-    description: 'Practise interviews, meetings and presentations with clear, structured guidance.',
+    description: 'Practice interviews, meetings and presentations with clear, structured guidance.',
     levels: { min: 'A2', max: 'C1' },
-    categoryIds: ['professional', 'academic'],
+    // social added 2026-11-09 (owner decision): professional networking.
+    categoryIds: ['professional', 'academic', 'social'],
     tone: 'primaryDark',
     voiceAvailable: false,
     voiceSampleAvailable: false,

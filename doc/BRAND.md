@@ -3,7 +3,12 @@
 **Document:** `BRAND.md`  
 **Brand:** Sprelia  
 **Status:** Provisional — pending trademark, domain and app-store clearance  
-**Version:** 1.0  
+**Version:** 1.0 (+ engineering additions 2026-11-09)  
+**Completeness:** complete (§1–§14, verified 2026-11-09; no truncated sections)  
+**Review status:** §1 to §11 rule 7 are the owner's original text. The end of §11 and
+§12–§14 (accessibility tokens, rebranding requirements, asset status) were drafted by
+engineering and are **pending owner review**. §4's palette table records the contrast fix requested
+in roadmap phase 2 §A (text secondary #77758B → #6A687C).  
 **Purpose:** Source of truth for AI coding agents, designers and developers.
 
 ---

@@ -47,7 +47,23 @@ describe('FIREBASE_PROJECT_ID', () => {
     expect(() => loadConfig({ FIREBASE_PROJECT_ID: '756773147926' })).toThrowError(/project number/);
   });
   it('accepts real and demo project IDs', () => {
-    expect(loadConfig({ FIREBASE_PROJECT_ID: 'sprelia' }).firebaseProjectId).toBe('sprelia');
+    expect(loadConfig({ FIREBASE_PROJECT_ID: 'sprelia-dev' }).firebaseProjectId).toBe('sprelia-dev');
     expect(loadConfig({ FIREBASE_PROJECT_ID: 'demo-sprelia' }).firebaseProjectId).toBe('demo-sprelia');
+  });
+});
+
+describe('production Firebase project guard (owner decision 2026-11-09)', () => {
+  const prod = { APP_ENV: 'production', TRUST_PROXY_HOPS: '1' };
+  it('production must use the sprelia project', () => {
+    expect(loadConfig({ ...prod, FIREBASE_PROJECT_ID: 'sprelia' }).firebaseProjectId).toBe('sprelia');
+    expect(() => loadConfig({ ...prod, FIREBASE_PROJECT_ID: 'sprelia-dev' })).toThrowError(/production project/);
+  });
+  it.each(['development', 'test', 'staging'])('%s must not use the production project', (env) => {
+    expect(() => loadConfig({ APP_ENV: env, FIREBASE_PROJECT_ID: 'sprelia' })).toThrowError(/production project/);
+  });
+  it('drafts are never published in production', () => {
+    expect(loadConfig({ ...prod, FIREBASE_PROJECT_ID: 'sprelia' }).catalogIncludeDrafts).toBe(false);
+    expect(() => loadConfig({ ...prod, FIREBASE_PROJECT_ID: 'sprelia', CATALOG_INCLUDE_DRAFTS: 'true' })).toThrowError(/unreviewed/);
+    expect(loadConfig({ FIREBASE_PROJECT_ID: 'demo-sprelia' }).catalogIncludeDrafts).toBe(true);
   });
 });

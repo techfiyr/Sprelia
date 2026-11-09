@@ -20,7 +20,11 @@ class TutorsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tutors = ref.watch(tutorsProvider);
+    // For a scenario, offer only the tutors the backend marks as compatible.
+    final scenario = scenarioId == null ? null : ref.watch(scenarioByIdProvider(scenarioId!))?.$2;
+    final tutors = ref.watch(tutorsProvider).whenData(
+          (all) => scenario == null ? all : all.where((t) => scenario.compatibleTutorIds.contains(t.id)).toList(),
+        );
     return Scaffold(
       appBar: AppBar(title: Text(context.l10n.tutorsTitle)),
       body: switch (tutors) {

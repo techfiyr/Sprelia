@@ -31,7 +31,7 @@ class CategoryScreen extends ConsumerWidget {
         AsyncData() when category == null => AppEmptyState(
             icon: Icons.explore_off_outlined,
             title: "This category isn't available",
-            message: 'Choose another category to practise.',
+            message: l10n.practiceChooseAnotherCategory,
             actionLabel: l10n.practiceTitle,
             onAction: () => context.go(AppRoutes.practice),
           ),
@@ -57,6 +57,7 @@ class CategoryScreen extends ConsumerWidget {
                       children: [
                         _Tag(l10n.practiceLevels(s.levels)),
                         _Tag(l10n.practiceAboutMinutes(s.estimatedMinutes)),
+                        if (s.premium) _Tag(l10n.practicePremium, icon: Icons.workspace_premium_outlined),
                       ],
                     ),
                   ],
@@ -71,13 +72,20 @@ class CategoryScreen extends ConsumerWidget {
 }
 
 class _Tag extends StatelessWidget {
-  const _Tag(this.label);
+  const _Tag(this.label, {this.icon});
   final String label;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
         decoration: BoxDecoration(color: context.palette.primaryLight, borderRadius: AppRadius.smallAll),
-        child: Text(label, style: context.textStyles.labelMedium?.copyWith(color: context.palette.primaryDark)),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[Icon(icon, size: 14, color: context.palette.primaryDark), const SizedBox(width: 4)],
+            Text(label, style: context.textStyles.labelMedium?.copyWith(color: context.palette.primaryDark)),
+          ],
+        ),
       );
 }

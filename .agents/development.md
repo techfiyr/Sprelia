@@ -121,7 +121,7 @@ firebase emulators:start --project demo-sprelia    # Auth :9099, Firestore :8180
 | Phase | Status |
 |---|---|
 | 1. Foundation (architecture, design system, routing, env config, error handling, Fastify API with auth middleware, Firebase scaffolding, guardrails) | **Done** (branch `phase-1-foundation`) |
-| 2. Experience: docs completed, contrast fixes, Inter, l10n, email auth, onboarding with persistence, home dashboard, tutors, practice categories, preparation; profile, onboarding, dashboard and catalogue APIs | **Done**, awaiting approval (branch `phase-2-experience`) |
+| 2. Experience: docs completed, contrast fixes, Inter, l10n, email auth, onboarding with persistence, home dashboard, tutors, practice categories, preparation; profile, onboarding, dashboard and catalogue APIs | **Done and closed out**, awaiting approval (`phase-2-experience` → `asset-library` → `phase-2-closeout`; record in `doc/roadmap/phase_2.md`) |
 | 3. Backend foundation: remaining modules, `AIProvider`, Dockerfile | Not started |
 | 4. Firebase projects, Auth, App Check, Firestore rules + emulator tests, Crashlytics/Analytics | Not started (needs approval to create projects) |
 | 5–10. Onboarding/profile, Gemini realtime, quotas, feedback, monetization, release | Not started |
