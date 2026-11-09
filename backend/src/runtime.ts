@@ -9,6 +9,8 @@ import { FirestoreConversationRepository } from './modules/conversations/firesto
 import { createAIProvider } from './modules/conversations/gemini-provider.js';
 import { createAnalyzer } from './modules/feedback/analysis.js';
 import { FirestoreFeedbackRepository } from './modules/feedback/firestore-feedback.repository.js';
+import { FirestoreSubscriptionRepository } from './modules/subscriptions/firestore-subscription.repository.js';
+import { HttpRevenueCatClient } from './modules/subscriptions/revenuecat.js';
 import { FirestoreUserRepository } from './modules/users/firestore-user.repository.js';
 
 /**
@@ -29,6 +31,8 @@ export async function createRuntimeApp(config: AppConfig, logger: FastifyBaseLog
     ai: createAIProvider(config),
     feedback: new FirestoreFeedbackRepository(db),
     analyzer: createAnalyzer(config),
+    subscriptions: new FirestoreSubscriptionRepository(db),
+    revenueCat: config.revenueCatSecretApiKey ? new HttpRevenueCatClient(config.revenueCatSecretApiKey) : undefined,
     identity: new FirebaseIdentityAdmin(auth),
     appCheck: config.appCheckMode === 'off' ? undefined : new FirebaseAppCheckVerifier(firebaseAppCheck(firebase)),
   });

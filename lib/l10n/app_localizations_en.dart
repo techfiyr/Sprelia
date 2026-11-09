@@ -699,4 +699,61 @@ class AppLocalizationsEn extends AppLocalizations {
   String progressSessionMinutes(int minutes) {
     return '${minutes} min';
   }
+
+  @override
+  String get premiumTitle => 'Sprelia Premium';
+
+  @override
+  String get premiumHeadline => 'Practice more, learn faster.';
+
+  @override
+  String get premiumActive => 'You have Premium. Thank you!';
+
+  @override
+  String get premiumBenefitTime => 'More speaking time every day';
+
+  @override
+  String get premiumBenefitScenarios => 'Advanced and professional scenarios';
+
+  @override
+  String get premiumBenefitFeedback => 'Detailed feedback after every session';
+
+  @override
+  String get premiumBenefitHistory => 'Your full learning history';
+
+  @override
+  String get premiumBenefitNoAds => 'No ads';
+
+  @override
+  String get premiumMonthly => 'Monthly: \$5.99';
+
+  @override
+  String get premiumAnnual => 'Annual: \$39.99';
+
+  @override
+  String get premiumPricesNotFinal => 'Test prices, not final. Your app store shows the actual price before you pay.';
+
+  @override
+  String get premiumUnavailable => 'Premium purchases are not available yet.';
+
+  @override
+  String get premiumSubscribe => 'Subscribe';
+
+  @override
+  String get premiumRestore => 'Restore purchases';
+
+  @override
+  String get premiumManageNote => 'Subscriptions renew automatically and are managed and canceled in your app store account.';
+
+  @override
+  String get premiumSee => 'See Premium';
+
+  @override
+  String get profileSubscription => 'Subscription';
+
+  @override
+  String get profilePlanFree => 'Free';
+
+  @override
+  String get profilePlanPremium => 'Premium';
 }

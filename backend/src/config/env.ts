@@ -150,6 +150,18 @@ const EnvSchema = z
     /** A session is not started with less allowance than this. */
     MIN_SESSION_SECONDS: z.coerce.number().int().min(10).max(120).default(30),
 
+    /**
+     * Premium daily AI speaking allowance. PLACEHOLDER pending the owner decision
+     * (APP_DEVELOPMENT §10/§19: "Premium daily allowance"); only used for entitled users.
+     */
+    PREMIUM_DAILY_SECONDS: z.coerce.number().int().min(60).max(24 * 3600).default(1800),
+    /** SECRET. The value RevenueCat sends in the webhook authorization header (dashboard setting). */
+    REVENUECAT_WEBHOOK_AUTH: z.string().min(24).optional(),
+    /** SECRET. RevenueCat secret API key for `GET /v1/subscribers/{app_user_id}` (server only). */
+    REVENUECAT_SECRET_API_KEY: z.string().min(10).optional(),
+    /** Entitlement identifier configured in RevenueCat for Premium. */
+    REVENUECAT_ENTITLEMENT_ID: z.string().regex(/^[A-Za-z0-9_.-]{1,64}$/).default('premium'),
+
     /** Sensitive operations (account deletion) need a sign-in at most this many seconds ago. */
     RECENT_AUTH_MAX_AGE_SECONDS: z.coerce.number().int().min(60).max(3600).default(300),
   })
@@ -244,6 +256,11 @@ export interface AppConfig {
   recentAuthMaxAgeSeconds: number;
   /** Backend-only secret; absent = voice and analysis unavailable. */
   geminiApiKey?: string;
+  premiumDailySeconds: number;
+  /** Secrets (non-enumerable); both set = RevenueCat webhook enabled. */
+  revenueCatWebhookAuth?: string;
+  revenueCatSecretApiKey?: string;
+  revenueCatEntitlementId: string;
   geminiLiveModel: string;
   geminiAnalysisModel: string;
   maxSessionSeconds: number;
@@ -287,12 +304,18 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     geminiLiveModel: e.GEMINI_LIVE_MODEL,
     geminiAnalysisModel: e.GEMINI_ANALYSIS_MODEL,
     maxSessionSeconds: e.MAX_SESSION_SECONDS,
+    premiumDailySeconds: e.PREMIUM_DAILY_SECONDS,
+    revenueCatEntitlementId: e.REVENUECAT_ENTITLEMENT_ID,
     minSessionSeconds: e.MIN_SESSION_SECONDS,
     firebaseServiceAccount: serviceAccount(e.FIREBASE_SERVICE_ACCOUNT_JSON, e.FIREBASE_PROJECT_ID),
   };
   // Secret: non-enumerable, so serializing or logging the config never includes it.
-  if (e.GEMINI_API_KEY !== undefined) {
-    Object.defineProperty(config, 'geminiApiKey', { value: e.GEMINI_API_KEY, enumerable: false, writable: false });
+  for (const [key, value] of [
+    ['geminiApiKey', e.GEMINI_API_KEY],
+    ['revenueCatWebhookAuth', e.REVENUECAT_WEBHOOK_AUTH],
+    ['revenueCatSecretApiKey', e.REVENUECAT_SECRET_API_KEY],
+  ] as const) {
+    if (value !== undefined) Object.defineProperty(config, key, { value, enumerable: false, writable: false });
   }
   return config;
 }

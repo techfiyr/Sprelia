@@ -13,6 +13,7 @@ import '../../features/practice/category_screen.dart';
 import '../../features/practice/conversation_screen.dart';
 import '../../features/practice/practice_screen.dart';
 import '../../features/practice/prepare_screen.dart';
+import '../../features/premium/paywall_screen.dart';
 import '../../features/profile/preference_editor_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/progress/progress_screen.dart';
@@ -105,6 +106,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ]),
         ],
       ),
+      GoRoute(path: AppRoutes.premium, builder: (_, _) => const PaywallScreen()),
       GoRoute(
         path: AppRoutes.tutors,
         builder: (_, s) => TutorsScreen(scenarioId: s.uri.queryParameters['scenario']),

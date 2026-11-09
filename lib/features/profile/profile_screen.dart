@@ -13,6 +13,7 @@ import '../../l10n/l10n.dart';
 import '../account/delete_account_flow.dart';
 import '../onboarding/onboarding_labels.dart';
 import '../practice/data/catalog_repository.dart';
+import '../premium/premium_services.dart';
 import 'data/learning_preferences.dart';
 import 'data/profile_repository.dart';
 import 'preference_editor_screen.dart';
@@ -122,6 +123,12 @@ class ProfileScreen extends ConsumerWidget {
             padding: EdgeInsets.zero,
             child: Column(
               children: [
+                _Row(
+                  key: const ValueKey('profile-subscription'),
+                  label: l10n.profileSubscription,
+                  value: (ref.watch(subscriptionProvider).value?.isPremium ?? false) ? l10n.profilePlanPremium : l10n.profilePlanFree,
+                  onTap: () => context.push(AppRoutes.premium),
+                ),
                 _Row(
                   key: const ValueKey('profile-display-name'),
                   label: l10n.profileDisplayName,

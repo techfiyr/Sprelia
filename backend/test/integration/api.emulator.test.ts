@@ -11,6 +11,11 @@ import type { AIProvider } from '../../src/modules/conversations/ai-provider.js'
 import { FirestoreConversationRepository } from '../../src/modules/conversations/firestore-conversation.repository.js';
 import { sanitizeFeedback, type ConversationAnalyzer } from '../../src/modules/feedback/analysis.js';
 import { FirestoreFeedbackRepository } from '../../src/modules/feedback/firestore-feedback.repository.js';
+import { FirestoreSubscriptionRepository } from '../../src/modules/subscriptions/firestore-subscription.repository.js';
+import type { RevenueCatClient } from '../../src/modules/subscriptions/revenuecat.js';
+
+const RC_AUTH = 'emulator-revenuecat-webhook-auth-0123456789';
+const rcEntitled = new Set<string>();
 import { FirebaseTokenVerifier } from '../../src/modules/auth/firebase-token-verifier.js';
 import { FirestoreUserRepository } from '../../src/modules/users/firestore-user.repository.js';
 import { assertEmulatorOnly, EMULATOR_PROJECT_ID } from './emulator-guard.js';
@@ -105,6 +110,8 @@ describe('API on the Firebase Emulator Suite', () => {
       FIREBASE_AUTH_EMULATOR_HOST: AUTH_HOST,
       FIRESTORE_EMULATOR_HOST: FIRESTORE_HOST,
       LOG_LEVEL: 'silent',
+      REVENUECAT_WEBHOOK_AUTH: RC_AUTH,
+      REVENUECAT_SECRET_API_KEY: 'sk_emulator_not_real',
     });
     const deps = {
       config,
@@ -144,6 +151,14 @@ describe('API on the Firebase Emulator Suite', () => {
             req.transcript,
           ),
       } satisfies ConversationAnalyzer,
+      subscriptions: new FirestoreSubscriptionRepository(db),
+      // Fake RevenueCat REST: entitled users are listed in rcEntitled.
+      revenueCat: {
+        getEntitlement: async (id) =>
+          rcEntitled.has(id)
+            ? { active: true, expiresAt: new Date(Date.now() + 30 * 86_400_000), productId: 'sprelia_premium_monthly', store: 'PLAY_STORE' }
+            : { active: false, expiresAt: null, productId: null, store: null },
+      } satisfies RevenueCatClient,
     };
     app = await buildApp(deps);
     await app.ready();
@@ -434,6 +449,38 @@ describe('API on the Firebase Emulator Suite', () => {
       expect((await call('DELETE', '/api/v1/me', pia.idToken)).statusCode).toBe(204);
       expect((await db.collection(`users/${pia.localId}/mistakes`).get()).size).toBe(0);
       expect((await db.doc(`users/${pia.localId}/conversations/${conversationId}/private/transcript`).get()).exists).toBe(false);
+    });
+  });
+
+  describe('Phase 9 subscriptions (Firestore)', () => {
+    it('webhook → REST-verified entitlement stored server-side → Premium plan', async () => {
+      const quinn = await verifiedSignUp('quinn@example.com');
+      await call('POST', '/api/v1/me/profile', quinn.idToken, { timezone: 'UTC' });
+      expect((await call('GET', '/api/v1/me/subscription', quinn.idToken)).json().subscription.plan).toBe('free');
+
+      rcEntitled.add(quinn.localId);
+      const hook = await app.inject({
+        method: 'POST',
+        url: '/api/v1/webhooks/revenuecat',
+        headers: { authorization: RC_AUTH },
+        payload: { api_version: '1.0', event: { id: 'evt-q', type: 'INITIAL_PURCHASE', app_user_id: quinn.localId } },
+      });
+      expect(hook.json()).toEqual({ received: true, updated: 1 });
+      const doc = await db.doc(`users/${quinn.localId}/subscription/current`).get();
+      expect(doc.data()).toMatchObject({ active: true, entitlementId: 'premium', store: 'PLAY_STORE', lastEventId: 'evt-q' });
+      expect((await call('GET', '/api/v1/me/subscription', quinn.idToken)).json().subscription).toMatchObject({ plan: 'premium', dailyAllowanceSeconds: 1800 });
+
+      // A user without a profile is never written (no orphan subscription documents).
+      const ghost = 'GhostUid0000000000000000000a';
+      rcEntitled.add(ghost);
+      const none = await app.inject({
+        method: 'POST',
+        url: '/api/v1/webhooks/revenuecat',
+        headers: { authorization: RC_AUTH },
+        payload: { event: { id: 'evt-g', type: 'RENEWAL', app_user_id: ghost } },
+      });
+      expect(none.json().updated).toBe(0);
+      expect((await db.doc(`users/${ghost}/subscription/current`).get()).exists).toBe(false);
     });
   });
 });

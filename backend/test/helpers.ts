@@ -10,6 +10,8 @@ import type { AIProvider } from '../src/modules/conversations/ai-provider.js';
 import type { ConversationRepository } from '../src/modules/conversations/conversation.repository.js';
 import type { ConversationAnalyzer } from '../src/modules/feedback/analysis.js';
 import type { FeedbackRepository } from '../src/modules/feedback/feedback.repository.js';
+import type { RevenueCatClient } from '../src/modules/subscriptions/revenuecat.js';
+import type { SubscriptionRepository } from '../src/modules/subscriptions/subscription.repository.js';
 import type { AuthenticatedUser, TokenVerifier } from '../src/modules/auth/token-verifier.js';
 import { InMemoryUserRepository } from '../src/modules/users/memory-user.repository.js';
 import type { UserRepository } from '../src/modules/users/user.repository.js';
@@ -78,6 +80,8 @@ export async function makeApp(
     isPremium?: (uid: string) => Promise<boolean>;
     feedback?: FeedbackRepository;
     analyzer?: ConversationAnalyzer;
+    subscriptions?: SubscriptionRepository;
+    revenueCat?: RevenueCatClient;
   } = {},
 ) {
   const config = opts.config ?? testConfig();
@@ -97,6 +101,8 @@ export async function makeApp(
     isPremium: opts.isPremium,
     feedback: opts.feedback,
     analyzer: opts.analyzer,
+    subscriptions: opts.subscriptions,
+    revenueCat: opts.revenueCat,
   });
   opts.register?.(app);
   await app.ready();

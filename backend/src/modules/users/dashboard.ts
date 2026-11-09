@@ -8,7 +8,7 @@ export const STREAK_LOOKBACK_DAYS = 60;
 export interface Dashboard {
   displayName: string | null;
   /** Phase 2: always "free". Entitlements arrive with RevenueCat (Phase 9); never client-supplied. */
-  plan: 'free';
+  plan: 'free' | 'premium';
   dailyGoalMinutes: number | null;
   today: {
     date: string;
@@ -44,7 +44,7 @@ export function computeStreak(today: string, activity: Map<string, DailyActivity
 export async function buildDashboard(
   users: UserRepository,
   profile: UserProfile,
-  options: { now: Date; freeDailySeconds: number; catalog: CatalogService },
+  options: { now: Date; freeDailySeconds: number; catalog: CatalogService; premium?: boolean; premiumDailySeconds?: number },
 ): Promise<Dashboard> {
   const dates = lastLocalDates(profile.timezone, options.now, STREAK_LOOKBACK_DAYS);
   const today = dates[0]!;
@@ -55,25 +55,28 @@ export async function buildDashboard(
   ]);
   const activity = new Map(activityList.map((a) => [a.date, a]));
   const week = dates.slice(0, 7);
+  const allowance = options.premium ? (options.premiumDailySeconds ?? options.freeDailySeconds) : options.freeDailySeconds;
 
   return {
     displayName: profile.displayName,
-    plan: 'free',
+    plan: options.premium ? 'premium' : 'free',
     dailyGoalMinutes: prefs?.dailyGoalMinutes ?? null,
     today: {
       date: today,
       timezone: profile.timezone,
       speakingSeconds: activity.get(today)?.speakingSeconds ?? 0,
-      freeAllowanceSeconds: options.freeDailySeconds,
-      remainingFreeSeconds: Math.max(0, options.freeDailySeconds - usageSeconds),
+      // Today's allowance for this user's plan (field names kept for API compatibility).
+      freeAllowanceSeconds: allowance,
+      remainingFreeSeconds: Math.max(0, allowance - usageSeconds),
     },
     progress: {
       streakDays: computeStreak(today, activity),
       weeklySpeakingSeconds: week.reduce((n, d) => n + (activity.get(d)?.speakingSeconds ?? 0), 0),
       weeklySessions: week.reduce((n, d) => n + (activity.get(d)?.sessionsCompleted ?? 0), 0),
     },
-    // Free plan: premium scenarios are not recommended (Phase 2 has no entitlements).
+    // Premium scenarios are recommended only with a server-verified entitlement.
     recommendation: recommend(prefs, {
+      includePremium: options.premium ?? false,
       categories: options.catalog.publishedCategories(),
       tutors: options.catalog.tutors,
       seed: `${profile.uid}:${today}`,

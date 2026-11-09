@@ -1263,6 +1263,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{minutes} min'**
   String progressSessionMinutes(int minutes);
+
+  /// No description provided for @premiumTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sprelia Premium'**
+  String get premiumTitle;
+
+  /// No description provided for @premiumHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice more, learn faster.'**
+  String get premiumHeadline;
+
+  /// No description provided for @premiumActive.
+  ///
+  /// In en, this message translates to:
+  /// **'You have Premium. Thank you!'**
+  String get premiumActive;
+
+  /// No description provided for @premiumBenefitTime.
+  ///
+  /// In en, this message translates to:
+  /// **'More speaking time every day'**
+  String get premiumBenefitTime;
+
+  /// No description provided for @premiumBenefitScenarios.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced and professional scenarios'**
+  String get premiumBenefitScenarios;
+
+  /// No description provided for @premiumBenefitFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed feedback after every session'**
+  String get premiumBenefitFeedback;
+
+  /// No description provided for @premiumBenefitHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Your full learning history'**
+  String get premiumBenefitHistory;
+
+  /// No description provided for @premiumBenefitNoAds.
+  ///
+  /// In en, this message translates to:
+  /// **'No ads'**
+  String get premiumBenefitNoAds;
+
+  /// No description provided for @premiumMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly: $5.99'**
+  String get premiumMonthly;
+
+  /// No description provided for @premiumAnnual.
+  ///
+  /// In en, this message translates to:
+  /// **'Annual: $39.99'**
+  String get premiumAnnual;
+
+  /// No description provided for @premiumPricesNotFinal.
+  ///
+  /// In en, this message translates to:
+  /// **'Test prices, not final. Your app store shows the actual price before you pay.'**
+  String get premiumPricesNotFinal;
+
+  /// No description provided for @premiumUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium purchases are not available yet.'**
+  String get premiumUnavailable;
+
+  /// No description provided for @premiumSubscribe.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe'**
+  String get premiumSubscribe;
+
+  /// No description provided for @premiumRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchases'**
+  String get premiumRestore;
+
+  /// No description provided for @premiumManageNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscriptions renew automatically and are managed and canceled in your app store account.'**
+  String get premiumManageNote;
+
+  /// No description provided for @premiumSee.
+  ///
+  /// In en, this message translates to:
+  /// **'See Premium'**
+  String get premiumSee;
+
+  /// No description provided for @profileSubscription.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscription'**
+  String get profileSubscription;
+
+  /// No description provided for @profilePlanFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get profilePlanFree;
+
+  /// No description provided for @profilePlanPremium.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get profilePlanPremium;
 }
 
 class _AppLocalizationsDelegate

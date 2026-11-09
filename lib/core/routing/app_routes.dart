@@ -20,6 +20,7 @@ abstract final class AppRoutes {
 
   // Full-screen flows above the tab shell.
   static const tutors = '/tutors';
+  static const premium = '/premium';
   static const preparePattern = '/prepare/:tutorId';
   static const conversationPattern = '/conversation/:tutorId';
   static const feedbackPattern = '/feedback/:conversationId';

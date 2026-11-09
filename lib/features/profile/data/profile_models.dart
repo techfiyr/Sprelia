@@ -77,9 +77,13 @@ class Dashboard {
     required this.weeklySpeakingSeconds,
     required this.weeklySessions,
     required this.recommendation,
+    this.isPremium = false,
   });
 
   final String? displayName;
+
+  /// Server-verified plan (the app never decides entitlement).
+  final bool isPremium;
   final int? dailyGoalMinutes;
   final int todaySpeakingSeconds;
   final int freeAllowanceSeconds;
@@ -102,6 +106,7 @@ class Dashboard {
       weeklySpeakingSeconds: progress['weeklySpeakingSeconds']! as int,
       weeklySessions: progress['weeklySessions']! as int,
       recommendation: LearningPlan.fromJson((j['recommendation']! as Map).cast<String, Object?>()),
+      isPremium: j['plan'] == 'premium',
     );
   }
 }

@@ -398,5 +398,24 @@
         "type": "int"
       }
     }
-  }
+  },
+  "premiumTitle": "Sprelia Premium",
+  "premiumHeadline": "Practice more, learn faster.",
+  "premiumActive": "You have Premium. Thank you!",
+  "premiumBenefitTime": "More speaking time every day",
+  "premiumBenefitScenarios": "Advanced and professional scenarios",
+  "premiumBenefitFeedback": "Detailed feedback after every session",
+  "premiumBenefitHistory": "Your full learning history",
+  "premiumBenefitNoAds": "No ads",
+  "premiumMonthly": "Monthly: $5.99",
+  "premiumAnnual": "Annual: $39.99",
+  "premiumPricesNotFinal": "Test prices, not final. Your app store shows the actual price before you pay.",
+  "premiumUnavailable": "Premium purchases are not available yet.",
+  "premiumSubscribe": "Subscribe",
+  "premiumRestore": "Restore purchases",
+  "premiumManageNote": "Subscriptions renew automatically and are managed and canceled in your app store account.",
+  "premiumSee": "See Premium",
+  "profileSubscription": "Subscription",
+  "profilePlanFree": "Free",
+  "profilePlanPremium": "Premium"
 }

@@ -34,8 +34,9 @@ class PrepareScreen extends ConsumerWidget {
     final remaining = ref.watch(dashboardProvider).value?.remainingFreeSeconds;
     // Tutor/scenario compatibility is decided by the backend (compatibleTutorIds).
     final tutorSuited = scenario == null || scenario.compatibleTutorIds.contains(tutor.id);
-    // Phase 2 has no entitlements: everyone is on the free plan.
-    final premiumLocked = scenario?.premium ?? false;
+    // Premium scenarios need the server-verified plan (from the dashboard).
+    final isPremium = ref.watch(dashboardProvider).value?.isPremium ?? false;
+    final premiumLocked = (scenario?.premium ?? false) && !isPremium;
     final noTimeLeft = remaining != null && remaining < minSessionSeconds;
     final canStart = tutor.voiceAvailable && tutorSuited && !premiumLocked && !noTimeLeft;
     final blockedReason = !tutorSuited
@@ -132,6 +133,15 @@ class PrepareScreen extends ConsumerWidget {
                 children: [
                   if (!canStart) ...[
                     Text(blockedReason, textAlign: TextAlign.center, style: text.bodyMedium),
+                    Gap.md,
+                  ],
+                  if (premiumLocked || noTimeLeft) ...[
+                    AppButton.secondary(
+                      key: const ValueKey('prepare-see-premium'),
+                      label: l10n.premiumSee,
+                      icon: Icons.workspace_premium_outlined,
+                      onPressed: () => context.push(AppRoutes.premium),
+                    ),
                     Gap.md,
                   ],
                   AppButton(

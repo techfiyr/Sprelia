@@ -30,6 +30,7 @@ export interface ConversationRoutesOptions {
   ai: AIProvider;
   now: () => Date;
   freeDailySeconds: number;
+  premiumDailySeconds: number;
   maxSessionSeconds: number;
   minSessionSeconds: number;
   requireEmailVerification: boolean;
@@ -123,7 +124,7 @@ export const conversationRoutes: FastifyPluginAsync<ConversationRoutesOptions> =
           tutorId: tutor.id,
           scenarioId,
           localDate: localDate(profile.timezone, now),
-          allowanceSeconds: opts.freeDailySeconds,
+          allowanceSeconds: premium ? opts.premiumDailySeconds : opts.freeDailySeconds,
           maxSessionSeconds: opts.maxSessionSeconds,
           minSessionSeconds: opts.minSessionSeconds,
           now,

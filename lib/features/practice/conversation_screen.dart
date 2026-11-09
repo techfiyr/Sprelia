@@ -5,11 +5,13 @@ import 'package:go_router/go_router.dart';
 import '../../core/routing/app_routes.dart';
 import '../../core/services/realtime/realtime_provider.dart';
 import '../../core/theme/app_theme.dart';
+import '../../l10n/l10n.dart';
 import '../tutors/tutor.dart';
 import '../tutors/tutor_avatar.dart';
 import 'conversation_controller.dart';
 import 'conversation_state.dart';
 import 'data/catalog_repository.dart';
+import 'data/conversation_repository.dart';
 
 class ConversationScreen extends ConsumerStatefulWidget {
   const ConversationScreen({super.key, required this.tutorId, this.scenarioId});
@@ -124,7 +126,15 @@ class _ConversationScreenState extends ConsumerState<ConversationScreen> {
               const SizedBox(height: 12),
               Text(state.error ?? 'Something went wrong.', textAlign: TextAlign.center),
               const SizedBox(height: 16),
-              OutlinedButton(onPressed: controller.start, child: const Text('Try again')),
+              if (state.startError == ConversationStartError.dailyLimitReached ||
+                  state.startError == ConversationStartError.premiumRequired)
+                FilledButton(
+                  key: const ValueKey('conversation-see-premium'),
+                  onPressed: () => context.pushReplacement(AppRoutes.premium),
+                  child: Text(context.l10n.premiumSee),
+                )
+              else
+                OutlinedButton(onPressed: () => controller.start(scenarioId: widget.scenarioId), child: const Text('Try again')),
             ],
           ),
         ),

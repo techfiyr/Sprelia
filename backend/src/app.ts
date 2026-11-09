@@ -14,6 +14,9 @@ import { conversationRoutes } from './modules/conversations/conversation.routes.
 import { UnavailableAnalyzer, type ConversationAnalyzer } from './modules/feedback/analysis.js';
 import type { FeedbackRepository } from './modules/feedback/feedback.repository.js';
 import { feedbackRoutes } from './modules/feedback/feedback.routes.js';
+import type { RevenueCatClient } from './modules/subscriptions/revenuecat.js';
+import { isEntitled, type SubscriptionRepository } from './modules/subscriptions/subscription.repository.js';
+import { revenueCatWebhookRoutes, subscriptionRoutes } from './modules/subscriptions/subscription.routes.js';
 import { catalogRoutes } from './modules/catalog/catalog.routes.js';
 import { CatalogService } from './modules/catalog/catalog.service.js';
 import { healthRoutes } from './modules/health/health.routes.js';
@@ -48,6 +51,10 @@ export interface AppDependencies {
   feedback?: FeedbackRepository;
   /** Post-session analysis; defaults to unavailable (feedback status `failed`). */
   analyzer?: ConversationAnalyzer;
+  /** Server-side entitlement store (Phase 9). Enables /me/subscription and Premium checks. */
+  subscriptions?: SubscriptionRepository;
+  /** RevenueCat REST client; with REVENUECAT_WEBHOOK_AUTH enables the webhook. */
+  revenueCat?: RevenueCatClient;
 }
 
 /**
@@ -65,9 +72,11 @@ export async function buildApp({
   appCheck,
   conversations,
   ai = new UnavailableAIProvider(),
-  isPremium = async () => false,
+  isPremium: isPremiumOverride,
   feedback,
   analyzer = new UnavailableAnalyzer(),
+  subscriptions,
+  revenueCat,
 }: AppDependencies): Promise<FastifyInstance> {
   const app = Fastify({
     loggerInstance: logger,
@@ -96,9 +105,23 @@ export async function buildApp({
     timeWindow: '1 minute',
   });
 
+  const isPremium =
+    isPremiumOverride ?? (subscriptions ? async (uid: string) => isEntitled(await subscriptions.get(uid), now()) : async () => false);
+
   await app.register(
     async (api) => {
       await api.register(healthRoutes);
+      // Server-to-server: authenticated by the RevenueCat authorization value, outside the
+      // Firebase-token and App Check scope. Registered only when fully configured.
+      if (subscriptions && revenueCat && config.revenueCatWebhookAuth) {
+        await api.register(revenueCatWebhookRoutes, {
+          webhookAuth: config.revenueCatWebhookAuth,
+          client: revenueCat,
+          subscriptions,
+          entitlementId: config.revenueCatEntitlementId,
+          now,
+        });
+      }
       // Everything except health is protected: App Check (per APP_CHECK_MODE) runs before
       // the per-route Firebase ID token verification.
       const checkApp = appCheckGuard(config.appCheckMode, appCheck);
@@ -112,7 +135,18 @@ export async function buildApp({
           now,
           catalog,
           requireEmailVerification: config.requireEmailVerification,
+          isPremium,
+          premiumDailySeconds: config.premiumDailySeconds,
         });
+        if (subscriptions) {
+          await secured.register(subscriptionRoutes, {
+            verifier,
+            subscriptions,
+            now,
+            freeDailySeconds: config.freeDailySeconds,
+            premiumDailySeconds: config.premiumDailySeconds,
+          });
+        }
         await secured.register(catalogRoutes, { verifier, catalog });
         if (conversations) {
           await secured.register(conversationRoutes, {
@@ -123,6 +157,7 @@ export async function buildApp({
             ai,
             now,
             freeDailySeconds: config.freeDailySeconds,
+            premiumDailySeconds: config.premiumDailySeconds,
             maxSessionSeconds: config.maxSessionSeconds,
             minSessionSeconds: config.minSessionSeconds,
             requireEmailVerification: config.requireEmailVerification,

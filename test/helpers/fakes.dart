@@ -7,6 +7,7 @@ import 'package:speakdaily/features/feedback/session_feedback.dart';
 import 'package:speakdaily/features/learn/data/learning_repository.dart';
 import 'package:speakdaily/features/practice/data/catalog_repository.dart';
 import 'package:speakdaily/features/practice/data/practice_models.dart';
+import 'package:speakdaily/features/premium/premium_services.dart';
 import 'package:speakdaily/features/profile/data/profile_models.dart';
 import 'package:speakdaily/features/profile/data/profile_repository.dart';
 import 'package:speakdaily/features/tutors/tutor.dart';
@@ -240,6 +241,9 @@ class FakeProfileRepository implements ProfileRepository {
 class FakeCatalogRepository implements CatalogRepository {
   Object? error;
 
+  /// Per-test override of the tutor list (defaults to [tutors]).
+  List<Tutor> tutorList = tutors;
+
   static const tutors = [
     Tutor(
       id: 'emma',
@@ -325,7 +329,7 @@ class FakeCatalogRepository implements CatalogRepository {
   @override
   Future<List<Tutor>> getTutors() async {
     if (error != null) throw error!;
-    return tutors;
+    return tutorList;
   }
 
   @override
@@ -406,4 +410,10 @@ class FakeLearningRepository implements LearningRepository {
 
   @override
   Future<Progress> getProgress() async => progress;
+}
+
+class FakeSubscriptionRepository implements SubscriptionRepository {
+  SubscriptionInfo info = const SubscriptionInfo(plan: Plan.free, dailyAllowanceSeconds: 600);
+  @override
+  Future<SubscriptionInfo> getSubscription() async => info;
 }

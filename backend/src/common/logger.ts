@@ -33,6 +33,11 @@ export const REDACT_PATHS = [
   'GEMINI_API_KEY',
   '*.GEMINI_API_KEY',
   'realtime.token',
+  'req.headers["x-revenuecat-webhook-signature"]',
+  'revenueCatWebhookAuth',
+  'revenueCatSecretApiKey',
+  'REVENUECAT_WEBHOOK_AUTH',
+  'REVENUECAT_SECRET_API_KEY',
   '*.realtime.token',
 ];
 

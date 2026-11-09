@@ -28,6 +28,9 @@ export interface ProfileRoutesOptions {
   freeDailySeconds: number;
   now: () => Date;
   catalog: CatalogService;
+  /** Server-verified Premium entitlement; defaults to free. */
+  isPremium?: (uid: string) => Promise<boolean>;
+  premiumDailySeconds?: number;
   /** Email/password accounts must verify their email first (config REQUIRE_EMAIL_VERIFICATION). */
   requireEmailVerification?: boolean;
 }
@@ -192,6 +195,8 @@ export const profileRoutes: FastifyPluginAsync<ProfileRoutesOptions> = async (ap
         now: opts.now(),
         freeDailySeconds: opts.freeDailySeconds,
         catalog: opts.catalog,
+        premium: opts.isPremium ? await opts.isPremium(uid) : false,
+        premiumDailySeconds: opts.premiumDailySeconds,
       }),
     };
   });
