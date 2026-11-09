@@ -75,6 +75,39 @@ describe('firestore.rules', () => {
     await assertFails(setDoc(doc(env.unauthenticatedContext().firestore(), 'users/mallory'), { uid: 'mallory' }));
   });
 
+  it('learning data from Phases 6–9 is server-only (owner cannot read or write it directly)', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      const db = ctx.firestore();
+      await setDoc(doc(db, 'users/alice/conversations/c1'), { status: 'ended', billedSeconds: 60 });
+      await setDoc(doc(db, 'users/alice/conversations/c1/private/transcript'), { lines: [] });
+      await setDoc(doc(db, 'users/alice/conversations/c1/feedback/analysis'), { status: 'completed' });
+      await setDoc(doc(db, 'users/alice/mistakes/m1'), { original: 'x' });
+      await setDoc(doc(db, 'users/alice/vocabulary/word'), { term: 'word' });
+      await setDoc(doc(db, 'users/alice/usageLedger/l1'), { seconds: 60 });
+    });
+    const owner = env.authenticatedContext('alice').firestore();
+    for (const path of [
+      'users/alice/conversations/c1',
+      'users/alice/conversations/c1/private/transcript',
+      'users/alice/conversations/c1/feedback/analysis',
+      'users/alice/mistakes/m1',
+      'users/alice/vocabulary/word',
+      'users/alice/usageLedger/l1',
+    ]) {
+      await assertFails(getDoc(doc(owner, path)));
+      await assertFails(setDoc(doc(owner, path), { hacked: true }));
+    }
+    // Clients cannot fake billing, feedback or a conversation.
+    await assertFails(setDoc(doc(owner, 'users/alice/conversations/c2'), { status: 'ended', billedSeconds: 0 }));
+    await assertFails(getDocs(collection(owner, 'users/alice/mistakes')));
+  });
+
+  it('the connectivity canary collection is not client-accessible', async () => {
+    const owner = env.authenticatedContext('alice').firestore();
+    await assertFails(setDoc(doc(owner, '__connectivity_canary/x'), { a: 1 }));
+    await assertFails(getDoc(doc(env.unauthenticatedContext().firestore(), '__connectivity_canary/x')));
+  });
+
   it('catalogue and app configuration are not client-writable', async () => {
     const db = env.authenticatedContext('alice').firestore();
     await assertFails(setDoc(doc(db, 'tutors/emma'), { name: 'Hacked' }));

@@ -31,9 +31,9 @@ silently choosing.
 
 ## Current status
 
-- **Phases 1 and 2 are complete and merged to `main`.** Phase 3 (Firebase integration and
-  account management) is code complete and verified locally (commit `1db48eb`, pushed), but
-  blocked on owner-only Firebase, signing and policy items; see `doc/roadmap/phase_3.md`.
+- **Phases 1–2 are complete.** Phases 3–9 (Firebase accounts, profile/settings, live voice with
+  server quotas, feedback/Mistake Vault/progress, Premium entitlements) are implemented and
+  verified locally. Release is blocked on owner items in `doc/RELEASE_CHECKLIST.md` (Phase 10).
 - **Work directly on `main`** (owner decision, 2026-11-09). Do not create feature or phase
   branches unless the owner asks. Commit and push only when asked; never force-push.
 - **Hosting: Netlify** (owner decision, 2026-11-09): free plan, default function region; API as a

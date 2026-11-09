@@ -74,6 +74,9 @@ The key is never committed, never placed in `netlify.toml`, and never uploaded b
    | `REQUIRE_EMAIL_VERIFICATION` | `true` |
    | `LOG_LEVEL` | `info` |
    | `FIREBASE_SERVICE_ACCOUNT_JSON` | the entire key file content, marked **Contains secret values**, scope **Functions**. Set it **before** the first deploy finishes |
+   | `GEMINI_API_KEY` | **secret**: Gemini key for voice grants and feedback (unset = voice/feedback unavailable, 503/`failed`) |
+   | `PREMIUM_DAILY_SECONDS` | Premium allowance once decided (placeholder 1800) |
+   | `REVENUECAT_WEBHOOK_AUTH`, `REVENUECAT_SECRET_API_KEY` | **secrets**, only once RevenueCat is set up (enables the webhook); point the RevenueCat webhook at `https://<site>/api/v1/webhooks/revenuecat` |
    | `NODE_VERSION` (Builds scope) | a Netlify-supported Node.js version ≥ 22 |
 
    Check Netlify's current limit on the total size of function environment variables: the key is

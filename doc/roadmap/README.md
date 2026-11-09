@@ -58,7 +58,7 @@ to avoid breaking existing references.
 | 7 | Sessions and daily quotas (server reservation, billing, ledger, reconciliation) | `[x]` Implemented and verified locally (emulator transactions) | `main` | `phase_6_7.md` |
 | 8 | AI feedback, Mistake Vault, vocabulary, Learn and Progress tabs | `[x]` Implemented and verified locally, incl. a live analysis check; transcript retention period still an owner decision | `main` | `phase_8.md` |
 | 9 | Premium: server entitlements, RevenueCat webhook, paywall, ad policy | `[/]` Server side and app UI done and verified locally; purchases and ads blocked on RevenueCat/AdMob accounts, store products, SDK setup and pricing/allowance decisions | `main` | `phase_9.md` |
-| 10 | Testing, security review, production readiness | `[ ]` Not started | none | none |
+| 10 | Testing, security review, production readiness | `[/]` Local checks complete; release blocked on owner items in `doc/RELEASE_CHECKLIST.md` | `main` | `../RELEASE_CHECKLIST.md` |
 
 ## Audit result (Phase 1 and 2 vs. repository, 2026-11-09)
 - **Verified completed:** every Phase 1 task, and every Phase 2 task except the one superseded by

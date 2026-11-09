@@ -3,10 +3,11 @@
 AI English-speaking coach (provisional brand; app ID `com.techfiyr.sprelia`, Dart package `speakdaily`).
 Flutter (Android first, iOS-ready) + Node.js/TypeScript (Fastify) backend + Firebase + Gemini.
 
-**Status:** Phases 1–2 complete. Phase 3 (Firebase integration and accounts: email/password
-with verification, Google sign-in, session restore, account deletion, App Check support) is code
-complete and verified locally, but blocked on owner-only Firebase, signing and policy items
-(`doc/roadmap/phase_3.md`). Hosting is Netlify (API function + website, free plan). Live voice sessions are not
+**Status:** Phases 1–9 implemented and verified locally: accounts (email/Google, verification,
+deletion), profile and settings, live voice practice with Gemini and server-side daily quotas,
+post-session feedback with Mistake Vault, vocabulary and progress, and Premium entitlements
+(paywall ready; purchases and ads await accounts). Release is blocked on owner items listed in
+`doc/RELEASE_CHECKLIST.md`. Hosting is Netlify (API function + website, free plan). Live voice sessions are not
 implemented yet; the legacy Emma prototype runs only in development builds.
 
 ## Run everything locally (no real Firebase project needed)
@@ -59,4 +60,5 @@ cd backend && npm run test:integration   # emulator-backed API + Firestore rules
 - `doc/FIREBASE_SETUP.md`: Firebase status and configuration
 - `doc/DEPLOYMENT_NETLIFY.md`: hosting on Netlify (API function + website), credentials and owner steps
 - `doc/reviews/LEGAL_PAGES_REVIEW.md`: review items for the website's draft policy pages
+- `doc/RELEASE_CHECKLIST.md`: what is verified and what blocks release
 - `doc/`: approved product, flow, brand and design specifications

@@ -585,18 +585,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileDisplayName => 'Display name';
 
   @override
-  String get profileDisplayNameHint => 'Shown on your home screen. Leave empty to remove it.';
+  String get profileDisplayNameHint =>
+      'Shown on your home screen. Leave empty to remove it.';
 
   @override
   String get profileTimeZone => 'Time zone';
 
   @override
   String profileUseDeviceTimeZone(String zone) {
-    return 'Use this device\'s time zone (${zone})';
+    return 'Use this device\'s time zone ($zone)';
   }
 
   @override
-  String get profileTimeZoneNote => 'Your daily practice time resets at midnight in this time zone. You can change it once a day.';
+  String get profileTimeZoneNote =>
+      'Your daily practice time resets at midnight in this time zone. You can change it once a day.';
 
   @override
   String get profilePracticeSection => 'Practice';
@@ -611,7 +613,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileReminders => 'Practice reminders';
 
   @override
-  String get profileRemindersNote => 'Reminders will start once notifications are available in the app.';
+  String get profileRemindersNote =>
+      'Reminders will start once notifications are available in the app.';
 
   @override
   String get profilePrivacySection => 'Privacy and data';
@@ -626,13 +629,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileInterfaceLanguage => 'App language';
 
   @override
-  String get profilePolicies => 'Privacy Policy and Terms are available on the Sprelia website.';
+  String get profilePolicies =>
+      'Privacy Policy and Terms are available on the Sprelia website.';
 
   @override
-  String get prepareNoTimeLeft => 'You\'ve used today\'s free speaking time. It resets at midnight in your time zone.';
+  String get prepareNoTimeLeft =>
+      'You\'ve used today\'s free speaking time. It resets at midnight in your time zone.';
 
   @override
-  String get conversationTryAgainTomorrow => 'Come back tomorrow for more free practice.';
+  String get conversationTryAgainTomorrow =>
+      'Come back tomorrow for more free practice.';
 
   @override
   String get learnTitle => 'Learn';
@@ -641,13 +647,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get learnMistakeVault => 'Mistake Vault';
 
   @override
-  String get learnMistakesEmpty => 'Great! No saved corrections yet. Your feedback will appear here after practice.';
+  String get learnMistakesEmpty =>
+      'Great! No saved corrections yet. Your feedback will appear here after practice.';
 
   @override
   String get learnVocabulary => 'Vocabulary';
 
   @override
-  String get learnVocabularyEmpty => 'You haven\'t saved any vocabulary yet. Start a conversation to discover useful new words.';
+  String get learnVocabularyEmpty =>
+      'You haven\'t saved any vocabulary yet. Start a conversation to discover useful new words.';
 
   @override
   String get learnMastered => 'Mastered';
@@ -662,16 +670,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get progressEmptyTitle => 'No progress yet';
 
   @override
-  String get progressEmptyMessage => 'Your progress will appear here after your first conversations.';
+  String get progressEmptyMessage =>
+      'Your progress will appear here after your first conversations.';
 
   @override
   String progressMinutes30(int minutes) {
-    return '${minutes} min spoken in the last 30 days';
+    return '$minutes min spoken in the last 30 days';
   }
 
   @override
   String progressSessions30(int count) {
-    return '${count} sessions in the last 30 days';
+    return '$count sessions in the last 30 days';
   }
 
   @override
@@ -679,17 +688,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String progressDayMinutes(String day, int minutes) {
-    return '${day}: ${minutes} min';
+    return '$day: $minutes min';
   }
 
   @override
   String progressMistakes(int open, int mastered) {
-    return 'Corrections to review: ${open} · mastered: ${mastered}';
+    return 'Corrections to review: $open · mastered: $mastered';
   }
 
   @override
   String progressVocabulary(int total, int learned) {
-    return 'Words saved: ${total} · learned: ${learned}';
+    return 'Words saved: $total · learned: $learned';
   }
 
   @override
@@ -697,7 +706,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String progressSessionMinutes(int minutes) {
-    return '${minutes} min';
+    return '$minutes min';
   }
 
   @override
@@ -731,7 +740,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumAnnual => 'Annual: \$39.99';
 
   @override
-  String get premiumPricesNotFinal => 'Test prices, not final. Your app store shows the actual price before you pay.';
+  String get premiumPricesNotFinal =>
+      'Test prices, not final. Your app store shows the actual price before you pay.';
 
   @override
   String get premiumUnavailable => 'Premium purchases are not available yet.';
@@ -743,7 +753,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get premiumRestore => 'Restore purchases';
 
   @override
-  String get premiumManageNote => 'Subscriptions renew automatically and are managed and canceled in your app store account.';
+  String get premiumManageNote =>
+      'Subscriptions renew automatically and are managed and canceled in your app store account.';
 
   @override
   String get premiumSee => 'See Premium';

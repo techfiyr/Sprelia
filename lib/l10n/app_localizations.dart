@@ -1315,13 +1315,13 @@ abstract class AppLocalizations {
   /// No description provided for @premiumMonthly.
   ///
   /// In en, this message translates to:
-  /// **'Monthly: $5.99'**
+  /// **'Monthly: \$5.99'**
   String get premiumMonthly;
 
   /// No description provided for @premiumAnnual.
   ///
   /// In en, this message translates to:
-  /// **'Annual: $39.99'**
+  /// **'Annual: \$39.99'**
   String get premiumAnnual;
 
   /// No description provided for @premiumPricesNotFinal.
