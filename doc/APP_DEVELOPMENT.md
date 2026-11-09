@@ -1,8 +1,8 @@
-# SpeakDaily — App Development & Architecture Specification
+# Sprelia (formerly SpeakDaily) — App Development & Architecture Specification
 
 **Document version:** 1.0  
 **Date:** November 2026  
-**Product:** SpeakDaily — AI English Speaking & Communication Coach  
+**Product:** Sprelia (formerly SpeakDaily) — AI English Speaking & Communication Coach  
 **Platforms:** Android first, iOS-ready  
 **Development approach:** Flutter + Firebase + Node.js + Gemini API  
 **Completeness:** complete (§1–§19, verified 2026-11-09; no truncated sections)  
@@ -16,7 +16,7 @@ same product. The app ID is `com.techfiyr.sprelia`.
 
 # 1. Project Overview
 
-SpeakDaily is a global AI-powered English speaking and communication coach.
+Sprelia is a global AI-powered English speaking and communication coach.
 
 **Product promise:** Practice English every day. Speak with confidence everywhere.
 

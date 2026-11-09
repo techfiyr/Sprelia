@@ -1,7 +1,7 @@
-# SpeakDaily — App Flow & User Experience Specification
+# Sprelia (formerly SpeakDaily) — App Flow & User Experience Specification
 
 **Document version:** 1.0  
-**Product:** SpeakDaily  
+**Product:** Sprelia (provisional brand; formerly SpeakDaily)  
 **Platform:** Android first, iOS-ready  
 **Design:** Light theme  
 **Primary interaction:** Real-time AI voice conversation
@@ -67,7 +67,7 @@ The live conversation screen must be presented as a focused full-screen experien
 # 2. Splash Screen
 
 Purpose:
-- Display SpeakDaily branding.
+- Display Sprelia branding.
 - Initialize Firebase.
 - Initialize application configuration.
 - Check authentication state.
@@ -85,7 +85,7 @@ Do not block the user indefinitely if an optional service is unavailable.
 # 3. Welcome Screen
 
 Content:
-- SpeakDaily logo.
+- Sprelia logo (text wordmark until the final logo is approved).
 - Headline: Practice English. Speak with confidence.
 - Supporting text: Build confidence through daily conversations with your personal AI English coach.
 - Continue with Google.
@@ -352,7 +352,7 @@ Do not establish an AI session before the user explicitly starts.
 
 # 10. Real-Time Voice Conversation Screen
 
-This is the core SpeakDaily experience.
+This is the core Sprelia experience.
 
 Screen components:
 

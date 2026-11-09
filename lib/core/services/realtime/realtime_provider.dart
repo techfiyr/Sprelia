@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-/// Connection details issued by the SpeakDaily backend for one conversation.
+/// Connection details issued by the Sprelia backend for one conversation.
 /// Contains only short-lived credentials, never a permanent provider key.
 class RealtimeSessionGrant {
   const RealtimeSessionGrant({

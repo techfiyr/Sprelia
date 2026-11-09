@@ -1,4 +1,4 @@
-# SpeakDaily — Brand Identity & UI/UX Design System
+# Sprelia (formerly SpeakDaily) — UI/UX Design System
 
 > **Precedence note (2026-11-09):** the product name ("SpeakDaily"), tagline, teal/navy
 > palette, logo and icon colours in this document are **superseded by `doc/BRAND.md`**
@@ -6,7 +6,7 @@
 > and accessibility guidance remain in force (see `CLAUDE.md`, document precedence).
 
 **Version:** 1.0 — Proposed  
-**Product:** SpeakDaily  
+**Product:** Sprelia (formerly SpeakDaily)  
 **Tagline:** Practice English. Speak with confidence everywhere.  
 **Design platform:** Flutter, Android first, iOS-ready  
 **Theme:** Light
@@ -24,7 +24,7 @@ Help people communicate confidently in English through daily speaking practice.
 - Premium, but accessible.
 
 ### Brand positioning
-SpeakDaily is a personal AI English-speaking coach, not a generic chatbot or grammar-learning application.
+Sprelia is a personal AI English-speaking coach, not a generic chatbot or grammar-learning application.
 
 ## 2. Logo concept
 
@@ -38,7 +38,7 @@ Create a distinctive symbol combining:
 The symbol should communicate speaking, listening, conversation and confidence.
 
 ### Logo variations
-1. Primary horizontal logo: symbol + SpeakDaily wordmark.
+1. Primary horizontal logo: symbol + Sprelia wordmark (see BRAND.md).
 2. App icon: symbol only.
 3. Compact logo: symbol with shortened wordmark.
 4. Monochrome logo: white or dark version.
@@ -390,5 +390,5 @@ Before approving a screen:
 - Does it avoid unnecessary visual clutter?
 - Does it match the product's speaking-first purpose?
 
-**This design system is the source of truth for all SpeakDaily Flutter screens.**
+**This design system is the source of truth for all Sprelia Flutter screens** (colors and name per BRAND.md).
 

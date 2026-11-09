@@ -204,5 +204,5 @@ setInterval(() => {
 }, 60_000).unref();
 
 app.listen(config.port, () => {
-  console.log(`SpeakDaily backend on :${config.port}${config.devSkipAuth ? ' (DEV_SKIP_AUTH on)' : ''}`);
+  console.log(`Sprelia prototype backend on :${config.port}${config.devSkipAuth ? ' (DEV_SKIP_AUTH on)' : ''}`);
 });
