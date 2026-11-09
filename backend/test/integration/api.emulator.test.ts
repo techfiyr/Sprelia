@@ -124,7 +124,7 @@ describe('API on the Firebase Emulator Suite', () => {
     if (firebase) await deleteApp(firebase);
   });
 
-  const call = (method: 'GET' | 'POST' | 'PUT' | 'DELETE', url: string, token?: string, payload?: object, on = app) =>
+  const call = (method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE', url: string, token?: string, payload?: object, on = app) =>
     on.inject({ method, url, payload, headers: token ? { authorization: `Bearer ${token}` } : {} });
 
   it('verifies real ID tokens and rejects missing or tampered ones', async () => {
@@ -259,6 +259,40 @@ describe('API on the Firebase Emulator Suite', () => {
 
       expect((await db.collection('users').doc(alice.localId).get()).exists).toBe(true);
       expect((await getAuth(firebase).getUser(alice.localId)).uid).toBe(alice.localId);
+    });
+  });
+
+  describe('Phase 5 profile and settings (Firestore)', () => {
+    it('patches the profile atomically and stores server-validated fields', async () => {
+      const kim = await verifiedSignUp('kim@example.com');
+      await call('POST', '/api/v1/me/profile', kim.idToken, { displayName: 'Kim', timezone: 'UTC' });
+      const res = await call('PATCH', '/api/v1/me/profile', kim.idToken, { displayName: 'Kim L', preferredTutorId: 'alex', practiceReminders: true });
+      expect(res.statusCode).toBe(200);
+      const doc = await db.collection('users').doc(kim.localId).get();
+      expect(doc.data()).toMatchObject({ displayName: 'Kim L', preferredTutorId: 'alex', practiceReminders: true, email: 'kim@example.com' });
+    });
+
+    it('limits time zone changes to one per day', async () => {
+      const lee = await verifiedSignUp('lee@example.com');
+      await call('POST', '/api/v1/me/profile', lee.idToken, { timezone: 'UTC' });
+      expect((await call('PATCH', '/api/v1/me/profile', lee.idToken, { timezone: 'Asia/Dhaka' })).statusCode).toBe(200);
+      const again = await call('PATCH', '/api/v1/me/profile', lee.idToken, { timezone: 'Europe/London' });
+      expect(again.statusCode).toBe(429);
+      expect((await db.collection('users').doc(lee.localId).get()).get('timezone')).toBe('Asia/Dhaka');
+    });
+
+    it('edits preferences after onboarding and exports only the caller’s data', async () => {
+      await call('PATCH', '/api/v1/me/preferences', alice.idToken, { preferences: { accent: 'american' } });
+      const prefs = await db.doc(`users/${alice.localId}/preferences/learning`).get();
+      expect(prefs.get('accent')).toBe('american');
+      await db.doc(`users/${alice.localId}/usage/2026-11-09`).set({ consumedSeconds: 42 });
+
+      const exp = await call('GET', '/api/v1/me/export', alice.idToken);
+      expect(exp.statusCode).toBe(200);
+      const body = exp.json();
+      expect(body.profile).toMatchObject({ uid: alice.localId, onboarding: { status: 'completed' } });
+      expect(body.usage).toContainEqual({ date: '2026-11-09', consumedSeconds: 42 });
+      expect(JSON.stringify(body)).not.toContain(bob.localId);
     });
   });
 });

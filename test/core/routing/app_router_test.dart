@@ -97,6 +97,7 @@ void main() {
     await pumpSpreliaApp(tester, backend: backend, prefs: await freshPrefs());
     await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text('Profile')));
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.byKey(const ValueKey('profile-sign-out')), 200);
     await tester.tap(find.byKey(const ValueKey('profile-sign-out')));
     await tester.pumpAndSettle();
     expect(find.text(AppBrand.tagline), findsOneWidget);

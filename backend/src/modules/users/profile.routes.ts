@@ -7,8 +7,20 @@ import type { CatalogService } from '../catalog/catalog.service.js';
 import { buildDashboard } from './dashboard.js';
 import { localDate } from './local-date.js';
 import { recommend } from './recommendation.js';
-import { OnboardingIncompleteError, ProfileNotFoundError, type UserProfile, type UserRepository } from './user.repository.js';
-import { CreateProfileBody, SaveOnboardingBody, type LearningPreferences } from './user.schemas.js';
+import {
+  OnboardingIncompleteError,
+  ProfileNotFoundError,
+  TimezoneChangeTooSoonError,
+  type UserProfile,
+  type UserRepository,
+} from './user.repository.js';
+import {
+  CreateProfileBody,
+  SaveOnboardingBody,
+  UpdatePreferencesBody,
+  UpdateProfileBody,
+  type LearningPreferences,
+} from './user.schemas.js';
 
 export interface ProfileRoutesOptions {
   verifier: TokenVerifier;
@@ -29,6 +41,8 @@ function serializeProfile(p: UserProfile, preferences: Partial<LearningPreferenc
     email: p.email,
     displayName: p.displayName,
     timezone: p.timezone,
+    preferredTutorId: p.preferredTutorId,
+    practiceReminders: p.practiceReminders,
     onboarding: {
       status: p.onboardingStatus,
       completedAt: p.onboardingCompletedAt?.toISOString() ?? null,
@@ -89,6 +103,7 @@ export const profileRoutes: FastifyPluginAsync<ProfileRoutesOptions> = async (ap
                   categories: opts.catalog.publishedCategories(),
                   tutors: opts.catalog.tutors,
                   seed: `${uid}:${localDate(profile.timezone, opts.now())}`,
+                  chosenTutorId: profile.preferredTutorId,
                 })
               : null,
         };
@@ -103,6 +118,67 @@ export const profileRoutes: FastifyPluginAsync<ProfileRoutesOptions> = async (ap
       }
     },
   );
+
+  /** Time zone changes move the daily quota boundary, so they are limited to one per day. */
+  const TIMEZONE_CHANGE_INTERVAL_MS = 24 * 60 * 60 * 1000;
+
+  app.patch<{ Body: UpdateProfileBody }>(
+    '/me/profile',
+    { preHandler: validate({ body: UpdateProfileBody }) },
+    async (request) => {
+      const { uid } = requireUser(request);
+      const { preferredTutorId } = request.body;
+      if (preferredTutorId && !opts.catalog.tutors.some((t) => t.id === preferredTutorId)) {
+        throw validationError([{ path: 'body.preferredTutorId', message: 'unknown tutor' }]);
+      }
+      try {
+        const profile = await users.updateProfile(uid, request.body, {
+          now: opts.now(),
+          minTimezoneIntervalMs: TIMEZONE_CHANGE_INTERVAL_MS,
+        });
+        return { profile: serializeProfile(profile, await users.getPreferences(uid)) };
+      } catch (err) {
+        if (err instanceof ProfileNotFoundError) throw profileNotFound();
+        if (err instanceof TimezoneChangeTooSoonError) {
+          throw new AppError(429, ErrorCode.TIMEZONE_CHANGE_TOO_SOON, 'You can change your time zone once a day. Please try again later.', [
+            { path: 'body.timezone', message: `retry after ${err.retryAfter.toISOString()}` },
+          ]);
+        }
+        throw err;
+      }
+    },
+  );
+
+  app.patch<{ Body: UpdatePreferencesBody }>(
+    '/me/preferences',
+    { preHandler: validate({ body: UpdatePreferencesBody }) },
+    async (request) => {
+      const { uid } = requireUser(request);
+      try {
+        // Same validated merge as onboarding; a completed onboarding stays completed.
+        const { profile, preferences } = await users.saveOnboarding(uid, request.body.preferences, false);
+        return { profile: serializeProfile(profile, preferences) };
+      } catch (err) {
+        if (err instanceof ProfileNotFoundError) throw profileNotFound();
+        throw err;
+      }
+    },
+  );
+
+  /** The caller's own data as JSON (APP_FLOW §17 "data export, where supported"). */
+  app.get('/me/export', async (request, reply) => {
+    const { uid } = requireUser(request);
+    const data = await users.exportUserData(uid);
+    if (!data) throw profileNotFound();
+    reply.header('content-disposition', 'attachment; filename="sprelia-data-export.json"');
+    return {
+      exportedAt: opts.now().toISOString(),
+      format: 'sprelia-export-v1',
+      profile: serializeProfile(data.profile, data.preferences),
+      usage: data.usage,
+      dailyProgress: data.dailyProgress,
+    };
+  });
 
   app.get('/me/dashboard', async (request) => {
     const { uid } = requireUser(request);

@@ -16,6 +16,8 @@ export interface RecommendOptions {
   seed?: string;
   /** Premium scenarios are only eligible with a server-verified premium entitlement. */
   includePremium?: boolean;
+  /** The learner's explicit tutor choice; used when that tutor covers their level. */
+  chosenTutorId?: string | null;
 }
 
 const GOAL_CATEGORIES: Record<LearningGoal, string[]> = {
@@ -76,7 +78,8 @@ export function recommend(prefs: Partial<LearningPreferences> | null, options: R
   const goals = prefs?.goals?.length ? prefs.goals : (['everyday'] as LearningGoal[]);
   const level = contentLevel(prefs);
   const categoryIds = [...new Set(goals.flatMap((g) => GOAL_CATEGORIES[g]))];
-  const tutor = preferredTutor(goals, level, options.tutors);
+  const chosen = options.tutors.find((t) => t.id === options.chosenTutorId && tutorCoversLevel(t, level));
+  const tutor = chosen ?? preferredTutor(goals, level, options.tutors);
 
   const candidates = options.categories
     .filter((c) => categoryIds.includes(c.id))

@@ -12,6 +12,8 @@ class UserProfile {
     this.email,
     this.displayName,
     this.preferences = const LearningPreferences(),
+    this.preferredTutorId,
+    this.practiceReminders = false,
   });
 
   final String uid;
@@ -20,6 +22,12 @@ class UserProfile {
   final String timezone;
   final OnboardingStatus onboardingStatus;
   final LearningPreferences preferences;
+
+  /// The learner's explicit tutor choice; null means "choose for me".
+  final String? preferredTutorId;
+
+  /// Opt-in for practice reminders (delivery arrives with push notifications).
+  final bool practiceReminders;
 
   bool get onboardingCompleted => onboardingStatus == OnboardingStatus.completed;
 
@@ -36,6 +44,8 @@ class UserProfile {
         _ => OnboardingStatus.notStarted,
       },
       preferences: LearningPreferences.fromJson((onboarding['preferences'] as Map?)?.cast<String, Object?>() ?? const {}),
+      preferredTutorId: j['preferredTutorId'] as String?,
+      practiceReminders: j['practiceReminders'] == true,
     );
   }
 }

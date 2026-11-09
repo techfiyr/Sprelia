@@ -13,6 +13,7 @@ import '../../features/practice/category_screen.dart';
 import '../../features/practice/conversation_screen.dart';
 import '../../features/practice/practice_screen.dart';
 import '../../features/practice/prepare_screen.dart';
+import '../../features/profile/preference_editor_screen.dart';
 import '../../features/profile/profile_screen.dart';
 import '../../features/progress/progress_screen.dart';
 import '../../features/splash/splash_screen.dart';
@@ -93,7 +94,15 @@ final routerProvider = Provider<GoRouter>((ref) {
           ]),
           tab(AppRoutes.learn, const LearnScreen()),
           tab(AppRoutes.progress, const ProgressScreen()),
-          tab(AppRoutes.profile, const ProfileScreen()),
+          tab(AppRoutes.profile, const ProfileScreen(), routes: [
+            GoRoute(
+              path: 'edit/:field',
+              builder: (_, s) {
+                final field = PreferenceField.fromSlug(s.pathParameters['field']);
+                return field == null ? const RouteNotFoundScreen() : PreferenceEditorScreen(field: field);
+              },
+            ),
+          ]),
         ],
       ),
       GoRoute(

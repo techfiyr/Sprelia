@@ -169,6 +169,70 @@ class FakeProfileRepository implements ProfileRepository {
     if (dashboardError != null) throw dashboardError!;
     return dashboard;
   }
+
+  final profileUpdates = <Map<String, Object?>>[];
+  final preferenceUpdates = <Map<String, Object?>>[];
+  Object? updateError;
+  int exports = 0;
+
+  UserProfile _copy({
+    String? displayName,
+    bool clearDisplayName = false,
+    String? timezone,
+    String? preferredTutorId,
+    bool clearPreferredTutor = false,
+    bool? practiceReminders,
+    LearningPreferences? preferences,
+  }) {
+    final p = profile!;
+    return UserProfile(
+      uid: p.uid,
+      email: p.email,
+      displayName: clearDisplayName ? null : displayName ?? p.displayName,
+      timezone: timezone ?? p.timezone,
+      onboardingStatus: p.onboardingStatus,
+      preferences: preferences ?? p.preferences,
+      preferredTutorId: clearPreferredTutor ? null : preferredTutorId ?? p.preferredTutorId,
+      practiceReminders: practiceReminders ?? p.practiceReminders,
+    );
+  }
+
+  @override
+  Future<UserProfile> updateProfile(ProfileUpdate update) async {
+    profileUpdates.add(update.toJson());
+    if (updateError != null) throw updateError!;
+    return profile = _copy(
+      displayName: update.displayName,
+      clearDisplayName: update.clearDisplayName,
+      timezone: update.timezone,
+      preferredTutorId: update.preferredTutorId,
+      clearPreferredTutor: update.clearPreferredTutor,
+      practiceReminders: update.practiceReminders,
+    );
+  }
+
+  @override
+  Future<UserProfile> updatePreferences(LearningPreferences preferences) async {
+    preferenceUpdates.add(preferences.toJson());
+    if (updateError != null) throw updateError!;
+    final current = profile!.preferences;
+    return profile = _copy(
+      preferences: LearningPreferences(
+        interfaceLanguage: preferences.interfaceLanguage ?? current.interfaceLanguage,
+        nativeLanguage: preferences.nativeLanguage ?? current.nativeLanguage,
+        goals: preferences.goals.isNotEmpty ? preferences.goals : current.goals,
+        level: preferences.level ?? current.level,
+        dailyGoalMinutes: preferences.dailyGoalMinutes ?? current.dailyGoalMinutes,
+        accent: preferences.accent ?? current.accent,
+      ),
+    );
+  }
+
+  @override
+  Future<String> exportData() async {
+    exports++;
+    return '{"format":"sprelia-export-v1","profile":{"uid":"${profile!.uid}"}}';
+  }
 }
 
 class FakeCatalogRepository implements CatalogRepository {

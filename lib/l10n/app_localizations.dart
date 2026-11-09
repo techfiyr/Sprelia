@@ -1029,6 +1029,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Deleting your account…'**
   String get deleteAccountInProgress;
+
+  /// No description provided for @commonSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get commonSave;
+
+  /// No description provided for @commonEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get commonEdit;
+
+  /// No description provided for @commonNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get commonNotSet;
+
+  /// No description provided for @profileSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved.'**
+  String get profileSaved;
+
+  /// No description provided for @profileDisplayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Display name'**
+  String get profileDisplayName;
+
+  /// No description provided for @profileDisplayNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown on your home screen. Leave empty to remove it.'**
+  String get profileDisplayNameHint;
+
+  /// No description provided for @profileTimeZone.
+  ///
+  /// In en, this message translates to:
+  /// **'Time zone'**
+  String get profileTimeZone;
+
+  /// No description provided for @profileUseDeviceTimeZone.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this device\'s time zone ({zone})'**
+  String profileUseDeviceTimeZone(String zone);
+
+  /// No description provided for @profileTimeZoneNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Your daily practice time resets at midnight in this time zone. You can change it once a day.'**
+  String get profileTimeZoneNote;
+
+  /// No description provided for @profilePracticeSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice'**
+  String get profilePracticeSection;
+
+  /// No description provided for @profilePreferredTutor.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferred tutor'**
+  String get profilePreferredTutor;
+
+  /// No description provided for @profileTutorAutomatic.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose for me'**
+  String get profileTutorAutomatic;
+
+  /// No description provided for @profileReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Practice reminders'**
+  String get profileReminders;
+
+  /// No description provided for @profileRemindersNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders will start once notifications are available in the app.'**
+  String get profileRemindersNote;
+
+  /// No description provided for @profilePrivacySection.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy and data'**
+  String get profilePrivacySection;
+
+  /// No description provided for @profileExportData.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy my data (JSON)'**
+  String get profileExportData;
+
+  /// No description provided for @profileExportDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data was copied to the clipboard.'**
+  String get profileExportDone;
+
+  /// No description provided for @profileInterfaceLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'App language'**
+  String get profileInterfaceLanguage;
+
+  /// No description provided for @profilePolicies.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy and Terms are available on the Sprelia website.'**
+  String get profilePolicies;
 }
 
 class _AppLocalizationsDelegate

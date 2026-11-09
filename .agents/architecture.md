@@ -129,6 +129,9 @@ Presentation → Notifier/Controller → Repository → Service/API.
 | GET | `/api/v1/me` | Bearer ID token | `200 {uid, email, emailVerified, signInProvider}` (read-only) |
 | GET | `/api/v1/me/profile` | Bearer | `200 {profile}` or `404 PROFILE_NOT_FOUND` |
 | POST | `/api/v1/me/profile` | Bearer | Body `{timezone, displayName?}` (strict). `201 {profile, created:true}`. If the profile exists: `200`, unchanged. uid and email come from the token. |
+| PATCH | `/api/v1/me/profile` | Bearer (verified email) | Body `{displayName?: string|null, timezone?, preferredTutorId?: string|null, practiceReminders?}` (strict, ≥1 field). Time zone changes: once per 24 h (429 `TIMEZONE_CHANGE_TOO_SOON`). Unknown tutor → 400. |
+| PATCH | `/api/v1/me/preferences` | Bearer (verified email) | Body `{preferences}` (partial, strict, ≥1 field). Same validated merge as onboarding; completion is kept. |
+| GET | `/api/v1/me/export` | Bearer (verified email) | The caller's own data as JSON (`sprelia-export-v1`: profile, preferences, usage, daily progress); `content-disposition: attachment`. |
 | PUT | `/api/v1/me/onboarding` | Bearer | Body `{preferences (partial, strict), complete?}`. Merges, then returns `{profile, plan}` (`plan` once completed). Completing with missing fields returns 400 listing them. |
 | GET | `/api/v1/me/dashboard` | Bearer | `200 {dashboard}` from server data only (today, free allowance remaining, streak, weekly totals, recommendation) |
 | GET | `/api/v1/tutors` | Bearer | Public tutor catalogue (no prompts or voices) |

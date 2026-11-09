@@ -568,4 +568,63 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteAccountInProgress => 'Deleting your account…';
+
+  @override
+  String get commonSave => 'Save';
+
+  @override
+  String get commonEdit => 'Edit';
+
+  @override
+  String get commonNotSet => 'Not set';
+
+  @override
+  String get profileSaved => 'Saved.';
+
+  @override
+  String get profileDisplayName => 'Display name';
+
+  @override
+  String get profileDisplayNameHint => 'Shown on your home screen. Leave empty to remove it.';
+
+  @override
+  String get profileTimeZone => 'Time zone';
+
+  @override
+  String profileUseDeviceTimeZone(String zone) {
+    return 'Use this device\'s time zone (${zone})';
+  }
+
+  @override
+  String get profileTimeZoneNote => 'Your daily practice time resets at midnight in this time zone. You can change it once a day.';
+
+  @override
+  String get profilePracticeSection => 'Practice';
+
+  @override
+  String get profilePreferredTutor => 'Preferred tutor';
+
+  @override
+  String get profileTutorAutomatic => 'Choose for me';
+
+  @override
+  String get profileReminders => 'Practice reminders';
+
+  @override
+  String get profileRemindersNote => 'Reminders will start once notifications are available in the app.';
+
+  @override
+  String get profilePrivacySection => 'Privacy and data';
+
+  @override
+  String get profileExportData => 'Copy my data (JSON)';
+
+  @override
+  String get profileExportDone => 'Your data was copied to the clipboard.';
+
+  @override
+  String get profileInterfaceLanguage => 'App language';
+
+  @override
+  String get profilePolicies => 'Privacy Policy and Terms are available on the Sprelia website.';
 }

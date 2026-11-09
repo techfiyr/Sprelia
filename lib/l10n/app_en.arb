@@ -301,5 +301,31 @@
   "reauthPasswordBody": "For your security, enter your password to continue.",
   "reauthGoogleBody": "For your security, sign in with Google again to continue.",
   "reauthContinue": "Continue",
-  "deleteAccountInProgress": "Deleting your account…"
+  "deleteAccountInProgress": "Deleting your account…",
+  "commonSave": "Save",
+  "commonEdit": "Edit",
+  "commonNotSet": "Not set",
+  "profileSaved": "Saved.",
+  "profileDisplayName": "Display name",
+  "profileDisplayNameHint": "Shown on your home screen. Leave empty to remove it.",
+  "profileTimeZone": "Time zone",
+  "profileUseDeviceTimeZone": "Use this device's time zone ({zone})",
+  "@profileUseDeviceTimeZone": {
+    "placeholders": {
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "profileTimeZoneNote": "Your daily practice time resets at midnight in this time zone. You can change it once a day.",
+  "profilePracticeSection": "Practice",
+  "profilePreferredTutor": "Preferred tutor",
+  "profileTutorAutomatic": "Choose for me",
+  "profileReminders": "Practice reminders",
+  "profileRemindersNote": "Reminders will start once notifications are available in the app.",
+  "profilePrivacySection": "Privacy and data",
+  "profileExportData": "Copy my data (JSON)",
+  "profileExportDone": "Your data was copied to the clipboard.",
+  "profileInterfaceLanguage": "App language",
+  "profilePolicies": "Privacy Policy and Terms are available on the Sprelia website."
 }

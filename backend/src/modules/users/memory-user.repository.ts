@@ -2,6 +2,9 @@ import { missingForCompletion, type LearningPreferences } from './user.schemas.j
 import {
   OnboardingIncompleteError,
   ProfileNotFoundError,
+  TimezoneChangeTooSoonError,
+  type ProfilePatch,
+  type UserDataExport,
   type DailyActivity,
   type UserProfile,
   type UserRepository,
@@ -31,6 +34,9 @@ export class InMemoryUserRepository implements UserRepository {
       ...input,
       onboardingStatus: 'not_started',
       onboardingCompletedAt: null,
+      preferredTutorId: null,
+      practiceReminders: false,
+      timezoneUpdatedAt: null,
       createdAt: now,
       updatedAt: now,
     };
@@ -81,5 +87,36 @@ export class InMemoryUserRepository implements UserRepository {
     for (const map of [this.usage, this.activity] as Map<string, unknown>[]) {
       for (const key of [...map.keys()]) if (key.startsWith(`${uid}/`)) map.delete(key);
     }
+  }
+
+  async updateProfile(uid: string, patch: ProfilePatch, options: { now: Date; minTimezoneIntervalMs: number }) {
+    const current = this.profiles.get(uid);
+    if (!current) throw new ProfileNotFoundError();
+    const next: UserProfile = { ...current, updatedAt: options.now };
+    if (patch.displayName !== undefined) next.displayName = patch.displayName;
+    if (patch.preferredTutorId !== undefined) next.preferredTutorId = patch.preferredTutorId;
+    if (patch.practiceReminders !== undefined) next.practiceReminders = patch.practiceReminders;
+    if (patch.timezone !== undefined && patch.timezone !== current.timezone) {
+      const last = current.timezoneUpdatedAt;
+      if (last && options.now.getTime() - last.getTime() < options.minTimezoneIntervalMs) {
+        throw new TimezoneChangeTooSoonError(new Date(last.getTime() + options.minTimezoneIntervalMs));
+      }
+      next.timezone = patch.timezone;
+      next.timezoneUpdatedAt = options.now;
+    }
+    this.profiles.set(uid, next);
+    return { ...next };
+  }
+
+  async exportUserData(uid: string): Promise<UserDataExport | null> {
+    const profile = this.profiles.get(uid);
+    if (!profile) return null;
+    const own = <T>(map: Map<string, T>) => [...map.entries()].filter(([k]) => k.startsWith(`${uid}/`));
+    return {
+      profile: { ...profile },
+      preferences: this.preferences.get(uid) ?? null,
+      usage: own(this.usage).map(([k, v]) => ({ date: k.slice(uid.length + 1), consumedSeconds: v })),
+      dailyProgress: own(this.activity).map(([, v]) => ({ ...v })),
+    };
   }
 }

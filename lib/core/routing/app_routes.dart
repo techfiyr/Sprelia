@@ -12,6 +12,8 @@ abstract final class AppRoutes {
   static const learn = '/learn';
   static const progress = '/progress';
   static const profile = '/profile';
+  static const profileEditPattern = '/profile/edit/:field';
+  static String profileEdit(String field) => '/profile/edit/${Uri.encodeComponent(field)}';
 
   static const categoryPattern = '/practice/category/:categoryId';
   static String category(String id) => '/practice/category/${Uri.encodeComponent(id)}';

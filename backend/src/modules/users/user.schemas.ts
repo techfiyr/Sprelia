@@ -80,3 +80,25 @@ export function missingForCompletion(merged: Partial<LearningPreferences>): stri
   return full.success ? [] : [...new Set(full.error.issues.map((i) => String(i.path[0] ?? '')))];
 }
 export type SaveOnboardingBody = z.infer<typeof SaveOnboardingBody>;
+
+/** Catalogue IDs are kebab-case; the route also checks the tutor exists. */
+const TutorId = z.string().regex(/^[a-z][a-z0-9-]{1,30}$/, 'must be a tutor ID');
+
+/** PATCH /me/profile. Server-owned fields (uid, email, status, timestamps) are never accepted. */
+export const UpdateProfileBody = z
+  .object({
+    displayName: DisplayName.nullable().optional(),
+    timezone: TimeZone.optional(),
+    preferredTutorId: TutorId.nullable().optional(),
+    practiceReminders: z.boolean().optional(),
+  })
+  .strict()
+  .refine((b) => Object.keys(b).length > 0, 'at least one field is required');
+export type UpdateProfileBody = z.infer<typeof UpdateProfileBody>;
+
+/** PATCH /me/preferences: edit learning preferences after onboarding (each field validated). */
+export const UpdatePreferencesBody = z
+  .object({ preferences: LearningPreferences.partial().strict() })
+  .strict()
+  .refine((b) => Object.keys(b.preferences).length > 0, 'at least one preference is required');
+export type UpdatePreferencesBody = z.infer<typeof UpdatePreferencesBody>;

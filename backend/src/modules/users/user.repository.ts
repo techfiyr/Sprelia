@@ -10,8 +10,29 @@ export interface UserProfile {
   timezone: string;
   onboardingStatus: OnboardingStatus;
   onboardingCompletedAt: Date | null;
+  /** Learner's explicit tutor choice (Profile → Preferred tutor); null = automatic. */
+  preferredTutorId: string | null;
+  /** Opt-in for practice reminders (delivery needs FCM, not configured yet). */
+  practiceReminders: boolean;
+  /** Last time the time zone changed (changes are rate-limited: quota day boundary). */
+  timezoneUpdatedAt: Date | null;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface ProfilePatch {
+  displayName?: string | null;
+  timezone?: string;
+  preferredTutorId?: string | null;
+  practiceReminders?: boolean;
+}
+
+/** Everything stored for one user, for GET /me/export. */
+export interface UserDataExport {
+  profile: UserProfile;
+  preferences: Partial<LearningPreferences> | null;
+  usage: { date: string; consumedSeconds: number }[];
+  dailyProgress: DailyActivity[];
 }
 
 /** Server-maintained activity for one local day: users/{uid}/dailyProgress/{YYYY-MM-DD}. */
@@ -64,6 +85,23 @@ export interface UserRepository {
    * Idempotent: succeeds when nothing is stored.
    */
   deleteUserData(uid: string): Promise<void>;
+
+  /**
+   * Applies a profile patch atomically. A time zone change is refused with
+   * TimezoneChangeTooSoonError when the previous change was less than
+   * `minTimezoneIntervalMs` ago (prevents quota farming across day boundaries).
+   */
+  updateProfile(uid: string, patch: ProfilePatch, options: { now: Date; minTimezoneIntervalMs: number }): Promise<UserProfile>;
+
+  /** All of the user's own stored data (no other users). */
+  exportUserData(uid: string): Promise<UserDataExport | null>;
+}
+
+export class TimezoneChangeTooSoonError extends Error {
+  constructor(public readonly retryAfter: Date) {
+    super('timezone changed too recently');
+    this.name = 'TimezoneChangeTooSoonError';
+  }
 }
 
 export class OnboardingIncompleteError extends Error {

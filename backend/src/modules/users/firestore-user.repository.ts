@@ -4,7 +4,10 @@ import {
   OnboardingIncompleteError,
   ProfileNotFoundError,
   type DailyActivity,
+  TimezoneChangeTooSoonError,
   type OnboardingStatus,
+  type ProfilePatch,
+  type UserDataExport,
   type UserProfile,
   type UserRepository,
 } from './user.repository.js';
@@ -51,6 +54,9 @@ export class FirestoreUserRepository implements UserRepository {
         timezone: input.timezone,
         onboardingStatus: 'not_started' satisfies OnboardingStatus,
         onboardingCompletedAt: null,
+        preferredTutorId: null,
+        practiceReminders: false,
+        timezoneUpdatedAt: null,
         createdAt: now,
         updatedAt: now,
         schemaVersion: SCHEMA_VERSION,
@@ -107,6 +113,51 @@ export class FirestoreUserRepository implements UserRepository {
     await this.db.recursiveDelete(this.userRef(uid));
   }
 
+  async updateProfile(uid: string, patch: ProfilePatch, options: { now: Date; minTimezoneIntervalMs: number }): Promise<UserProfile> {
+    const ref = this.userRef(uid);
+    return this.db.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      if (!snap.exists) throw new ProfileNotFoundError();
+      const current = toProfile(uid, snap.data()!);
+      const now = Timestamp.fromDate(options.now);
+      const update: Record<string, unknown> = { updatedAt: now };
+      if (patch.displayName !== undefined) update.displayName = patch.displayName;
+      if (patch.preferredTutorId !== undefined) update.preferredTutorId = patch.preferredTutorId;
+      if (patch.practiceReminders !== undefined) update.practiceReminders = patch.practiceReminders;
+      if (patch.timezone !== undefined && patch.timezone !== current.timezone) {
+        const last = current.timezoneUpdatedAt;
+        if (last && options.now.getTime() - last.getTime() < options.minTimezoneIntervalMs) {
+          throw new TimezoneChangeTooSoonError(new Date(last.getTime() + options.minTimezoneIntervalMs));
+        }
+        update.timezone = patch.timezone;
+        update.timezoneUpdatedAt = now;
+      }
+      tx.update(ref, update);
+      return toProfile(uid, { ...snap.data()!, ...update });
+    });
+  }
+
+  async exportUserData(uid: string): Promise<UserDataExport | null> {
+    const ref = this.userRef(uid);
+    const [snap, prefs, usage, progress] = await Promise.all([
+      ref.get(),
+      this.getPreferences(uid),
+      ref.collection('usage').get(),
+      ref.collection('dailyProgress').get(),
+    ]);
+    if (!snap.exists) return null;
+    return {
+      profile: toProfile(uid, snap.data()!),
+      preferences: prefs,
+      usage: usage.docs.map((d) => ({ date: d.id, consumedSeconds: nonNegative(d.get('consumedSeconds')) })),
+      dailyProgress: progress.docs.map((d) => ({
+        date: d.id,
+        speakingSeconds: nonNegative(d.get('speakingSeconds')),
+        sessionsCompleted: nonNegative(d.get('sessionsCompleted')),
+      })),
+    };
+  }
+
   async getUsageSeconds(uid: string, date: string): Promise<number> {
     const snap = await this.userRef(uid).collection('usage').doc(date).get();
     const consumed = snap.exists ? snap.get('consumedSeconds') : 0;
@@ -151,6 +202,9 @@ function toProfile(uid: string, d: DocumentData): UserProfile {
     timezone: typeof d.timezone === 'string' ? d.timezone : 'UTC',
     onboardingStatus: status === 'in_progress' || status === 'completed' ? status : 'not_started',
     onboardingCompletedAt: toDate(d.onboardingCompletedAt),
+    preferredTutorId: typeof d.preferredTutorId === 'string' ? d.preferredTutorId : null,
+    practiceReminders: d.practiceReminders === true,
+    timezoneUpdatedAt: toDate(d.timezoneUpdatedAt),
     createdAt: toDate(d.createdAt) ?? new Date(0),
     updatedAt: toDate(d.updatedAt) ?? new Date(0),
   };

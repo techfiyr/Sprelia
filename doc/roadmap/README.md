@@ -53,7 +53,7 @@ to avoid breaking existing references.
 | 2 | Application experience: onboarding, home, tutors, practice; profile/onboarding/dashboard/catalogue APIs; asset library; final decisions | `[x]` Complete; merged to `main` (PR #2 and merge `bbe720a`) | `main` | `phase_2.md` |
 | 3 | Firebase integration and account management: single `sprelia` project, Google sign-in, email verification, account deletion, App Check, Firestore | `[/]` **Code complete and verified locally; blocked on owner items** (Firebase Console, signing, retention policy); not committed | `main` | `phase_3.md` |
 | 4 | ~~Firebase Auth hardening, App Check, Firestore owner rules~~ (merged into Phase 3) | n/a | none | none |
-| 5 | Profile editing (account deletion moved to Phase 3) | `[ ]` Not started | none | none |
+| 5 | Profile and settings: edit preferences, display name, time zone (1/day), preferred tutor, reminder opt-in, data export | `[x]` Implemented and verified locally; reminder delivery needs FCM (owner) | `main` | `phase_5.md` |
 | 6 | Gemini real-time speaking | `[ ]` Not started | none | none |
 | 7 | Sessions and daily quotas | `[ ]` Not started | none | none |
 | 8 | AI feedback, vocabulary, Mistake Vault | `[ ]` Not started | none | none |

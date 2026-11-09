@@ -77,6 +77,7 @@ export async function buildDashboard(
       categories: options.catalog.publishedCategories(),
       tutors: options.catalog.tutors,
       seed: `${profile.uid}:${today}`,
+      chosenTutorId: profile.preferredTutorId,
     }),
   };
 }
